@@ -24,14 +24,8 @@ function ChessPiece({
 
   return (
     <motion.div
-      initial={{ opacity: 0.15, y: -100, rotate: -15 }}
-      animate={{ opacity: 0.15, y: 0, rotate: 0 }}
-      transition={{
-        duration: 2,
-        delay,
-        ease: [0.23, 0.86, 0.39, 0.96] as [number, number, number, number],
-      }}
-      className={cn("absolute", className)}
+      initial={{ y: 0, rotate: 0 }}
+      className={cn("absolute opacity-15", className)}
     >
       <motion.div
         animate={{
