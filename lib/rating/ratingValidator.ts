@@ -193,7 +193,8 @@ export class RatingValidator {
   /**
    * Validate rating consistency across platforms
    */
-  private validateRatingConsistency(user: User): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private validateRatingConsistency(_user: User): boolean {
     // Unified rating system - no need to check consistency across platforms
     return true
   }
