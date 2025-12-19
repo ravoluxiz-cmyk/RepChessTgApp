@@ -8,11 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
-    "test:unit": "vitest run",
-    "bbp:smoke": "node scripts/bbp-smoke.js",
-    "bbp:integration": "node scripts/bbp-integration.js",
-    "migrate:ratings": "node scripts/migrate-ratings.js",
-    "verify:ratings": "node scripts/verify-ratings.js"
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -21,7 +17,6 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.22",
     "glicko2": "^1.2.1",
-    "googleapis": "^161.0.0",
     "lucide-react": "^0.545.0",
     "next": "15.5.4",
     "react": "19.1.0",

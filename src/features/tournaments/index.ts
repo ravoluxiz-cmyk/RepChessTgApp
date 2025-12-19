@@ -1,0 +1,1 @@
+export { default as TournamentCard } from '@/components/tournaments/tournament-card'

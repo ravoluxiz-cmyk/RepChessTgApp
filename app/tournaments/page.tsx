@@ -14,10 +14,10 @@ export default function TournamentsPage() {
   useEffect(() => {
     async function fetchTournaments() {
       try {
-        const response = await fetch("/api/tournaments/calendar")
-        if (!response.ok) throw new Error("Failed to fetch tournaments")
-        const data = await response.json()
-        setTournaments(data)
+        // TODO: Replace with backend API when available
+        // For now, show empty state with message about upcoming tournaments
+        setTournaments([])
+        setError("Турниры скоро будут доступны. Проверяйте обновления!")
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error")
       } finally {
