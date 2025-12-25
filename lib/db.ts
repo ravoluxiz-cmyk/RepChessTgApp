@@ -56,6 +56,7 @@ export interface TournamentParticipant {
   tournament_id: number
   user_id: number
   nickname: string
+  active?: boolean
   created_at?: string
 }
 
@@ -526,7 +527,9 @@ async function getTournamentScoring(tournamentId: number) {
   return tournament || { points_win: 1, points_loss: 0, points_draw: 0.5, bye_points: 0 }
 }
 
-export async function simpleSwissPairings(tournamentId: number, roundId: number): Promise<Match[]> {
+// ===== DEPRECATED: Старый алгоритм паросочетания =====
+// Используйте generateSwissPairings из lib/pairing.ts
+export async function simpleSwissPairings_DEPRECATED(tournamentId: number, roundId: number): Promise<Match[]> {
   // Determine current round number
   const { data: roundRow } = await supabaseAdmin
     .from('rounds')
@@ -1016,5 +1019,60 @@ export async function deleteRoundById(roundId: number): Promise<boolean> {
     return false
   }
 }
+
+// ===== WITHDRAW ИГРОКОВ =====
+
+/**
+ * Исключает участника из жеребьевки (withdraw)
+ */
+export async function withdrawPlayer(participantId: number): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('tournament_participants')
+    .update({ active: false })
+    .eq('id', participantId)
+
+  if (error) {
+    console.error('Error withdrawing player:', error)
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Возвращает участника в жеребьевку (restore)
+ */
+export async function restorePlayer(participantId: number): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('tournament_participants')
+    .update({ active: true })
+    .eq('id', participantId)
+
+  if (error) {
+    console.error('Error restoring player:', error)
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Проверяет активен ли участник
+ */
+export async function isPlayerActive(participantId: number): Promise<boolean> {
+  const { data, error } = await supabaseAdmin
+    .from('tournament_participants')
+    .select('active')
+    .eq('id', participantId)
+    .single()
+
+  if (error || !data) return true // По умолчанию считаем активным
+
+  return data.active !== false
+}
+
+// ===== НОВЫЙ SWISS АЛГОРИТМ =====
+// Экспортируем новую функцию паросочетания из lib/pairing.ts
+export { generateSwissPairings } from './pairing'
 
 export default supabase

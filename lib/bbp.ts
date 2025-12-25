@@ -2,7 +2,7 @@ import { spawn } from 'child_process'
 import { promises as fs, existsSync } from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import { getTournamentById, listTournamentParticipants, listRounds, listMatches, simpleSwissPairings, type Tournament, type TournamentParticipant, type Round, type Match, type User } from './db'
+import { getTournamentById, listTournamentParticipants, listRounds, listMatches, generateSwissPairings, type Tournament, type TournamentParticipant, type Round, type Match, type User } from './db'
 import { supabase } from './supabase'
 
 /**
@@ -368,7 +368,7 @@ export async function generatePairingsWithBBP(tournamentId: number, roundId: num
       if (existingAfter && existingAfter.length > 0) {
         return existingAfter as unknown as Match[]
       }
-      const swiss = await simpleSwissPairings(tournamentId, roundId)
+      const swiss = await generateSwissPairings(tournamentId, roundId)
       if (!swiss || swiss.length === 0) {
         lastBbpReason = 'Mock BBP produced no matches'
         return null
@@ -428,7 +428,7 @@ export async function generatePairingsWithBBP(tournamentId: number, roundId: num
       if (existingAfter && existingAfter.length > 0) {
         return existingAfter as unknown as Match[]
       }
-      const swiss = await simpleSwissPairings(tournamentId, roundId)
+      const swiss = await generateSwissPairings(tournamentId, roundId)
       return swiss || null
     }
     return null
