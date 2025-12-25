@@ -20,12 +20,21 @@ interface PlayerStanding {
   }
 }
 
+interface MatchData {
+  white_participant_id?: number | null
+  black_participant_id?: number | null
+  score_white?: number | null
+  score_black?: number | null
+  result?: string | null
+  round_number: number
+}
+
 // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
 
 /**
  * Получает все матчи турнира с результатами
  */
-async function getAllTournamentMatches(tournamentId: number) {
+async function getAllTournamentMatches(tournamentId: number): Promise<MatchData[]> {
   // Получаем все раунды
   const { data: rounds } = await supabaseAdmin
     .from('rounds')
@@ -36,7 +45,7 @@ async function getAllTournamentMatches(tournamentId: number) {
   if (!rounds) return []
 
   // Получаем все матчи для всех раундов
-  const allMatches: Array<Record<string, unknown> & { round_number: number }> = []
+  const allMatches: MatchData[] = []
   for (const round of rounds) {
     const { data: matches } = await supabaseAdmin
       .from('matches')
@@ -44,7 +53,7 @@ async function getAllTournamentMatches(tournamentId: number) {
       .eq('round_id', round.id)
 
     if (matches) {
-      allMatches.push(...matches.map((m: Record<string, unknown>) => ({ ...m, round_number: round.number })))
+      allMatches.push(...matches.map((m) => ({ ...m, round_number: round.number } as MatchData)))
     }
   }
 
