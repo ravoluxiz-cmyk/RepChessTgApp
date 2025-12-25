@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { Shield, PlusCircle, Trash2, Archive, ArrowLeft, List } from "lucide-react"
+import { Shield, PlusCircle, Archive, ArrowLeft, List } from "lucide-react"
 
 export default function AdminMainMenuPage() {
   const router = useRouter()
@@ -115,18 +115,6 @@ export default function AdminMainMenuPage() {
                   <span className="text-lg sm:text-xl font-bold">Турниры</span>
                 </div>
                 <div className="text-white/70">Откройте список и переключайтесь между «Все» и «Мои»</div>
-              </button>
-
-              {/* Delete Tournament */}
-              <button
-                onClick={() => router.push("/admin/tournaments/delete")}
-                className="w-full backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6 text-left hover:bg-white/10 transition-all"
-              >
-                <div className="flex items-center gap-3 text-white mb-2">
-                  <Trash2 className="w-6 h-6 text-red-400" />
-                  <span className="text-lg sm:text-xl font-bold">Удалить выбранный турнир</span>
-                </div>
-                <div className="text-white/70">Выберите турнир и удалите его</div>
               </button>
 
               {/* Archive */}
