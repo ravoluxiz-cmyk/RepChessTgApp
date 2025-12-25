@@ -53,7 +53,8 @@ async function getAllTournamentMatches(tournamentId: number): Promise<MatchData[
       .eq('round_id', round.id)
 
     if (matches) {
-      allMatches.push(...matches.map((m) => ({ ...m, round_number: round.number } as MatchData)))
+      const typedMatches = matches as MatchData[]
+      allMatches.push(...typedMatches.map((m) => ({ ...m, round_number: round.number })))
     }
   }
 
