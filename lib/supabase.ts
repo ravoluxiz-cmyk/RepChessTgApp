@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 // Supabase configuration
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 // Simple utility
 const nowIso = () => new Date().toISOString()
@@ -217,8 +218,7 @@ function createMemoryClient() {
   } as any
 }
 
-// Create Supabase client with service role key for server-side operations
-// If env vars are present, use real client; otherwise fall back to in-memory client.
+// Create Supabase client for client-side operations (uses anon key, subject to RLS)
 export const supabase: any = (() => {
   const hasReal = !!(supabaseUrl && supabaseAnonKey)
   if (hasReal) {
@@ -231,6 +231,23 @@ export const supabase: any = (() => {
   }
   // Dev/testing fallback
   console.warn('[supabase] Using in-memory fallback. Provide NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to use a real database.')
+  return createMemoryClient()
+})()
+
+// Create Supabase client for server-side operations (uses service role key, bypasses RLS)
+// Use this for admin operations like creating tournaments, managing users, etc.
+export const supabaseAdmin: any = (() => {
+  const hasReal = !!(supabaseUrl && supabaseServiceRoleKey)
+  if (hasReal) {
+    return createClient(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  }
+  // Dev/testing fallback
+  console.warn('[supabaseAdmin] Using in-memory fallback. Provide NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to use a real database.')
   return createMemoryClient()
 })()
 

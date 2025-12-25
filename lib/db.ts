@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, supabaseAdmin } from './supabase'
 
 // Types matching our database schema
 export interface User {
@@ -256,7 +256,9 @@ export async function seedTestUsers(count = 20): Promise<{ inserted: number }> {
 // ===== TOURNAMENT FUNCTIONS =====
 
 export async function createTournament(t: Tournament): Promise<Tournament | null> {
-  const { data, error } = await supabase
+  console.log('[createTournament] Attempting to create tournament:', { title: t.title, creator_telegram_id: t.creator_telegram_id })
+
+  const { data, error } = await supabaseAdmin
     .from('tournaments')
     .insert({
       title: t.title,
@@ -285,10 +287,12 @@ export async function createTournament(t: Tournament): Promise<Tournament | null
     .single()
 
   if (error) {
-    console.error('Error creating tournament:', error)
+    console.error('[createTournament] Error creating tournament:', error)
+    console.error('[createTournament] Error details:', JSON.stringify(error, null, 2))
     return null
   }
 
+  console.log('[createTournament] Tournament created successfully:', data)
   return data as Tournament
 }
 

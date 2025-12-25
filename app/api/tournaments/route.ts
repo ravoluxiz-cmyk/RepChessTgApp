@@ -14,11 +14,16 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[POST /api/tournaments] Starting tournament creation')
     const adminUser = await requireAdmin(request.headers)
+    console.log('[POST /api/tournaments] Admin user:', adminUser)
+
     if (!adminUser) {
+      console.log('[POST /api/tournaments] No admin user found, returning 403')
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
     const body = (await request.json()) as Partial<Tournament>
+    console.log('[POST /api/tournaments] Request body:', { title: body.title })
 
     if (!body.title) {
       return NextResponse.json({ error: "Название обязательно" }, { status: 400 })
@@ -48,13 +53,18 @@ export async function POST(request: NextRequest) {
       archived: body.archived ?? 0,
     }
 
+  console.log('[POST /api/tournaments] Calling createTournament with creator_telegram_id:', adminUser.id)
   const created = await createTournament(tournament)
+  console.log('[POST /api/tournaments] createTournament returned:', created)
+
   if (!created) {
+    console.log('[POST /api/tournaments] createTournament returned null, returning error')
     return NextResponse.json({ error: "Не удалось создать турнир" }, { status: 400 })
   }
+  console.log('[POST /api/tournaments] Tournament created successfully')
   return NextResponse.json(created, { status: 201 })
   } catch (e) {
-    console.error("Failed to create tournament:", e)
+    console.error("[POST /api/tournaments] Exception:", e)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
