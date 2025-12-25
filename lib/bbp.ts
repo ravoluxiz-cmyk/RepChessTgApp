@@ -323,15 +323,29 @@ async function runBbpBinary(trfPath: string, outPath: string, listPath: string, 
 export async function generatePairingsWithBBP(tournamentId: number, roundId: number): Promise<Match[] | null> {
   lastBbpReason = undefined
   const cfg = resolveBbpBinary()
+  const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production'
+
   if (!cfg.ok || !cfg.bin) {
     lastBbpReason = cfg.reason || 'not configured'
     console.warn(`[BBP] Skipping: ${lastBbpReason}`)
-    // Проверяем, запущены ли в serverless окружении (Vercel)
-    const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production'
-    if (isServerless && !cfg.bin?.includes('mock')) {
-      console.warn('[BBP] В serverless окружении рекомендуется использовать bbp-mock.js')
-      lastBbpReason = 'BBP бинарник недоступен в serverless окружении. Используйте bbp-mock.js для генерации пар.'
+
+    // В serverless окружении используем встроенный генератор
+    if (isServerless) {
+      console.log('[BBP] Using built-in Swiss pairing generator in serverless environment')
+      try {
+        const swiss = await generateSwissPairings(tournamentId, roundId)
+        if (!swiss || swiss.length === 0) {
+          lastBbpReason = 'Built-in Swiss pairing produced no matches'
+          return null
+        }
+        return swiss
+      } catch (e) {
+        lastBbpReason = e instanceof Error ? e.message : String(e)
+        console.error('[BBP] Built-in pairing error:', lastBbpReason)
+        return null
+      }
     }
+
     return null
   }
 
