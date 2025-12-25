@@ -44,7 +44,7 @@ async function getAllTournamentMatches(tournamentId: number) {
       .eq('round_id', round.id)
 
     if (matches) {
-      allMatches.push(...matches.map(m => ({ ...m, round_number: round.number })))
+      allMatches.push(...matches.map((m: Record<string, unknown>) => ({ ...m, round_number: round.number })))
     }
   }
 
