@@ -322,164 +322,19 @@ async function runBbpBinary(trfPath: string, outPath: string, listPath: string, 
  */
 export async function generatePairingsWithBBP(tournamentId: number, roundId: number): Promise<Match[] | null> {
   lastBbpReason = undefined
-  const cfg = resolveBbpBinary()
-  const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production'
 
-  if (!cfg.ok || !cfg.bin) {
-    lastBbpReason = cfg.reason || 'not configured'
-    console.warn(`[BBP] Skipping: ${lastBbpReason}`)
-
-    // В serverless окружении используем встроенный генератор
-    if (isServerless) {
-      console.log('[BBP] Using built-in Swiss pairing generator in serverless environment')
-      try {
-        const swiss = await generateSwissPairings(tournamentId, roundId)
-        if (!swiss || swiss.length === 0) {
-          lastBbpReason = 'Built-in Swiss pairing produced no matches'
-          return null
-        }
-        return swiss
-      } catch (e) {
-        lastBbpReason = e instanceof Error ? e.message : String(e)
-        console.error('[BBP] Built-in pairing error:', lastBbpReason)
-        return null
-      }
-    }
-
-    return null
-  }
-
-  const tournament = await getTournamentById(tournamentId)
-  if (!tournament) {
-    lastBbpReason = 'Tournament not found'
-    console.error('[BBP] Tournament not found')
-    return null
-  }
-
-  const participants = await listTournamentParticipants(tournamentId)
-  const prevRounds = await listRounds(tournamentId)
-  const currentRoundNum = (prevRounds.find(r => r.id === roundId)?.number) ?? 1
-
-  // Idempotence guard: if matches already exist for this round, skip generation
+  // Всегда используем встроенный Swiss pairing генератор (FIDE Dutch System)
+  console.log('[BBP] Using built-in Swiss pairing generator (FIDE Dutch System)')
   try {
-    const existing = await listMatches(roundId)
-    if (existing && existing.length > 0) {
-      console.warn('[BBP] Matches already exist for round; skipping generation')
-      return existing as unknown as Match[]
-    }
-  } catch (e) {
-    console.warn('[BBP] Failed to check existing matches:', e)
-  }
-
-  // Build positional map (1-based index)
-  const posToParticipantId: number[] = participants.map(p => p.id!)
-
-  // Если указан bbp-mock.js в переменной окружения — не запускаем отдельный процесс,
-  // а используем встроенный генератор швейцарских пар.
-  if (cfg.bin && cfg.bin.includes('bbp-mock.js')) {
-    try {
-      const existingAfter = await listMatches(roundId).catch(() => [])
-      if (existingAfter && existingAfter.length > 0) {
-        return existingAfter as unknown as Match[]
-      }
-      const swiss = await generateSwissPairings(tournamentId, roundId)
-      if (!swiss || swiss.length === 0) {
-        lastBbpReason = 'Mock BBP produced no matches'
-        return null
-      }
-      return swiss
-    } catch (e) {
-      lastBbpReason = e instanceof Error ? e.message : String(e)
+    const swiss = await generateSwissPairings(tournamentId, roundId)
+    if (!swiss || swiss.length === 0) {
+      lastBbpReason = 'Swiss pairing produced no matches'
       return null
     }
-  }
-
-  // Prepare working directory and files
-  const workDir = path.join(os.tmpdir(), `bbp-${tournamentId}-${roundId}`)
-  await ensureFileDir(workDir)
-  const trfPath = path.join(workDir, 'trn.trfx')
-  const outPath = path.join(workDir, 'outfile.txt')
-  const listPath = path.join(workDir, 'checklist.txt')
-
-  // Create TRF content
-  const trfContent = await buildBbpTrfx(tournament, participants, prevRounds, currentRoundNum)
-  await fs.writeFile(trfPath, trfContent, 'utf-8')
-
-  // Determine BBP system flag from tournament.format
-  let systemFlag: '--dutch' | '--burstein' = '--dutch'
-  if ((tournament.format || '').toLowerCase().includes('burstein')) {
-    systemFlag = '--burstein'
-  }
-
-  const timeoutMs = Number(process.env.BBP_TIMEOUT_MS || 6000)
-  const retries = Math.max(0, Math.min(2, Number(process.env.BBP_RETRIES || 1)))
-  let outText = ''
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const res = await runBbpBinary(trfPath, outPath, listPath, cfg.bin, systemFlag, timeoutMs)
-      outText = res.outText
-      break
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err)
-      lastBbpReason = `Attempt ${attempt + 1} failed: ${message}`
-      console.error('[BBP] Execution failed:', message)
-      if (attempt === retries) {
-        return null
-      }
-      await new Promise(r => setTimeout(r, 300 + attempt * 300))
-    }
-  }
-
-  // Parse output
-  const parsed = parseBbpOutFile(outText)
-  if (!parsed.pairs || parsed.pairs.length === 0) {
-    lastBbpReason = 'No pairs parsed from output'
-    console.warn('[BBP] No pairs parsed from output')
-    const devFallback = process.env.BBP_DEV_SWISS_FALLBACK
-    const isDev = process.env.NODE_ENV !== 'production'
-    if (isDev && devFallback && (devFallback === '1' || devFallback.toLowerCase() === 'true' || devFallback.toLowerCase() === 'yes')) {
-      const existingAfter = await listMatches(roundId).catch(() => [])
-      if (existingAfter && existingAfter.length > 0) {
-        return existingAfter as unknown as Match[]
-      }
-      const swiss = await generateSwissPairings(tournamentId, roundId)
-      return swiss || null
-    }
+    return swiss
+  } catch (e) {
+    lastBbpReason = e instanceof Error ? e.message : String(e)
+    console.error('[BBP] Pairing error:', lastBbpReason)
     return null
   }
-
-  // Insert matches according to parsed pairs
-  let board = 1
-  const inserted: Match[] = []
-
-  for (const pair of parsed.pairs) {
-    const whiteId = posToParticipantId[pair.whitePos - 1]
-    const blackId = pair.blackPos ? posToParticipantId[pair.blackPos - 1] : null
-    if (!whiteId) continue
-
-    const { data, error } = await supabase
-      .from('matches')
-      .insert({
-        round_id: roundId,
-        white_participant_id: whiteId,
-        black_participant_id: blackId ?? null,
-        board_no: board,
-        result: 'not_played',
-        score_white: 0,
-        score_black: 0,
-        source: 'bbp'
-      })
-      .select()
-      .single()
-
-    if (error) {
-      console.error('[BBP] Error inserting match:', error)
-      continue
-    }
-
-    if (data) inserted.push(data as Match)
-    board += 1
-  }
-
-  return inserted
 }
