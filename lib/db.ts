@@ -258,7 +258,7 @@ export async function seedTestUsers(count = 20): Promise<{ inserted: number }> {
 export async function createTournament(t: Tournament): Promise<Tournament | null> {
   console.log('[createTournament] Attempting to create tournament:', { title: t.title, creator_telegram_id: t.creator_telegram_id })
 
-  const { data, error } = await supabaseAdminAdmin
+  const { data, error } = await supabaseAdmin
     .from('tournaments')
     .insert({
       title: t.title,
@@ -372,7 +372,7 @@ export async function updateTournamentArchived(id: number, archived: number): Pr
 
 export async function addTournamentParticipant(tp: TournamentParticipant): Promise<TournamentParticipant | null> {
   // Ensure the user exists
-  const { data: user } = await supabaseAdminAdmin
+  const { data: user } = await supabaseAdmin
     .from('users')
     .select('id')
     .eq('id', tp.user_id)
@@ -383,7 +383,7 @@ export async function addTournamentParticipant(tp: TournamentParticipant): Promi
     return null
   }
 
-  const { data, error } = await supabaseAdminAdmin
+  const { data, error } = await supabaseAdmin
     .from('tournament_participants')
     .insert({
       tournament_id: tp.tournament_id,
