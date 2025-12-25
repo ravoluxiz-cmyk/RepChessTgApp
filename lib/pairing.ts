@@ -6,7 +6,7 @@
  */
 
 import { supabaseAdmin } from './supabase'
-import type { Match, TournamentParticipant, Tournament } from './db'
+import type { Match } from './db'
 
 // ===== ТИПЫ =====
 
@@ -451,30 +451,9 @@ function generateSubsequentRoundPairings(players: Player[]): Pairing[] {
   return allPairs
 }
 
-/**
- * Выбор игрока для bye (минимальный рейтинг, случайный при повторе)
- */
-function selectByePlayer(
-  players: Player[],
-  forbidRepeatBye: boolean
-): Player | null {
-  if (players.length % 2 === 0) return null
-
-  // Находим игроков с минимальным рейтингом
-  const minRating = Math.min(...players.map(p => p.rating))
-  const lowestRated = players.filter(p => p.rating === minRating)
-
-  if (forbidRepeatBye) {
-    // Сначала пытаемся найти тех кто не получал bye
-    const neverHadBye = lowestRated.filter(p => !p.hadBye)
-    if (neverHadBye.length > 0) {
-      return neverHadBye[Math.floor(Math.random() * neverHadBye.length)]
-    }
-  }
-
-  // Случайный выбор среди игроков с минимальным рейтингом
-  return lowestRated[Math.floor(Math.random() * lowestRated.length)]
-}
+// Удалена неиспользуемая функция selectByePlayer
+// Логика bye обрабатывается автоматически в generateRound1Pairings
+// и generateSubsequentRoundPairings
 
 /**
  * ГЛАВНАЯ ФУНКЦИЯ: Генерация пар для раунда
@@ -503,7 +482,6 @@ export async function generateSwissPairings(
     throw new Error('Tournament not found')
   }
 
-  const forbidRepeatBye = tournament.forbid_repeat_bye === 1
   const byePoints = tournament.bye_points || 1
 
   // Получаем участников турнира (только активных)
@@ -527,7 +505,7 @@ export async function generateSwissPairings(
   const playerDataMap = new Map<number, PlayerData>()
 
   for (const p of participants) {
-    const user = (p as any).users
+    const user = (p as { users?: { rating?: number } }).users
     playerDataMap.set(p.id!, {
       participantId: p.id!,
       userId: p.user_id,

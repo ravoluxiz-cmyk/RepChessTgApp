@@ -218,7 +218,7 @@ export async function calculateAllTiebreakers(tournamentId: number) {
   const standings = await buildStandings(tournamentId)
 
   // Вычисляем тай-брейкеры для каждого игрока
-  for (const [participantId, player] of Array.from(standings.entries())) {
+  for (const [, player] of Array.from(standings.entries())) {
     player.tiebreakers.buchholz = calculateBuchholz(player, standings)
     player.tiebreakers.buchholzCut1 = calculateBuchholzCut1(player, standings)
   }
