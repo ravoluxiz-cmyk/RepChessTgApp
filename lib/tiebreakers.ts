@@ -36,7 +36,7 @@ async function getAllTournamentMatches(tournamentId: number) {
   if (!rounds) return []
 
   // Получаем все матчи для всех раундов
-  const allMatches = []
+  const allMatches: Array<Record<string, unknown> & { round_number: number }> = []
   for (const round of rounds) {
     const { data: matches } = await supabaseAdmin
       .from('matches')
@@ -44,7 +44,7 @@ async function getAllTournamentMatches(tournamentId: number) {
       .eq('round_id', round.id)
 
     if (matches) {
-      allMatches.push(...matches.map((m: any) => ({ ...m, round_number: round.number })))
+      allMatches.push(...matches.map(m => ({ ...m, round_number: round.number })))
     }
   }
 
