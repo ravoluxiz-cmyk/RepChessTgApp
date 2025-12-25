@@ -85,7 +85,7 @@ export interface Match {
 // ===== USER FUNCTIONS =====
 
 export async function getUserById(userId: number): Promise<User | null> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('users')
     .select('*')
     .eq('id', userId)
@@ -101,7 +101,7 @@ export async function getUserById(userId: number): Promise<User | null> {
 }
 
 export async function getUserByTelegramId(telegramId: number): Promise<User | null> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('users')
     .select('*')
     .eq('telegram_id', telegramId)
@@ -117,7 +117,7 @@ export async function getUserByTelegramId(telegramId: number): Promise<User | nu
 }
 
 export async function createUser(user: User): Promise<User | null> {
-  const { data, error} = await supabase
+  const { data, error} = await supabaseAdmin
     .from('users')
     .insert({
       telegram_id: user.telegram_id,
@@ -145,7 +145,7 @@ export async function updateUserProfile(
   telegramId: number,
   profileData: UserProfileData
 ): Promise<boolean> {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('users')
     .update({
       first_name: profileData.first_name,
@@ -187,7 +187,7 @@ export async function upsertUser(user: User): Promise<User | null> {
 }
 
 export async function getAllUsers(): Promise<User[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('users')
     .select('*')
     .order('created_at', { ascending: false })
@@ -204,7 +204,7 @@ export async function searchUsersByUsernameFragment(fragment: string, limit = 8)
   const q = (fragment || '').trim()
   if (!q) return []
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('users')
     .select('*')
     .ilike('username', `%${q}%`)
@@ -227,7 +227,7 @@ export async function seedTestUsers(count = 20): Promise<{ inserted: number }> {
     const role = i <= 5 ? 'admin' : i <= 10 ? 'moderator' : 'user'
     const tgId = baseId + i
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('users')
       .insert({
         telegram_id: tgId,
@@ -258,7 +258,7 @@ export async function seedTestUsers(count = 20): Promise<{ inserted: number }> {
 export async function createTournament(t: Tournament): Promise<Tournament | null> {
   console.log('[createTournament] Attempting to create tournament:', { title: t.title, creator_telegram_id: t.creator_telegram_id })
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseAdminAdmin
     .from('tournaments')
     .insert({
       title: t.title,
@@ -297,7 +297,7 @@ export async function createTournament(t: Tournament): Promise<Tournament | null
 }
 
 export async function listTournaments(): Promise<Tournament[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('tournaments')
     .select('*')
     .order('created_at', { ascending: false })
@@ -311,7 +311,7 @@ export async function listTournaments(): Promise<Tournament[]> {
 }
 
 export async function listTournamentsByCreator(telegramId: number): Promise<Tournament[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('tournaments')
     .select('*')
     .eq('creator_telegram_id', telegramId)
@@ -326,7 +326,7 @@ export async function listTournamentsByCreator(telegramId: number): Promise<Tour
 }
 
 export async function getTournamentById(id: number): Promise<Tournament | null> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('tournaments')
     .select('*')
     .eq('id', id)
@@ -341,7 +341,7 @@ export async function getTournamentById(id: number): Promise<Tournament | null> 
 }
 
 export async function deleteTournament(id: number): Promise<boolean> {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('tournaments')
     .delete()
     .eq('id', id)
@@ -355,7 +355,7 @@ export async function deleteTournament(id: number): Promise<boolean> {
 }
 
 export async function updateTournamentArchived(id: number, archived: number): Promise<boolean> {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('tournaments')
     .update({ archived })
     .eq('id', id)
@@ -372,7 +372,7 @@ export async function updateTournamentArchived(id: number, archived: number): Pr
 
 export async function addTournamentParticipant(tp: TournamentParticipant): Promise<TournamentParticipant | null> {
   // Ensure the user exists
-  const { data: user } = await supabase
+  const { data: user } = await supabaseAdminAdmin
     .from('users')
     .select('id')
     .eq('id', tp.user_id)
@@ -383,7 +383,7 @@ export async function addTournamentParticipant(tp: TournamentParticipant): Promi
     return null
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdminAdmin
     .from('tournament_participants')
     .insert({
       tournament_id: tp.tournament_id,
@@ -402,7 +402,7 @@ export async function addTournamentParticipant(tp: TournamentParticipant): Promi
 }
 
 export async function listTournamentParticipants(tournamentId: number): Promise<Array<TournamentParticipant & { user: User }>> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('tournament_participants')
     .select(`
       *,
@@ -438,7 +438,7 @@ export async function listTournamentParticipants(tournamentId: number): Promise<
 // ===== ROUNDS =====
 
 export async function getNextRoundNumber(tournamentId: number): Promise<number> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('rounds')
     .select('number')
     .eq('tournament_id', tournamentId)
@@ -456,7 +456,7 @@ export async function getNextRoundNumber(tournamentId: number): Promise<number> 
 export async function createRound(tournamentId: number, number?: number): Promise<Round | null> {
   const num = number ?? await getNextRoundNumber(tournamentId)
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('rounds')
     .insert({
       tournament_id: tournamentId,
@@ -475,7 +475,7 @@ export async function createRound(tournamentId: number, number?: number): Promis
 }
 
 export async function listRounds(tournamentId: number): Promise<Round[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('rounds')
     .select('*')
     .eq('tournament_id', tournamentId)
@@ -492,7 +492,7 @@ export async function listRounds(tournamentId: number): Promise<Round[]> {
 // ===== MATCHES =====
 
 export async function listMatches(roundId: number): Promise<Array<Match & { white_nickname?: string | null; black_nickname?: string | null }>> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('matches')
     .select(`
       *,
@@ -528,7 +528,7 @@ async function getTournamentScoring(tournamentId: number) {
 
 export async function simpleSwissPairings(tournamentId: number, roundId: number): Promise<Match[]> {
   // Determine current round number
-  const { data: roundRow } = await supabase
+  const { data: roundRow } = await supabaseAdmin
     .from('rounds')
     .select('number')
     .eq('id', roundId)
@@ -630,7 +630,7 @@ export async function simpleSwissPairings(tournamentId: number, roundId: number)
     const w = ids[i]
     const b = ids[i + 1]
 
-    const { data } = await supabase
+    const { data } = await supabaseAdmin
       .from('matches')
       .insert({
         round_id: roundId,
@@ -653,7 +653,7 @@ export async function simpleSwissPairings(tournamentId: number, roundId: number)
 
   // Add bye if needed: automatically assign a win to the player with a bye
   if (byeId) {
-    const { data } = await supabase
+    const { data } = await supabaseAdmin
       .from('matches')
       .insert({
         round_id: roundId,
@@ -674,7 +674,7 @@ export async function simpleSwissPairings(tournamentId: number, roundId: number)
   }
 
   // Update round status
-  await supabase
+  await supabaseAdmin
     .from('rounds')
     .update({ status: 'paired', paired_at: new Date().toISOString() })
     .eq('id', roundId)
@@ -684,7 +684,7 @@ export async function simpleSwissPairings(tournamentId: number, roundId: number)
 
 export async function updateMatchResult(matchId: number, result: string): Promise<Match | null> {
   // Get match and tournament info
-  const { data: match } = await supabase
+  const { data: match } = await supabaseAdmin
     .from('matches')
     .select('id, round_id, rounds!inner(tournament_id)')
     .eq('id', matchId)
@@ -727,7 +727,7 @@ export async function updateMatchResult(matchId: number, result: string): Promis
       sb = 0
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('matches')
     .update({
       result,
@@ -747,7 +747,7 @@ export async function updateMatchResult(matchId: number, result: string): Promis
   try {
     const roundId = (match as { round_id?: number }).round_id ?? 0
     if (Number.isFinite(roundId)) {
-      const { data: roundMatches } = await supabase
+      const { data: roundMatches } = await supabaseAdmin
         .from('matches')
         .select('id, result')
         .eq('round_id', roundId)
@@ -756,7 +756,7 @@ export async function updateMatchResult(matchId: number, result: string): Promis
       const allFinished = rms.length > 0 && rms.every((m) => m.result && m.result !== 'not_played')
       if (allFinished) {
         // Lock the round
-        await supabase
+        await supabaseAdmin
           .from('rounds')
           .update({ status: 'locked', locked_at: new Date().toISOString() })
           .eq('id', roundId)
@@ -831,7 +831,7 @@ export async function finalizeTournamentIfExceeded(tournamentId: number): Promis
 
   const planned = tournament.rounds || 0
 
-  const { data: rounds, error: rErr } = await supabase
+  const { data: rounds, error: rErr } = await supabaseAdmin
     .from('rounds')
     .select('id, number, status')
     .eq('tournament_id', tournamentId)
@@ -856,7 +856,7 @@ export async function finalizeTournamentIfExceeded(tournamentId: number): Promis
 
     // If there are no participants/standings, skip leaderboard snapshot gracefully
     if (rows.length > 0) {
-      const { error: lbErr } = await supabase
+      const { error: lbErr } = await supabaseAdmin
         .from('leaderboard')
         .upsert(rows, { onConflict: 'tournament_id,participant_id' })
         .select()
@@ -899,7 +899,7 @@ export async function finalizeTournament(tournamentId: number): Promise<boolean>
 
   // If there are no participants/standings, skip leaderboard snapshot gracefully
   if (rows.length > 0) {
-    const { error: lbErr } = await supabase
+    const { error: lbErr } = await supabaseAdmin
       .from('leaderboard')
       .upsert(rows, { onConflict: 'tournament_id,participant_id' })
       .select()
@@ -923,7 +923,7 @@ export async function finalizeTournament(tournamentId: number): Promise<boolean>
 
 // ===== LEADERBOARD =====
 export async function listLeaderboard(tournamentId: number): Promise<Array<{ participant_id: number; nickname: string; points: number; rank: number }>> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('leaderboard')
     .select('participant_id, nickname, points, rank')
     .eq('tournament_id', tournamentId)
@@ -942,7 +942,7 @@ export async function listLeaderboard(tournamentId: number): Promise<Array<{ par
 export async function deleteAllRoundsForTournament(tournamentId: number): Promise<boolean> {
   try {
     // Get all round IDs for the tournament
-    const { data: rounds, error: roundsErr } = await supabase
+    const { data: rounds, error: roundsErr } = await supabaseAdmin
       .from('rounds')
       .select('id')
       .eq('tournament_id', tournamentId)
@@ -957,7 +957,7 @@ export async function deleteAllRoundsForTournament(tournamentId: number): Promis
 
     // Delete matches first to satisfy FK constraints (though ON DELETE CASCADE exists, be explicit)
     if (roundIds.length > 0) {
-      const { error: matchesErr } = await supabase
+      const { error: matchesErr } = await supabaseAdmin
         .from('matches')
         .delete()
         .in('round_id', roundIds)
@@ -968,7 +968,7 @@ export async function deleteAllRoundsForTournament(tournamentId: number): Promis
     }
 
     // Delete rounds for the tournament
-    const { error: delRoundsErr } = await supabase
+    const { error: delRoundsErr } = await supabaseAdmin
       .from('rounds')
       .delete()
       .eq('tournament_id', tournamentId)
@@ -989,7 +989,7 @@ export async function deleteAllRoundsForTournament(tournamentId: number): Promis
 export async function deleteRoundById(roundId: number): Promise<boolean> {
   try {
     // Удаляем матчи этого тура
-    const { error: matchesErr } = await supabase
+    const { error: matchesErr } = await supabaseAdmin
       .from('matches')
       .delete()
       .eq('round_id', roundId)
@@ -1000,7 +1000,7 @@ export async function deleteRoundById(roundId: number): Promise<boolean> {
     }
 
     // Удаляем сам тур
-    const { error: roundErr } = await supabase
+    const { error: roundErr } = await supabaseAdmin
       .from('rounds')
       .delete()
       .eq('id', roundId)
