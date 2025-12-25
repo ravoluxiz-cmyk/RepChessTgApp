@@ -472,14 +472,15 @@ export async function generateSwissPairings(
   const currentRoundNum = roundRow?.number || 1
 
   // Получаем настройки турнира
-  const { data: tournament } = await supabaseAdmin
+  const { data: tournament, error: tournamentError } = await supabaseAdmin
     .from('tournaments')
     .select('*')
     .eq('id', tournamentId)
     .single()
 
-  if (!tournament) {
-    throw new Error('Tournament not found')
+  if (tournamentError || !tournament) {
+    console.error('Error getting tournament by id:', tournamentError)
+    throw new Error(`Tournament not found (ID: ${tournamentId})`)
   }
 
   const byePoints = tournament.bye_points || 1
