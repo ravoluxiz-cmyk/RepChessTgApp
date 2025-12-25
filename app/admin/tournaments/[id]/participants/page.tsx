@@ -19,6 +19,7 @@ type Participant = {
   tournament_id: number
   user_id: number
   nickname: string
+  active?: boolean
   created_at: string
 }
 
@@ -289,6 +290,43 @@ export default function TournamentParticipantsPage() {
     }
   }
 
+  const withdrawPlayer = async (participantId: number) => {
+    if (!confirm("Исключить участника из жеребьевки? Он не будет участвовать в следующих турах.")) return
+    setError(null)
+    try {
+      const res = await fetch(`/api/tournaments/${tournamentId}/participants/${participantId}/withdraw`, {
+        method: "POST",
+        headers: initData ? { Authorization: `Bearer ${initData}` } : undefined,
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || "Не удалось исключить участника")
+      }
+      // Обновляем локальный state
+      setParticipants((prev) => prev.map((p) => p.id === participantId ? { ...p, active: false } : p))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Неизвестная ошибка")
+    }
+  }
+
+  const restorePlayer = async (participantId: number) => {
+    setError(null)
+    try {
+      const res = await fetch(`/api/tournaments/${tournamentId}/participants/${participantId}/restore`, {
+        method: "POST",
+        headers: initData ? { Authorization: `Bearer ${initData}` } : undefined,
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || "Не удалось вернуть участника")
+      }
+      // Обновляем локальный state
+      setParticipants((prev) => prev.map((p) => p.id === participantId ? { ...p, active: true } : p))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Неизвестная ошибка")
+    }
+  }
+
   return (
     <ChessBackground>
       <div className="min-h-screen px-4 py-10">
@@ -421,23 +459,48 @@ export default function TournamentParticipantsPage() {
                   <tr className="bg-white/10">
                     <th className="text-left p-3">Ник</th>
                     <th className="text-left p-3">Пользователь</th>
+                    <th className="text-left p-3">Статус</th>
                     <th className="text-left p-3">Добавлен</th>
+                    <th className="text-left p-3">Действия</th>
                   </tr>
                 </thead>
                 <tbody>
                   {participants.map((p) => {
                     const user = users.find((u) => u.id === p.user_id)
+                    const isActive = p.active !== false
                     return (
                       <tr key={p.id} className="border-t border-white/10">
                         <td className="p-3">{p.nickname}</td>
                         <td className="p-3">@{user?.username || user?.telegram_id}</td>
+                        <td className="p-3">
+                          <span className={`px-2 py-1 rounded text-xs ${isActive ? 'bg-green-600/30 text-green-300' : 'bg-red-600/30 text-red-300'}`}>
+                            {isActive ? '✓ Активен' : '✗ Исключен'}
+                          </span>
+                        </td>
                         <td className="p-3">{new Date(p.created_at).toLocaleString()}</td>
+                        <td className="p-3">
+                          {isActive ? (
+                            <button
+                              onClick={() => withdrawPlayer(p.id)}
+                              className="px-3 py-1 rounded bg-red-600 hover:bg-red-500 text-white text-sm"
+                            >
+                              Исключить
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => restorePlayer(p.id)}
+                              className="px-3 py-1 rounded bg-green-600 hover:bg-green-500 text-white text-sm"
+                            >
+                              Вернуть
+                            </button>
+                          )}
+                        </td>
                       </tr>
                     )
                   })}
                   {participants.length === 0 && !loading && (
                     <tr>
-                      <td colSpan={3} className="p-3 text-white/70">
+                      <td colSpan={5} className="p-3 text-white/70">
                         Пока нет участников
                       </td>
                     </tr>
