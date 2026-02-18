@@ -527,7 +527,7 @@ export async function generateSwissPairings(
       .order('number', { ascending: true })
 
     if (prevRounds && prevRounds.length > 0) {
-      const roundIds = prevRounds.map(r => r.id)
+      const roundIds = prevRounds.map((r: { id: number }) => r.id)
 
       // Один запрос вместо N (async-parallel)
       const { data: allMatches } = await supabaseAdmin

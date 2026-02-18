@@ -31,7 +31,7 @@ export default function Home() {
           return
         }
 
-        const data = await response.json()
+        await response.json()
         // Профиль успешно сохранён
       } catch (e) {
         console.error("Auto-save on enter error:", e)
