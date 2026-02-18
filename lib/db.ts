@@ -422,6 +422,7 @@ export async function listTournamentParticipants(tournamentId: number): Promise<
     tournament_id: number
     user_id: number
     nickname: string
+    active?: boolean
     created_at: string
     user?: User
   }>
@@ -431,6 +432,7 @@ export async function listTournamentParticipants(tournamentId: number): Promise<
     tournament_id: row.tournament_id,
     user_id: row.user_id,
     nickname: row.nickname,
+    active: row.active,
     created_at: row.created_at,
     user: (row.user as User) || ({} as User)
   }))
@@ -1137,6 +1139,7 @@ export async function withdrawPlayer(participantId: number): Promise<boolean> {
             result: 'bye',
             score_white: scoring.bye_points,
             score_black: 0,
+            notes: `withdrawn:${participantId}`,
           })
           .eq('id', m.id)
       } else {
@@ -1155,6 +1158,7 @@ export async function withdrawPlayer(participantId: number): Promise<boolean> {
             result: 'bye',
             score_white: scoring.bye_points,
             score_black: 0,
+            notes: `withdrawn:${participantId}`,
           })
           .eq('id', m.id)
       } else {
@@ -1197,17 +1201,70 @@ export async function withdrawPlayer(participantId: number): Promise<boolean> {
 }
 
 /**
- * Возвращает участника в жеребьевку (restore)
+ * Возвращает участника в жеребьевку (restore).
+ * Если в текущих турах есть bye-матчи, созданные при исключении этого игрока,
+ * они конвертируются обратно в реальные матчи.
  */
 export async function restorePlayer(participantId: number): Promise<boolean> {
-  const { error } = await supabaseAdmin
+  const { data: participant, error } = await supabaseAdmin
     .from('tournament_participants')
     .update({ active: true })
     .eq('id', participantId)
+    .select('tournament_id')
+    .single()
 
-  if (error) {
+  if (error || !participant) {
     console.error('Error restoring player:', error)
     return false
+  }
+
+  const tournamentId = (participant as { tournament_id: number }).tournament_id
+
+  // Ищем bye-матчи, помеченные withdrawn:participantId, и конвертируем обратно
+  try {
+    const { data: byeMatches } = await supabaseAdmin
+      .from('matches')
+      .select('id, round_id, white_participant_id, result, notes')
+      .eq('result', 'bye')
+      .eq('notes', `withdrawn:${participantId}`)
+
+    const bms = (byeMatches || []) as Array<{ id: number; round_id: number; white_participant_id: number | null; result: string; notes: string }>
+
+    for (const m of bms) {
+      // Проверяем что раунд принадлежит этому турниру
+      const { data: round } = await supabaseAdmin
+        .from('rounds')
+        .select('id, tournament_id, status')
+        .eq('id', m.round_id)
+        .single()
+
+      const rd = round as { id: number; tournament_id: number; status: string } | null
+      if (!rd || rd.tournament_id !== tournamentId) continue
+      // Только для незалоченных раундов
+      if (rd.status === 'locked') continue
+
+      // Восстанавливаем матч: возвращаемый игрок становится чёрным
+      await supabaseAdmin
+        .from('matches')
+        .update({
+          black_participant_id: participantId,
+          result: 'not_played',
+          score_white: 0,
+          score_black: 0,
+          notes: null,
+        })
+        .eq('id', m.id)
+
+      // Если раунд был locked из-за всех-bye, разблокируем
+      if (rd.status === 'locked') {
+        await supabaseAdmin
+          .from('rounds')
+          .update({ status: 'paired', locked_at: null })
+          .eq('id', rd.id)
+      }
+    }
+  } catch (e) {
+    console.error('Error restoring bye matches:', e)
   }
 
   return true
