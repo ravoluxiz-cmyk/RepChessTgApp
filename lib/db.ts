@@ -1071,17 +1071,126 @@ export async function deleteRoundById(roundId: number): Promise<boolean> {
 // ===== WITHDRAW ИГРОКОВ =====
 
 /**
- * Исключает участника из жеребьевки (withdraw)
+ * Исключает участника из жеребьевки (withdraw).
+ * Все незавершённые матчи этого игрока превращаются в bye для оппонента.
  */
 export async function withdrawPlayer(participantId: number): Promise<boolean> {
-  const { error } = await supabaseAdmin
+  // 1. Ставим active = false
+  const { data: participant, error } = await supabaseAdmin
     .from('tournament_participants')
     .update({ active: false })
     .eq('id', participantId)
+    .select('tournament_id')
+    .single()
 
-  if (error) {
+  if (error || !participant) {
     console.error('Error withdrawing player:', error)
     return false
+  }
+
+  const tournamentId = (participant as { tournament_id: number }).tournament_id
+
+  // 2. Находим все незавершённые матчи этого участника
+  try {
+    const scoring = await getTournamentScoring(tournamentId)
+
+    // Матчи где участник играет белыми и результат ещё не определён
+    const { data: whiteMatches } = await supabaseAdmin
+      .from('matches')
+      .select('id, round_id, black_participant_id')
+      .eq('white_participant_id', participantId)
+      .in('result', ['not_played'])
+
+    // Матчи где участник играет чёрными и результат ещё не определён
+    const { data: blackMatches } = await supabaseAdmin
+      .from('matches')
+      .select('id, round_id, white_participant_id')
+      .eq('black_participant_id', participantId)
+      .in('result', ['not_played'])
+
+    // Также ищем матчи с result = null (на всякий случай)
+    const { data: whiteNullMatches } = await supabaseAdmin
+      .from('matches')
+      .select('id, round_id, black_participant_id')
+      .eq('white_participant_id', participantId)
+      .is('result', null)
+
+    const { data: blackNullMatches } = await supabaseAdmin
+      .from('matches')
+      .select('id, round_id, white_participant_id')
+      .eq('black_participant_id', participantId)
+      .is('result', null)
+
+    const allWhite = [...(whiteMatches || []), ...(whiteNullMatches || [])] as Array<{ id: number; round_id: number; black_participant_id: number | null }>
+    const allBlack = [...(blackMatches || []), ...(blackNullMatches || [])] as Array<{ id: number; round_id: number; white_participant_id: number | null }>
+
+    // 3. Конвертируем матчи в bye
+    // Если исключённый играл белыми → оппонент (чёрный) получает bye
+    for (const m of allWhite) {
+      if (m.black_participant_id) {
+        // Оппонент становится белым, чёрный = null (формат bye)
+        await supabaseAdmin
+          .from('matches')
+          .update({
+            white_participant_id: m.black_participant_id,
+            black_participant_id: null,
+            result: 'bye',
+            score_white: scoring.bye_points,
+            score_black: 0,
+          })
+          .eq('id', m.id)
+      } else {
+        // Оба отсутствуют — просто удаляем матч
+        await supabaseAdmin.from('matches').delete().eq('id', m.id)
+      }
+    }
+
+    // Если исключённый играл чёрными → белый получает bye
+    for (const m of allBlack) {
+      if (m.white_participant_id) {
+        await supabaseAdmin
+          .from('matches')
+          .update({
+            black_participant_id: null,
+            result: 'bye',
+            score_white: scoring.bye_points,
+            score_black: 0,
+          })
+          .eq('id', m.id)
+      } else {
+        await supabaseAdmin.from('matches').delete().eq('id', m.id)
+      }
+    }
+
+    // 4. Проверяем, не завершился ли тур автоматически
+    const affectedRoundIds = new Set<number>()
+    for (const m of allWhite) affectedRoundIds.add(m.round_id)
+    for (const m of allBlack) affectedRoundIds.add(m.round_id)
+
+    for (const roundId of affectedRoundIds) {
+      const { data: roundMatches } = await supabaseAdmin
+        .from('matches')
+        .select('id, result')
+        .eq('round_id', roundId)
+
+      const rms = (roundMatches || []) as Array<{ id: number; result: string | null }>
+      const allFinished = rms.length > 0 && rms.every((rm) => rm.result && rm.result !== 'not_played')
+      if (allFinished) {
+        await supabaseAdmin
+          .from('rounds')
+          .update({ status: 'locked', locked_at: new Date().toISOString() })
+          .eq('id', roundId)
+
+        try {
+          await finalizeTournamentIfExceeded(tournamentId)
+        } catch (fErr) {
+          console.error('Finalization after withdraw lock failed:', fErr)
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error converting matches to bye on withdraw:', e)
+    // Участник уже исключён, матчи не сконвертированы — не фатально
   }
 
   return true
