@@ -327,6 +327,24 @@ export default function TournamentParticipantsPage() {
     }
   }
 
+  const deletePlayer = async (participantId: number, nickname: string) => {
+    if (!confirm(`Полностью удалить участника «${nickname}»? Все его матчи будут удалены. Это необратимо!`)) return
+    setError(null)
+    try {
+      const res = await fetch(`/api/tournaments/${tournamentId}/participants/${participantId}`, {
+        method: "DELETE",
+        headers: initData ? { Authorization: `Bearer ${initData}` } : undefined,
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || "Не удалось удалить участника")
+      }
+      setParticipants((prev) => prev.filter((p) => p.id !== participantId))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Неизвестная ошибка")
+    }
+  }
+
   return (
     <ChessBackground>
       <div className="min-h-screen px-4 py-10">
@@ -486,21 +504,29 @@ export default function TournamentParticipantsPage() {
                         </td>
                         <td className="p-3">{new Date(p.created_at).toLocaleString()}</td>
                         <td className="p-3">
-                          {isActive ? (
+                          <div className="flex gap-2 flex-wrap">
+                            {isActive ? (
+                              <button
+                                onClick={() => withdrawPlayer(p.id)}
+                                className="px-3 py-1 rounded bg-yellow-600 hover:bg-yellow-500 text-white text-sm"
+                              >
+                                Исключить
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => restorePlayer(p.id)}
+                                className="px-3 py-1 rounded bg-green-600 hover:bg-green-500 text-white text-sm"
+                              >
+                                Вернуть
+                              </button>
+                            )}
                             <button
-                              onClick={() => withdrawPlayer(p.id)}
-                              className="px-3 py-1 rounded bg-red-600 hover:bg-red-500 text-white text-sm"
+                              onClick={() => deletePlayer(p.id, p.nickname)}
+                              className="px-3 py-1 rounded bg-red-700 hover:bg-red-600 text-white text-sm"
                             >
-                              Исключить
+                              Удалить
                             </button>
-                          ) : (
-                            <button
-                              onClick={() => restorePlayer(p.id)}
-                              className="px-3 py-1 rounded bg-green-600 hover:bg-green-500 text-white text-sm"
-                            >
-                              Вернуть
-                            </button>
-                          )}
+                          </div>
                         </td>
                       </tr>
                     )

@@ -1105,6 +1105,68 @@ export async function restorePlayer(participantId: number): Promise<boolean> {
 }
 
 /**
+ * Полностью удаляет участника из турнира.
+ * ⚠️ Опасная операция: удаляет все матчи с участием этого игрока и очищает leaderboard.
+ */
+export async function deleteParticipant(participantId: number): Promise<boolean> {
+  try {
+    // Узнаём tournament_id до удаления
+    const { data: participant } = await supabaseAdmin
+      .from('tournament_participants')
+      .select('tournament_id')
+      .eq('id', participantId)
+      .single()
+
+    const tournamentId = (participant as { tournament_id?: number } | null)?.tournament_id
+
+    // Удаляем все матчи, где участник играл белыми или чёрными
+    const { error: mWhiteErr } = await supabaseAdmin
+      .from('matches')
+      .delete()
+      .eq('white_participant_id', participantId)
+
+    if (mWhiteErr) {
+      console.error('Error deleting matches (white) for participant:', mWhiteErr)
+      return false
+    }
+
+    const { error: mBlackErr } = await supabaseAdmin
+      .from('matches')
+      .delete()
+      .eq('black_participant_id', participantId)
+
+    if (mBlackErr) {
+      console.error('Error deleting matches (black) for participant:', mBlackErr)
+      return false
+    }
+
+    // Удаляем запись участника
+    const { error: pErr } = await supabaseAdmin
+      .from('tournament_participants')
+      .delete()
+      .eq('id', participantId)
+
+    if (pErr) {
+      console.error('Error deleting participant:', pErr)
+      return false
+    }
+
+    // Очищаем snapshot лидерборда — он стал неактуальным
+    if (tournamentId) {
+      await supabaseAdmin
+        .from('leaderboard')
+        .delete()
+        .eq('tournament_id', tournamentId)
+    }
+
+    return true
+  } catch (e) {
+    console.error('Failed to delete participant:', e)
+    return false
+  }
+}
+
+/**
  * Проверяет активен ли участник
  */
 export async function isPlayerActive(participantId: number): Promise<boolean> {
