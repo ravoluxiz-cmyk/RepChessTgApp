@@ -478,68 +478,54 @@ export default function TournamentParticipantsPage() {
           {/* Список участников */}
           <div className="mt-8">
             <h2 className="text-white text-xl font-bold mb-3">Участники</h2>
-            <div className="bg-white/5 rounded-lg overflow-x-auto">
-              <table className="min-w-[640px] w-full text-white">
-                <thead>
-                  <tr className="bg-white/10">
-                    <th className="text-left p-3">Ник</th>
-                    <th className="text-left p-3">Пользователь</th>
-                    <th className="text-left p-3">Статус</th>
-                    <th className="text-left p-3">Добавлен</th>
-                    <th className="text-left p-3">Действия</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {participants.map((p) => {
-                    const user = users.find((u) => u.id === p.user_id)
-                    const isActive = p.active !== false
-                    return (
-                      <tr key={p.id} className="border-t border-white/10">
-                        <td className="p-3">{p.nickname}</td>
-                        <td className="p-3">@{user?.username || user?.telegram_id}</td>
-                        <td className="p-3">
-                          <span className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-1 rounded text-xs ${isActive ? 'bg-green-600/30 text-green-300' : 'bg-red-600/30 text-red-300'}`}>
-                            {isActive ? '✓ Активен' : '✗ Исключен'}
+            <div className="space-y-3">
+              {participants.map((p) => {
+                const user = users.find((u) => u.id === p.user_id)
+                const isActive = p.active !== false
+                return (
+                  <div key={p.id} className="bg-white/5 rounded-lg p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-white font-semibold text-base truncate">{p.nickname}</span>
+                          <span className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-0.5 rounded text-xs ${isActive ? 'bg-green-600/30 text-green-300' : 'bg-red-600/30 text-red-300'}`}>
+                            {isActive ? '✓' : '✗'}
                           </span>
-                        </td>
-                        <td className="p-3">{new Date(p.created_at).toLocaleString()}</td>
-                        <td className="p-3">
-                          <div className="flex gap-2 flex-wrap">
-                            {isActive ? (
-                              <button
-                                onClick={() => withdrawPlayer(p.id)}
-                                className="px-3 py-1 rounded bg-yellow-600 hover:bg-yellow-500 text-white text-sm"
-                              >
-                                Исключить
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => restorePlayer(p.id)}
-                                className="px-3 py-1 rounded bg-green-600 hover:bg-green-500 text-white text-sm"
-                              >
-                                Вернуть
-                              </button>
-                            )}
-                            <button
-                              onClick={() => deletePlayer(p.id, p.nickname)}
-                              className="px-3 py-1 rounded bg-red-700 hover:bg-red-600 text-white text-sm"
-                            >
-                              Удалить
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                  {participants.length === 0 && !loading && (
-                    <tr>
-                      <td colSpan={5} className="p-3 text-white/70">
-                        Пока нет участников
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                        </div>
+                        <div className="text-white/50 text-sm mt-0.5">@{user?.username || user?.telegram_id}</div>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        {isActive ? (
+                          <button
+                            onClick={() => withdrawPlayer(p.id)}
+                            className="px-3 py-1.5 rounded bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-medium"
+                          >
+                            Исключить
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => restorePlayer(p.id)}
+                            className="px-3 py-1.5 rounded bg-green-600 hover:bg-green-500 text-white text-sm font-medium"
+                          >
+                            Вернуть
+                          </button>
+                        )}
+                        <button
+                          onClick={() => deletePlayer(p.id, p.nickname)}
+                          className="px-3 py-1.5 rounded bg-red-700 hover:bg-red-600 text-white text-sm font-medium"
+                        >
+                          🗑
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+              {participants.length === 0 && !loading && (
+                <div className="bg-white/5 rounded-lg p-4 text-white/70">
+                  Пока нет участников
+                </div>
+              )}
             </div>
             {/* Панель действий после ввода участников */}
             <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
