@@ -991,6 +991,20 @@ export async function deleteAllRoundsForTournament(tournamentId: number): Promis
       return false
     }
 
+    // Clear leaderboard snapshot — it becomes stale without rounds/matches
+    const { error: lbErr } = await supabaseAdmin
+      .from('leaderboard')
+      .delete()
+      .eq('tournament_id', tournamentId)
+
+    if (lbErr) {
+      console.error('Error clearing leaderboard snapshot:', lbErr)
+      // Non-critical: continue even if leaderboard table is missing
+    }
+
+    // Reset archived flag so the tournament can be restarted
+    await updateTournamentArchived(tournamentId, 0)
+
     return true
   } catch (err) {
     console.error('Error in deleteAllRoundsForTournament:', err)
@@ -1001,6 +1015,15 @@ export async function deleteAllRoundsForTournament(tournamentId: number): Promis
 // Удаление конкретного тура и всех его матчей
 export async function deleteRoundById(roundId: number): Promise<boolean> {
   try {
+    // Узнаём tournament_id до удаления тура
+    const { data: roundRow } = await supabaseAdmin
+      .from('rounds')
+      .select('tournament_id')
+      .eq('id', roundId)
+      .single()
+
+    const tournamentId = (roundRow as { tournament_id?: number } | null)?.tournament_id
+
     // Удаляем матчи этого тура
     const { error: matchesErr } = await supabaseAdmin
       .from('matches')
@@ -1021,6 +1044,21 @@ export async function deleteRoundById(roundId: number): Promise<boolean> {
     if (roundErr) {
       console.error('Error deleting round:', roundErr)
       return false
+    }
+
+    // Очищаем snapshot лидерборда — результаты изменились
+    if (tournamentId) {
+      const { error: lbErr } = await supabaseAdmin
+        .from('leaderboard')
+        .delete()
+        .eq('tournament_id', tournamentId)
+
+      if (lbErr) {
+        console.error('Error clearing leaderboard after round deletion:', lbErr)
+      }
+
+      // Снимаем archived, если турнир был завершён
+      await updateTournamentArchived(tournamentId, 0)
     }
 
     return true
