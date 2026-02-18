@@ -98,7 +98,7 @@ async function getAllTournamentMatches(tournamentId: number): Promise<MatchData[
     score_black: m.score_black,
     result: m.result,
     round_number: roundMap.get(m.round_id) || 0,
-  }))
+  })).sort((a, b) => a.round_number - b.round_number)
 }
 
 /**
