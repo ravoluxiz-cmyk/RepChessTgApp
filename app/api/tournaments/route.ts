@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
       compute_performance: body.compute_performance ?? 0,
       hide_color_names: body.hide_color_names ?? 0,
       show_opponent_names: body.show_opponent_names ?? 1,
+      chat_id: body.chat_id || null,
       creator_telegram_id: adminUser.id,
       archived: body.archived ?? 0,
     }

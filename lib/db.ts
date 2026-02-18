@@ -46,6 +46,7 @@ export interface Tournament {
   compute_performance?: number
   hide_color_names?: number
   show_opponent_names?: number
+  chat_id?: string | null
   creator_telegram_id?: number | null
   archived?: number
   created_at?: string
@@ -363,6 +364,20 @@ export async function updateTournamentArchived(id: number, archived: number): Pr
 
   if (error) {
     console.error('Error updating tournament archived status:', error)
+    return false
+  }
+
+  return true
+}
+
+export async function updateTournamentChatId(id: number, chatId: string | null): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('tournaments')
+    .update({ chat_id: chatId })
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error updating tournament chat_id:', error)
     return false
   }
 

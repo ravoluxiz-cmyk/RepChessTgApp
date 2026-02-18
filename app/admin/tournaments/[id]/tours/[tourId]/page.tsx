@@ -180,6 +180,16 @@ export default function TourManagePage() {
         throw new Error(msg)
       }
 
+      // Send leaderboard screenshot to Telegram (fire-and-forget)
+      fetch(`/api/tournaments/${tournamentId}/send-standings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(initData ? { Authorization: `Bearer ${initData}` } : {}),
+        },
+        body: JSON.stringify({ roundNumber: roundNumber ?? 0 }),
+      }).catch((e) => console.error("[send-standings] failed:", e))
+
       router.push(`/admin/tournaments/${tournamentId}/tours/${newTour.id}`)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Неизвестная ошибка")

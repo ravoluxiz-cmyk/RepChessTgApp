@@ -1,6 +1,4 @@
 import { NextResponse, NextRequest } from 'next/server'
-import { ImageResponse } from 'next/og'
-import React from 'react'
 import {
   getTournamentById,
   listTournamentParticipants,
@@ -9,7 +7,6 @@ import {
   type Match,
 } from '@/lib/db'
 import { generatePairingsWithBBP, getLastBbpReason } from '@/lib/bbp'
-import { getSortedStandings } from '@/lib/tiebreakers'
 
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string; tourId: string }> }) {
   const { id, tourId } = await context.params
@@ -49,101 +46,6 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     // Always return the current round pairings after generation to keep response unified
     const matches = await listMatches(roundId)
-
-    try {
-      const sorted = await getSortedStandings(tournamentId)
-      const participants = await listTournamentParticipants(tournamentId)
-      const nickMap = new Map(participants.map(p => [p.id!, p.nickname]))
-      const standings = sorted.map((s, i) => ({
-        participant_id: s.participantId,
-        nickname: nickMap.get(s.participantId) || `#${s.participantId}`,
-        points: s.score,
-      }))
-      const img = new ImageResponse(
-        React.createElement(
-          'div',
-          {
-            style: {
-              fontSize: 16,
-              width: 800,
-              height: 1200,
-              display: 'flex',
-              flexDirection: 'column',
-              padding: 24,
-              background: '#0b1220',
-              color: 'white',
-              fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system',
-            },
-          },
-          [
-            React.createElement('div', { style: { fontSize: 22, fontWeight: 700, marginBottom: 12 } }, `Турнир: ${tournament?.title || 'Без названия'}`),
-            React.createElement('div', { style: { fontSize: 18, opacity: 0.8, marginBottom: 16 } }, `Раунд ${roundId}`),
-            React.createElement(
-              'div',
-              { style: { display: 'flex', flexDirection: 'column', gap: 8 } },
-              [
-                React.createElement(
-                  'div',
-                  { style: { display: 'flex', justifyContent: 'space-between', opacity: 0.8, marginBottom: 6 } },
-                  [
-                    React.createElement('div', null, 'Участник'),
-                    React.createElement('div', { style: { textAlign: 'right' } }, 'Очки'),
-                  ]
-                ),
-                ...standings.slice(0, 25).map((s, i: number) =>
-                  React.createElement(
-                    'div',
-                    {
-                      key: `row-${i}-${s.participant_id}`,
-                      style: {
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        background: i % 2 === 0 ? '#111827' : '#0b1220',
-                        padding: '10px 12px',
-                        borderRadius: 8,
-                      },
-                    },
-                    [
-                      React.createElement('div', null, `${i + 1}. ${s.nickname}`),
-                      React.createElement('div', { style: { textAlign: 'right' } }, s.points.toFixed(2)),
-                    ]
-                  )
-                ),
-              ]
-            ),
-          ]
-        ),
-        { width: 800, height: 1200 }
-      )
-      const token = String(process.env.TELEGRAM_BOT_TOKEN || '').trim()
-      const targetsRaw = String(process.env.ADMIN_TELEGRAM_ID || '').trim()
-      if (token && targetsRaw) {
-        void (async () => {
-          try {
-            const ab = await img.arrayBuffer()
-            const blob = new Blob([ab], { type: 'image/png' })
-            const targets = targetsRaw.split(',').map((s) => s.trim()).filter(Boolean)
-            await Promise.all(
-              targets.map(async (chatId) => {
-                const fd = new FormData()
-                fd.append('chat_id', chatId)
-                fd.append('photo', blob, 'standings.png')
-                fd.append('caption', `Турнир: ${tournament?.title || 'Без названия'}\nРаунд ${roundId}`)
-                const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: fd })
-                if (!res.ok) {
-                  const text = await res.text()
-                  throw new Error(`Telegram sendPhoto failed: ${res.status} ${text}`)
-                }
-              })
-            )
-          } catch (e) {
-            console.error('[Pairings] Telegram sendPhoto failed:', e)
-          }
-        })()
-      }
-    } catch (sErr) {
-      console.error('[Pairings] Screenshot generation/send failed:', sErr)
-    }
 
     // Finalize tournament if exceeded rounds
     await finalizeTournamentIfExceeded(tournamentId)

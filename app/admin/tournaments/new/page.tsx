@@ -54,6 +54,7 @@ export default function AdminCreateTournamentPage() {
   const [computePerformance, setComputePerformance] = useState(false)
   const [hideColorNames, setHideColorNames] = useState(false)
   const [showOpponentNames, setShowOpponentNames] = useState(true)
+  const [chatId, setChatId] = useState("")
   const [archived, setArchived] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -97,6 +98,7 @@ export default function AdminCreateTournamentPage() {
           if (d.compute_performance !== undefined) setComputePerformance(Boolean(d.compute_performance))
           if (d.hide_color_names !== undefined) setHideColorNames(Boolean(d.hide_color_names))
           if (d.show_opponent_names !== undefined) setShowOpponentNames(Boolean(d.show_opponent_names))
+          if (d.chat_id !== undefined) setChatId(String(d.chat_id))
           if (d.archived !== undefined) setArchived(Boolean(d.archived))
         }
       }
@@ -127,6 +129,7 @@ export default function AdminCreateTournamentPage() {
         compute_performance: computePerformance,
         hide_color_names: hideColorNames,
         show_opponent_names: showOpponentNames,
+        chat_id: chatId,
         archived,
       }
       if (typeof window !== "undefined") {
@@ -161,6 +164,7 @@ export default function AdminCreateTournamentPage() {
     computePerformance,
     hideColorNames,
     showOpponentNames,
+    chatId,
     archived,
   ])
 
@@ -211,6 +215,7 @@ export default function AdminCreateTournamentPage() {
           compute_performance: computePerformance ? 1 : 0,
           hide_color_names: hideColorNames ? 1 : 0,
           show_opponent_names: showOpponentNames ? 1 : 0,
+          chat_id: chatId || null,
           archived: archived ? 1 : 0,
         }),
       })
@@ -471,6 +476,20 @@ export default function AdminCreateTournamentPage() {
               <Toggle checked={hideColorNames} onChange={setHideColorNames} label="Скрывать названия цветов" />
               <Toggle checked={showOpponentNames} onChange={setShowOpponentNames} label="Показывать имена противников в итогах" />
               <Toggle checked={archived} onChange={setArchived} label="В архиве" />
+            </div>
+
+            <div className="space-y-4">
+              <h2 className="text-white text-xl font-bold">Telegram</h2>
+              <div>
+                <label className="text-gray-300 text-sm">Chat ID группы (для отправки лидерборда)</label>
+                <input
+                  type="text"
+                  value={chatId}
+                  onChange={(e) => setChatId(e.target.value)}
+                  placeholder="-1001234567890"
+                  className="w-full bg-[#1a1f2e] text-white border border-gray-700 rounded-lg p-3 mt-1"
+                />
+              </div>
             </div>
 
             <button

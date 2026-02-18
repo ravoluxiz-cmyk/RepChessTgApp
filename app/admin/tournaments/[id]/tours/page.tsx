@@ -23,14 +23,27 @@ export default function TournamentToursPage() {
   const [error, setError] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
 
+  // Telegram chat_id editing
+  const [chatId, setChatId] = useState("")
+  const [chatIdSaved, setChatIdSaved] = useState(false)
+  const [chatIdSaving, setChatIdSaving] = useState(false)
+
   useEffect(() => {
     const load = async () => {
       setLoading(true)
       try {
-        const res = await fetch(`/api/tournaments/${tournamentId}/tours`)
-        if (!res.ok) throw new Error("Не удалось загрузить туры")
-        const data = await res.json()
-        setTours(data)
+        // Load tours
+        const toursRes = await fetch(`/api/tournaments/${tournamentId}/tours`)
+        if (!toursRes.ok) throw new Error("Не удалось загрузить туры")
+        const toursData = await toursRes.json()
+        setTours(toursData)
+
+        // Load tournament to get chat_id
+        const tRes = await fetch(`/api/tournaments/${tournamentId}`)
+        if (tRes.ok) {
+          const t = await tRes.json()
+          setChatId(t.chat_id || "")
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Неизвестная ошибка")
       } finally {
@@ -61,6 +74,28 @@ export default function TournamentToursPage() {
       setError(e instanceof Error ? e.message : "Неизвестная ошибка")
     } finally {
       setCreating(false)
+    }
+  }
+
+  const saveChatId = async () => {
+    setChatIdSaving(true)
+    setChatIdSaved(false)
+    try {
+      const res = await fetch(`/api/tournaments/${tournamentId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(initData ? { Authorization: `Bearer ${initData}` } : {}),
+        },
+        body: JSON.stringify({ chat_id: chatId || null }),
+      })
+      if (!res.ok) throw new Error("Не удалось сохранить")
+      setChatIdSaved(true)
+      setTimeout(() => setChatIdSaved(false), 2000)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка сохранения chat_id")
+    } finally {
+      setChatIdSaving(false)
     }
   }
 
@@ -113,6 +148,29 @@ export default function TournamentToursPage() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Telegram Settings */}
+          <div className="mt-8 bg-white/5 rounded-lg p-4">
+            <h2 className="text-white text-lg font-bold mb-3">Telegram</h2>
+            <label className="text-gray-300 text-sm">Chat ID группы (для отправки лидерборда)</label>
+            <p className="text-gray-500 text-xs mb-2">Если не задан — лидерборд отправляется создателю турнира</p>
+            <div className="flex gap-2 mt-1">
+              <input
+                type="text"
+                value={chatId}
+                onChange={(e) => setChatId(e.target.value)}
+                placeholder="-1001234567890"
+                className="flex-1 bg-[#1a1f2e] text-white border border-gray-700 rounded-lg p-3"
+              />
+              <button
+                onClick={saveChatId}
+                disabled={chatIdSaving}
+                className="bg-blue-600 text-white px-4 rounded-lg font-bold hover:bg-blue-500 disabled:opacity-60 whitespace-nowrap"
+              >
+                {chatIdSaved ? "✓" : chatIdSaving ? "..." : "Сохранить"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
