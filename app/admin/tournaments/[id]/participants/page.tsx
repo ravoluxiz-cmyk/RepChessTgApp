@@ -478,8 +478,8 @@ export default function TournamentParticipantsPage() {
           {/* Список участников */}
           <div className="mt-8">
             <h2 className="text-white text-xl font-bold mb-3">Участники</h2>
-            <div className="bg-white/5 rounded-lg overflow-hidden">
-              <table className="min-w-full text-white">
+            <div className="bg-white/5 rounded-lg overflow-x-auto">
+              <table className="min-w-[640px] w-full text-white">
                 <thead>
                   <tr className="bg-white/10">
                     <th className="text-left p-3">Ник</th>
