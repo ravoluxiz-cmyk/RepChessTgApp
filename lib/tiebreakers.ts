@@ -290,27 +290,24 @@ function getOpponentScoresForBuchholz(
 
 /**
  * Собирает очки оппонентов (без мутации opponents массива)
+ * Bye пропускается — не добавляет виртуального оппонента в Бухгольц
  */
 function collectOpponentScores(
   player: PlayerStanding,
   standings: Map<number, PlayerStanding>
 ): number[] {
   const scores: number[] = []
-  let virtualIdx = 0
 
   for (let i = 0; i < player.results.length; i++) {
     if (player.results[i] === 'bye') {
-      if (virtualIdx < player.virtualOpponentScores.length) {
-        scores.push(player.virtualOpponentScores[virtualIdx])
-        virtualIdx++
-      }
-    } else {
-      const opponentId = player.opponents[i]
-      if (opponentId && opponentId !== 0) {
-        const opponent = standings.get(opponentId)
-        if (opponent) {
-          scores.push(opponent.adjustedScore)
-        }
+      // Bye не учитывается в Бухгольце
+      continue
+    }
+    const opponentId = player.opponents[i]
+    if (opponentId && opponentId !== 0) {
+      const opponent = standings.get(opponentId)
+      if (opponent) {
+        scores.push(opponent.adjustedScore)
       }
     }
   }
