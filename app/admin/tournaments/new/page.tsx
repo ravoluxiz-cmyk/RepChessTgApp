@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { ArrowLeft, LogOut, Trash2 } from "lucide-react"
+import { ArrowLeft, LogOut, Trash2, Search, X } from "lucide-react"
 
 const Toggle = ({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) => (
   <label className="flex items-center gap-3 text-white">
@@ -26,14 +26,21 @@ export default function AdminCreateTournamentPage() {
 
   // Все доступные тай-брейкеры
   const ALL_TIEBREAKERS = [
-    { key: 'head_to_head', label: 'Личная встреча (H2H)' },
-    { key: 'buchholz_cut1', label: 'Бухгольц Cut-1' },
+    { key: 'head_to_head', label: 'Личная встреча' },
+    { key: 'buchholz_cut1', label: 'Усеченный Бухгольц-1' },
     { key: 'buchholz', label: 'Бухгольц' },
+    { key: 'sonneborn_berger', label: 'Бергер' },
     { key: 'median_buchholz', label: 'Медианный Бухгольц' },
-    { key: 'sonneborn_berger', label: 'Зоннеборн-Бергер (SB)' },
-    { key: 'number_of_wins', label: 'Кол-во побед' },
+    { key: 'buchholz_cut2', label: 'Усеченный Бухгольц-2' },
+    { key: 'number_of_wins', label: 'Победы' },
+    { key: 'games_as_black', label: 'Игры чёрными' },
+    { key: 'progressive', label: 'Кумулятивный' },
+    { key: 'wins_with_black', label: 'Победы чёрными' },
   ]
   const [tiebreakers, setTiebreakers] = useState<string[]>(['head_to_head', 'buchholz_cut1', 'buchholz'])
+  const [tbSearch, setTbSearch] = useState('')
+  const [tbOpen, setTbOpen] = useState(false)
+  const tbRef = useRef<HTMLDivElement>(null)
   const [teamMode, setTeamMode] = useState("none")
 
   // Options
@@ -51,6 +58,18 @@ export default function AdminCreateTournamentPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
+
+  // Close tiebreaker dropdown on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (tbRef.current && !tbRef.current.contains(e.target as Node)) {
+        setTbOpen(false)
+        setTbSearch('')
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   // Restore draft if available
   useEffect(() => {
@@ -319,59 +338,101 @@ export default function AdminCreateTournamentPage() {
             </div>
 
             {/* Тай-брейки */}
-            <div>
-              <label className="text-white block mb-2">Тай-брейки (порядок = приоритет)</label>
-              <div className="space-y-2">
-                {tiebreakers.map((tbKey, idx) => {
+            <div ref={tbRef} className="relative">
+              <label className="text-white block mb-2">Тай-брейки</label>
+
+              {/* Chips + Search input */}
+              <div
+                className="w-full bg-white/10 rounded-xl border border-white/20 px-3 py-2 flex flex-wrap items-center gap-2 cursor-text"
+                onClick={() => { setTbOpen(true) }}
+              >
+                {tiebreakers.map((tbKey) => {
                   const tb = ALL_TIEBREAKERS.find(t => t.key === tbKey)
                   return (
-                    <div key={tbKey} className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
-                      <span className="text-white/50 text-sm font-mono w-6">{idx + 1}.</span>
-                      <span className="text-white flex-1">{tb?.label || tbKey}</span>
+                    <span
+                      key={tbKey}
+                      className="inline-flex items-center gap-1 bg-white/15 backdrop-blur text-white text-sm px-3 py-1.5 rounded-lg"
+                    >
+                      {tb?.label || tbKey}
                       <button
                         type="button"
-                        disabled={idx === 0}
-                        className="text-white/60 hover:text-white disabled:opacity-30 px-1"
-                        onClick={() => {
-                          const arr = [...tiebreakers]
-                            ;[arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]
-                          setTiebreakers(arr)
+                        className="text-white/60 hover:text-white ml-0.5"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setTiebreakers(tiebreakers.filter(t => t !== tbKey))
                         }}
-                      >▲</button>
-                      <button
-                        type="button"
-                        disabled={idx === tiebreakers.length - 1}
-                        className="text-white/60 hover:text-white disabled:opacity-30 px-1"
-                        onClick={() => {
-                          const arr = [...tiebreakers]
-                            ;[arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]]
-                          setTiebreakers(arr)
-                        }}
-                      >▼</button>
-                      <button
-                        type="button"
-                        className="text-red-400 hover:text-red-300 px-1"
-                        onClick={() => setTiebreakers(tiebreakers.filter(t => t !== tbKey))}
-                      >✕</button>
-                    </div>
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
                   )
                 })}
-              </div>
-              {/* Добавить тай-брейк */}
-              {ALL_TIEBREAKERS.filter(t => !tiebreakers.includes(t.key)).length > 0 && (
-                <div className="mt-2">
-                  <select
-                    className="bg-white/10 text-white p-2 rounded-lg outline-none"
-                    value=""
-                    onChange={(e) => {
-                      if (e.target.value) setTiebreakers([...tiebreakers, e.target.value])
+                {tiebreakers.length > 0 && (
+                  <button
+                    type="button"
+                    className="ml-auto text-white/40 hover:text-white/70"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setTiebreakers([])
                     }}
                   >
-                    <option value="">+ Добавить тай-брейк...</option>
-                    {ALL_TIEBREAKERS.filter(t => !tiebreakers.includes(t.key)).map(t => (
-                      <option key={t.key} value={t.key}>{t.label}</option>
-                    ))}
-                  </select>
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Dropdown */}
+              {tbOpen && (
+                <div className="absolute z-50 left-0 right-0 mt-1 bg-[#2a3a5c] border border-white/20 rounded-xl shadow-2xl overflow-hidden">
+                  {/* Search */}
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+                    <input
+                      type="text"
+                      value={tbSearch}
+                      onChange={(e) => setTbSearch(e.target.value)}
+                      placeholder="Поиск..."
+                      className="flex-1 bg-transparent text-white outline-none placeholder:text-white/40"
+                      autoFocus
+                    />
+                    <Search className="w-5 h-5 text-white/40" />
+                  </div>
+                  {/* Options list */}
+                  <div className="max-h-64 overflow-y-auto">
+                    {ALL_TIEBREAKERS
+                      .filter(t => t.label.toLowerCase().includes(tbSearch.toLowerCase()))
+                      .map(t => {
+                        const isSelected = tiebreakers.includes(t.key)
+                        return (
+                          <button
+                            key={t.key}
+                            type="button"
+                            className={`w-full text-left px-4 py-3 text-white transition-colors ${isSelected
+                              ? 'bg-blue-500/30 text-blue-200'
+                              : 'hover:bg-white/10'
+                              }`}
+                            onClick={() => {
+                              if (isSelected) {
+                                setTiebreakers(tiebreakers.filter(k => k !== t.key))
+                              } else {
+                                setTiebreakers([...tiebreakers, t.key])
+                              }
+                            }}
+                          >
+                            {t.label}
+                          </button>
+                        )
+                      })}
+                  </div>
+                  {/* Done button */}
+                  <div className="border-t border-white/10 px-4 py-2">
+                    <button
+                      type="button"
+                      className="w-full text-center text-sm text-white/60 hover:text-white py-1"
+                      onClick={() => { setTbOpen(false); setTbSearch('') }}
+                    >
+                      Готово
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

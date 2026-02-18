@@ -25,6 +25,8 @@ interface PlayerStanding {
   adjustedScore: number
   opponents: number[] // participantId оппонентов по раундам
   results: ('win' | 'loss' | 'draw' | 'bye' | 'forfeit_win' | 'forfeit_loss')[]
+  /** Цвет фигур в каждом раунде */
+  colors: ('white' | 'black' | 'bye')[]
   /** Фактические очки, полученные в каждом раунде (из БД) */
   matchScores: number[]
   /** Номера раундов для каждого результата */
@@ -34,9 +36,13 @@ interface PlayerStanding {
   tiebreakers: {
     buchholz?: number
     buchholzCut1?: number
+    buchholzCut2?: number
     medianBuchholz?: number
     sonnebornBerger?: number
     numberOfWins?: number
+    gamesAsBlack?: number
+    progressive?: number
+    winsWithBlack?: number
     headToHead?: number
   }
 }
@@ -115,6 +121,7 @@ async function buildStandings(tournamentId: number): Promise<Map<number, PlayerS
       adjustedScore: 0,
       opponents: [],
       results: [],
+      colors: [],
       matchScores: [],
       roundNumbers: [],
       virtualOpponentScores: [],
@@ -141,6 +148,7 @@ async function buildStandings(tournamentId: number): Promise<Map<number, PlayerS
 
         if (blackId) {
           ws.opponents.push(blackId)
+          ws.colors.push('white')
           if (result === 'white') {
             ws.results.push('win')
             ws.adjustedScore += match.score_white || 0
@@ -164,6 +172,7 @@ async function buildStandings(tournamentId: number): Promise<Map<number, PlayerS
         } else {
           // Bye — виртуальный оппонент
           ws.results.push('bye')
+          ws.colors.push('bye')
           const byePoints = match.score_white || 0
           ws.adjustedScore += byePoints >= 1 ? 0.5 : byePoints
           ws.matchScores.push(byePoints)
@@ -179,6 +188,7 @@ async function buildStandings(tournamentId: number): Promise<Map<number, PlayerS
 
         if (whiteId) {
           bs.opponents.push(whiteId)
+          bs.colors.push('black')
           if (result === 'black') {
             bs.results.push('win')
             bs.adjustedScore += match.score_black || 0
@@ -426,6 +436,53 @@ function calculateNumberOfWins(player: PlayerStanding): number {
   return wins
 }
 
+/**
+ * Buchholz Cut-2 — сумма очков оппонентов, убрав 2 самых слабых
+ */
+function calculateBuchholzCut2(
+  player: PlayerStanding,
+  standings: Map<number, PlayerStanding>
+): number {
+  const scores = collectOpponentScores(player, standings)
+  if (scores.length <= 2) return 0
+  const sorted = [...scores].sort((a, b) => a - b)
+  return sorted.slice(2).reduce((sum, s) => sum + s, 0)
+}
+
+/**
+ * Games as Black — количество партий, сыгранных чёрными
+ */
+function calculateGamesAsBlack(player: PlayerStanding): number {
+  return player.colors.filter(c => c === 'black').length
+}
+
+/**
+ * Progressive Score (Кумулятивный) — сумма промежуточных очков
+ * после каждого раунда. Поощряет раннее лидерство.
+ */
+function calculateProgressive(player: PlayerStanding): number {
+  let cumulative = 0
+  let running = 0
+  for (const s of player.matchScores) {
+    running += s
+    cumulative += running
+  }
+  return cumulative
+}
+
+/**
+ * Wins with Black — количество побед чёрными фигурами
+ */
+function calculateWinsWithBlack(player: PlayerStanding): number {
+  let count = 0
+  for (let i = 0; i < player.results.length; i++) {
+    if (player.colors[i] === 'black' && (player.results[i] === 'win' || player.results[i] === 'forfeit_win')) {
+      count++
+    }
+  }
+  return count
+}
+
 // ===== ГЛАВНЫЕ ФУНКЦИИ =====
 
 /**
@@ -437,9 +494,13 @@ export async function calculateAllTiebreakers(tournamentId: number) {
   for (const [, player] of Array.from(standings.entries())) {
     player.tiebreakers.buchholz = calculateBuchholz(player, standings)
     player.tiebreakers.buchholzCut1 = calculateBuchholzCut1(player, standings)
+    player.tiebreakers.buchholzCut2 = calculateBuchholzCut2(player, standings)
     player.tiebreakers.medianBuchholz = calculateMedianBuchholz(player, standings)
     player.tiebreakers.sonnebornBerger = calculateSonnebornBerger(player, standings)
     player.tiebreakers.numberOfWins = calculateNumberOfWins(player)
+    player.tiebreakers.gamesAsBlack = calculateGamesAsBlack(player)
+    player.tiebreakers.progressive = calculateProgressive(player)
+    player.tiebreakers.winsWithBlack = calculateWinsWithBlack(player)
   }
 
   return standings
@@ -522,7 +583,40 @@ export function comparePlayersWithTiebreakers(
       case 'wins': {
         const w1 = player1.tiebreakers.numberOfWins ?? calculateNumberOfWins(player1)
         const w2 = player2.tiebreakers.numberOfWins ?? calculateNumberOfWins(player2)
-        if (w1 !== w2) return w2 - w1 // Больше побед = лучше
+        if (w1 !== w2) return w2 - w1
+        break
+      }
+
+      case 'buchholz_cut2':
+      case 'buchholz-cut2':
+      case 'cut2': {
+        const bc2_1 = player1.tiebreakers.buchholzCut2 ?? calculateBuchholzCut2(player1, standings)
+        const bc2_2 = player2.tiebreakers.buchholzCut2 ?? calculateBuchholzCut2(player2, standings)
+        if (Math.abs(bc2_1 - bc2_2) > 0.001) return bc2_2 - bc2_1
+        break
+      }
+
+      case 'games_as_black':
+      case 'games-as-black': {
+        const gb1 = player1.tiebreakers.gamesAsBlack ?? calculateGamesAsBlack(player1)
+        const gb2 = player2.tiebreakers.gamesAsBlack ?? calculateGamesAsBlack(player2)
+        if (gb1 !== gb2) return gb2 - gb1
+        break
+      }
+
+      case 'progressive':
+      case 'cumulative': {
+        const p1 = player1.tiebreakers.progressive ?? calculateProgressive(player1)
+        const p2 = player2.tiebreakers.progressive ?? calculateProgressive(player2)
+        if (Math.abs(p1 - p2) > 0.001) return p2 - p1
+        break
+      }
+
+      case 'wins_with_black':
+      case 'wins-with-black': {
+        const wb1 = player1.tiebreakers.winsWithBlack ?? calculateWinsWithBlack(player1)
+        const wb2 = player2.tiebreakers.winsWithBlack ?? calculateWinsWithBlack(player2)
+        if (wb1 !== wb2) return wb2 - wb1
         break
       }
     }
