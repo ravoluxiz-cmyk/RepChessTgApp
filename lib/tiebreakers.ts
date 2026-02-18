@@ -131,14 +131,18 @@ async function buildStandings(tournamentId: number): Promise<Map<number, PlayerS
 
   const matches = await getAllTournamentMatches(tournamentId)
 
-  // Определяем общее кол-во сыгранных раундов
-  const totalRounds = matches.reduce((max, m) => Math.max(max, m.round_number), 0)
+  // Определяем общее кол-во сыгранных раундов (исключаем not_played)
+  const playedMatches = matches.filter(m => m.result && m.result !== 'not_played')
+  const totalRounds = playedMatches.reduce((max, m) => Math.max(max, m.round_number), 0)
 
   // Первый проход: накапливаем score, opponents, results
   for (const match of matches) {
     const whiteId = match.white_participant_id
     const blackId = match.black_participant_id
     const result = match.result
+
+    // Пропускаем ещё не сыгранные матчи
+    if (!result || result === 'not_played') continue
 
     if (whiteId) {
       const ws = standings.get(whiteId)
