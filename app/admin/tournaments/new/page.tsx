@@ -23,13 +23,23 @@ export default function AdminCreateTournamentPage() {
   const [pointsDraw, setPointsDraw] = useState(0.5)
   const [byePoints, setByePoints] = useState(0)
   const [rounds, setRounds] = useState(5)
-  const tiebreakers: string[] = ["head_to_head", "buchholz_cut1", "buchholz", "median_buchholz"]
+
+  // Все доступные тай-брейкеры
+  const ALL_TIEBREAKERS = [
+    { key: 'head_to_head', label: 'Личная встреча (H2H)' },
+    { key: 'buchholz_cut1', label: 'Бухгольц Cut-1' },
+    { key: 'buchholz', label: 'Бухгольц' },
+    { key: 'median_buchholz', label: 'Медианный Бухгольц' },
+    { key: 'sonneborn_berger', label: 'Зоннеборн-Бергер (SB)' },
+    { key: 'number_of_wins', label: 'Кол-во побед' },
+  ]
+  const [tiebreakers, setTiebreakers] = useState<string[]>(['head_to_head', 'buchholz_cut1', 'buchholz'])
   const [teamMode, setTeamMode] = useState("none")
 
   // Options
-  const [allowJoin, setAllowJoin] = useState(false)
-  const [allowEditResults, setAllowEditResults] = useState(false)
-  const [allowDangerChanges, setAllowDangerChanges] = useState(false)
+  const [allowJoin, setAllowJoin] = useState(true)
+  const [allowEditResults, setAllowEditResults] = useState(true)
+  const [allowDangerChanges, setAllowDangerChanges] = useState(true)
   const [forbidRepeatBye, setForbidRepeatBye] = useState(true)
   const [lateJoinPoints, setLateJoinPoints] = useState(false)
   const [hideRating, setHideRating] = useState(false)
@@ -56,6 +66,7 @@ export default function AdminCreateTournamentPage() {
           if (d.points_draw !== undefined) setPointsDraw(Number(d.points_draw))
           if (d.bye_points !== undefined) setByePoints(Number(d.bye_points))
           if (d.rounds !== undefined) setRounds(Number(d.rounds))
+          if (d.tiebreakers !== undefined && Array.isArray(d.tiebreakers)) setTiebreakers(d.tiebreakers)
           if (d.team_mode !== undefined) setTeamMode(String(d.team_mode))
           if (d.allow_join !== undefined) setAllowJoin(Boolean(d.allow_join))
           if (d.allow_edit_results !== undefined) setAllowEditResults(Boolean(d.allow_edit_results))
@@ -85,6 +96,7 @@ export default function AdminCreateTournamentPage() {
         points_draw: pointsDraw,
         bye_points: byePoints,
         rounds,
+        tiebreakers,
         team_mode: teamMode,
         allow_join: allowJoin,
         allow_edit_results: allowEditResults,
@@ -118,6 +130,7 @@ export default function AdminCreateTournamentPage() {
     pointsDraw,
     byePoints,
     rounds,
+    tiebreakers,
     teamMode,
     allowJoin,
     allowEditResults,
@@ -307,12 +320,60 @@ export default function AdminCreateTournamentPage() {
 
             {/* Тай-брейки */}
             <div>
-              <label className="text-white block mb-2">Тай-брейки</label>
-              <div className="flex flex-wrap gap-2">
-                {tiebreakers.map((tb) => (
-                  <span key={tb} className="bg-white/10 text-white px-3 py-2 rounded-lg">{tb}</span>
-                ))}
+              <label className="text-white block mb-2">Тай-брейки (порядок = приоритет)</label>
+              <div className="space-y-2">
+                {tiebreakers.map((tbKey, idx) => {
+                  const tb = ALL_TIEBREAKERS.find(t => t.key === tbKey)
+                  return (
+                    <div key={tbKey} className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+                      <span className="text-white/50 text-sm font-mono w-6">{idx + 1}.</span>
+                      <span className="text-white flex-1">{tb?.label || tbKey}</span>
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        className="text-white/60 hover:text-white disabled:opacity-30 px-1"
+                        onClick={() => {
+                          const arr = [...tiebreakers]
+                            ;[arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]
+                          setTiebreakers(arr)
+                        }}
+                      >▲</button>
+                      <button
+                        type="button"
+                        disabled={idx === tiebreakers.length - 1}
+                        className="text-white/60 hover:text-white disabled:opacity-30 px-1"
+                        onClick={() => {
+                          const arr = [...tiebreakers]
+                            ;[arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]]
+                          setTiebreakers(arr)
+                        }}
+                      >▼</button>
+                      <button
+                        type="button"
+                        className="text-red-400 hover:text-red-300 px-1"
+                        onClick={() => setTiebreakers(tiebreakers.filter(t => t !== tbKey))}
+                      >✕</button>
+                    </div>
+                  )
+                })}
               </div>
+              {/* Добавить тай-брейк */}
+              {ALL_TIEBREAKERS.filter(t => !tiebreakers.includes(t.key)).length > 0 && (
+                <div className="mt-2">
+                  <select
+                    className="bg-white/10 text-white p-2 rounded-lg outline-none"
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value) setTiebreakers([...tiebreakers, e.target.value])
+                    }}
+                  >
+                    <option value="">+ Добавить тай-брейк...</option>
+                    {ALL_TIEBREAKERS.filter(t => !tiebreakers.includes(t.key)).map(t => (
+                      <option key={t.key} value={t.key}>{t.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Командный режим */}
