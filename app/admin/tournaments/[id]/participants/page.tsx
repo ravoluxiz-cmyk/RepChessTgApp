@@ -85,14 +85,14 @@ export default function TournamentParticipantsPage() {
     try {
       const res = await fetch(`/api/participants/add`, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           ...(initData ? { Authorization: `Bearer ${initData}` } : {}),
         },
-        body: JSON.stringify({ 
-          tournament_id: tournamentId, 
-          user_id: selectedUserId, 
-          nickname: nickname.trim() 
+        body: JSON.stringify({
+          tournament_id: tournamentId,
+          user_id: selectedUserId,
+          nickname: nickname.trim()
         }),
       })
       if (!res.ok) {
@@ -153,7 +153,7 @@ export default function TournamentParticipantsPage() {
         try {
           const data = await pairRes.json()
           if (data && typeof data.error === 'string') msg = data.error
-        } catch {}
+        } catch { }
         if (pairRes.status === 502) {
           msg = "BBP недоступен или вернул пустой результат. Для Vercel используйте bbp-mock.js вместо нативного бинарника. Проверьте BBP_PAIRINGS_BIN в .env.local. Пары можно сгенерировать позже на странице тура."
         }
@@ -240,7 +240,7 @@ export default function TournamentParticipantsPage() {
         const data = await res.json()
         setSearchResults(Array.isArray(data.users) ? data.users : [])
         setShowDropdown(true)
-      } catch { 
+      } catch {
         // ignore fetch aborts
         setShowDropdown(false)
       } finally {
@@ -275,8 +275,8 @@ export default function TournamentParticipantsPage() {
         typeof data === 'object' && data !== null && 'inserted' in data && typeof (data as { inserted: unknown }).inserted === 'number'
           ? (data as { inserted: number }).inserted
           : (typeof data === 'object' && data !== null && 'count' in data && typeof (data as { count: unknown }).count === 'number'
-              ? (data as { count: number }).count
-              : 0)
+            ? (data as { count: number }).count
+            : 0)
       setSeedInfo(`Добавлено пользователей: ${insertedCount}`)
       const usersRes = await fetch("/api/users")
       if (usersRes.ok) {
@@ -331,6 +331,13 @@ export default function TournamentParticipantsPage() {
     <ChessBackground>
       <div className="min-h-screen px-4 py-10">
         <div className="max-w-3xl mx-auto">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-white/70 hover:text-white mb-4 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
+            Назад
+          </button>
           <h1 className="text-4xl font-black text-white mb-6">Добавить участников</h1>
 
           {error && (
@@ -473,7 +480,7 @@ export default function TournamentParticipantsPage() {
                         <td className="p-3">{p.nickname}</td>
                         <td className="p-3">@{user?.username || user?.telegram_id}</td>
                         <td className="p-3">
-                          <span className={`px-2 py-1 rounded text-xs ${isActive ? 'bg-green-600/30 text-green-300' : 'bg-red-600/30 text-red-300'}`}>
+                          <span className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-1 rounded text-xs ${isActive ? 'bg-green-600/30 text-green-300' : 'bg-red-600/30 text-red-300'}`}>
                             {isActive ? '✓ Активен' : '✗ Исключен'}
                           </span>
                         </td>
