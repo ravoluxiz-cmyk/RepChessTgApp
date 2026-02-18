@@ -25,6 +25,8 @@ type LeaderRow = {
   nickname: string
   points: number
   rank: number
+  rounds?: { label: string }[]
+  tbValues?: Record<string, number | undefined>
 }
 
 export default function TourManagePage() {
@@ -45,6 +47,9 @@ export default function TourManagePage() {
 
   // Лидерборд (онлайн таблица очков)
   const [leaderboard, setLeaderboard] = useState<LeaderRow[]>([])
+  const [lbTotalRounds, setLbTotalRounds] = useState(0)
+  const [lbTbKeys, setLbTbKeys] = useState<string[]>([])
+  const [lbTbLabels, setLbTbLabels] = useState<Record<string, string>>({})
   const [lbLoading, setLbLoading] = useState<boolean>(false)
   const [lbError, setLbError] = useState<string | null>(null)
 
@@ -87,7 +92,7 @@ export default function TourManagePage() {
         const t = await tournamentRes.json()
         setTournamentMeta(t && typeof t === 'object' ? { rounds: Number(t.rounds || 0), archived: Number(t.archived || 0) } : null)
       }
-    } catch {}
+    } catch { }
   }, [tournamentId, tourId])
 
   useEffect(() => {
@@ -111,7 +116,7 @@ export default function TourManagePage() {
         try {
           const err = await res.json()
           if (err && typeof err.error === 'string') msg = err.error
-        } catch {}
+        } catch { }
         if (res.status === 502) {
           msg = "BBP недоступен или вернул пустой результат. Для Vercel используйте bbp-mock.js вместо нативного бинарника. Проверьте BBP_PAIRINGS_BIN в .env.local."
         }
@@ -168,7 +173,7 @@ export default function TourManagePage() {
         try {
           const err = await pairRes.json()
           if (err && typeof err.error === 'string') msg = err.error
-        } catch {}
+        } catch { }
         if (pairRes.status === 502) {
           msg = "BBP недоступен или вернул пустой результат. Для Vercel используйте bbp-mock.js вместо нативного бинарника. Проверьте BBP_PAIRINGS_BIN в .env.local."
         }
@@ -218,8 +223,20 @@ export default function TourManagePage() {
     try {
       const res = await fetch(`/api/tournaments/${tournamentId}/leaderboard`)
       if (!res.ok) throw new Error("Не удалось загрузить лидерборд")
-      const rows = await res.json()
-      setLeaderboard(Array.isArray(rows) ? rows : [])
+      const data = await res.json()
+      // New structured response
+      if (data && data.rows) {
+        setLeaderboard(Array.isArray(data.rows) ? data.rows : [])
+        setLbTotalRounds(data.totalRounds || 0)
+        setLbTbKeys(Array.isArray(data.tiebreakerKeys) ? data.tiebreakerKeys : [])
+        setLbTbLabels(data.tiebreakerLabels || {})
+      } else {
+        // Legacy flat array fallback
+        setLeaderboard(Array.isArray(data) ? data : [])
+        setLbTotalRounds(0)
+        setLbTbKeys([])
+        setLbTbLabels({})
+      }
     } catch (e) {
       setLbError(e instanceof Error ? e.message : "Неизвестная ошибка")
     } finally {
@@ -346,25 +363,46 @@ export default function TourManagePage() {
               <div className="bg-red-500/20 border border-red-500 text-white rounded-lg p-3 mb-3">{lbError}</div>
             )}
             <div className="overflow-x-auto">
-              <table className="min-w-full text-white">
+              <table className="min-w-full text-white text-sm">
                 <thead>
                   <tr className="bg-white/10">
-                    <th className="text-left p-3">Место</th>
-                    <th className="text-left p-3">Участник</th>
-                    <th className="text-left p-3">Очки</th>
+                    <th className="text-left p-2 whitespace-nowrap">Место</th>
+                    <th className="text-left p-2 whitespace-nowrap">Имя</th>
+                    <th className="text-center p-2 whitespace-nowrap">Очки</th>
+                    {Array.from({ length: lbTotalRounds }, (_, i) => (
+                      <th key={`rh-${i}`} className="text-center p-2 whitespace-nowrap">Тур<br />#{i + 1}</th>
+                    ))}
+                    {lbTbKeys.map(k => (
+                      <th key={`tbh-${k}`} className="text-center p-2 whitespace-nowrap">{lbTbLabels[k] || k}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {leaderboard.map((row) => (
-                    <tr key={row.participant_id} className="border-t border-white/10">
-                      <td className="p-3">#{row.rank}</td>
-                      <td className="p-3">{row.nickname}</td>
-                      <td className="p-3 font-semibold">{row.points}</td>
+                    <tr key={row.participant_id} className="border-t border-white/10 hover:bg-white/5">
+                      <td className="p-2 font-bold text-center">{row.rank}</td>
+                      <td className="p-2 whitespace-nowrap">{row.nickname}</td>
+                      <td className="p-2 text-center font-semibold">{row.points}</td>
+                      {row.rounds ? row.rounds.map((r, i) => {
+                        const label = r.label || ''
+                        const color = label.startsWith('+') ? 'text-green-400'
+                          : label.startsWith('-') ? 'text-red-400'
+                            : label.startsWith('=') ? 'text-yellow-400'
+                              : 'text-white/50'
+                        return <td key={`r-${i}`} className={`p-2 text-center whitespace-nowrap font-mono text-xs ${color}`}>{label}</td>
+                      }) : Array.from({ length: lbTotalRounds }, (_, i) => (
+                        <td key={`r-${i}`} className="p-2 text-center">–</td>
+                      ))}
+                      {lbTbKeys.map(k => (
+                        <td key={`tb-${k}`} className="p-2 text-center whitespace-nowrap">
+                          {row.tbValues?.[k] != null ? Number(row.tbValues[k]).toFixed(1) : '–'}
+                        </td>
+                      ))}
                     </tr>
                   ))}
                   {!lbLoading && leaderboard.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="p-3 text-white/70">Ещё нет данных для таблицы. Добавьте участников и/или результаты.</td>
+                      <td colSpan={3 + lbTotalRounds + lbTbKeys.length} className="p-3 text-white/70">Ещё нет данных для таблицы. Добавьте участников и/или результаты.</td>
                     </tr>
                   )}
                 </tbody>

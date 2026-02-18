@@ -17,7 +17,7 @@ import { supabaseAdmin } from './supabase'
 
 // ===== ТИПЫ =====
 
-interface PlayerStanding {
+export interface PlayerStanding {
   participantId: number
   /** Реальные набранные очки */
   score: number
@@ -171,6 +171,7 @@ async function buildStandings(tournamentId: number): Promise<Map<number, PlayerS
           ws.matchScores.push(match.score_white || 0)
         } else {
           // Bye — виртуальный оппонент
+          ws.opponents.push(0) // 0 = нет оппонента (bye), для синхронизации массивов
           ws.results.push('bye')
           ws.colors.push('bye')
           const byePoints = match.score_white || 0
@@ -291,21 +292,17 @@ function collectOpponentScores(
   standings: Map<number, PlayerStanding>
 ): number[] {
   const scores: number[] = []
-  let opponentIdx = 0
   let virtualIdx = 0
 
   for (let i = 0; i < player.results.length; i++) {
-    const res = player.results[i]
-
-    if (res === 'bye') {
+    if (player.results[i] === 'bye') {
       if (virtualIdx < player.virtualOpponentScores.length) {
         scores.push(player.virtualOpponentScores[virtualIdx])
         virtualIdx++
       }
     } else {
-      if (opponentIdx < player.opponents.length) {
-        const opponentId = player.opponents[opponentIdx]
-        opponentIdx++
+      const opponentId = player.opponents[i]
+      if (opponentId && opponentId !== 0) {
         const opponent = standings.get(opponentId)
         if (opponent) {
           scores.push(opponent.adjustedScore)
@@ -336,8 +333,8 @@ function calculateHeadToHead(
   let score2 = 0
   let gamesPlayed = 0
 
-  for (let i = 0; i < player1.opponents.length; i++) {
-    if (player1.opponents[i] === player2.participantId) {
+  for (let i = 0; i < player1.results.length; i++) {
+    if (player1.opponents[i] && player1.opponents[i] === player2.participantId) {
       gamesPlayed++
       const res = player1.results[i]
       if (res === 'win' || res === 'forfeit_win') score1 += 1
