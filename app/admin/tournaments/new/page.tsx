@@ -23,7 +23,7 @@ export default function AdminCreateTournamentPage() {
   const [pointsDraw, setPointsDraw] = useState(0.5)
   const [byePoints, setByePoints] = useState(0)
   const [rounds, setRounds] = useState(5)
-  const tiebreakers: string[] = ["head_to_head", "buchholz_cut1", "buchholz"]
+  const tiebreakers: string[] = ["head_to_head", "buchholz_cut1", "buchholz", "median_buchholz"]
   const [teamMode, setTeamMode] = useState("none")
 
   // Options
