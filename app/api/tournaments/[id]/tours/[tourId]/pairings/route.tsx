@@ -5,11 +5,11 @@ import {
   getTournamentById,
   listTournamentParticipants,
   listMatches,
-  getStandings,
   finalizeTournamentIfExceeded,
   type Match,
 } from '@/lib/db'
 import { generatePairingsWithBBP, getLastBbpReason } from '@/lib/bbp'
+import { getSortedStandings } from '@/lib/tiebreakers'
 
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string; tourId: string }> }) {
   const { id, tourId } = await context.params
@@ -51,7 +51,14 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     const matches = await listMatches(roundId)
 
     try {
-      const standings = await getStandings(tournamentId)
+      const sorted = await getSortedStandings(tournamentId)
+      const participants = await listTournamentParticipants(tournamentId)
+      const nickMap = new Map(participants.map(p => [p.id!, p.nickname]))
+      const standings = sorted.map((s, i) => ({
+        participant_id: s.participantId,
+        nickname: nickMap.get(s.participantId) || `#${s.participantId}`,
+        points: s.score,
+      }))
       const img = new ImageResponse(
         React.createElement(
           'div',

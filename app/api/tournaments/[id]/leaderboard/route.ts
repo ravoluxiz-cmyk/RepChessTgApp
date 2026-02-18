@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { listLeaderboard, getStandings } from "@/lib/db"
+import { listLeaderboard } from "@/lib/db"
+import { getSortedStandings } from "@/lib/tiebreakers"
 
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -13,14 +14,24 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
       return NextResponse.json(leaderboard)
     }
 
-    // Fallback: compute standings dynamically when snapshot is absent
-    const standings = await getStandings(tournamentId)
-    const rows = standings.map((s, idx) => ({
-      participant_id: s.participant_id,
-      nickname: s.nickname,
-      points: s.points,
+    // Fallback: compute standings dynamically with tiebreakers
+    const sorted = await getSortedStandings(tournamentId)
+    const rows = sorted.map((s, idx) => ({
+      participant_id: s.participantId,
+      nickname: '', // will be filled below
+      points: s.score,
       rank: idx + 1,
+      tiebreakers: s.tiebreakers,
     }))
+
+    // Fill nicknames from participants
+    const { listTournamentParticipants } = await import("@/lib/db")
+    const participants = await listTournamentParticipants(tournamentId)
+    const nickMap = new Map(participants.map(p => [p.id!, p.nickname]))
+    for (const row of rows) {
+      row.nickname = nickMap.get(row.participant_id) || `#${row.participant_id}`
+    }
+
     return NextResponse.json(rows)
   } catch (e) {
     console.error("Failed to get leaderboard:", e)
