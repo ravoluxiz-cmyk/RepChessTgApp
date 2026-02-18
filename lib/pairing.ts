@@ -378,17 +378,37 @@ function generateRound1Pairings(players: Player[]): Pairing[] {
  * ПОСЛЕДУЮЩИЕ РАУНДЫ: Swiss с группировкой по очкам
  */
 function generateSubsequentRoundPairings(players: Player[]): Pairing[] {
-  const groups = groupByScore(players)
-  const sortedScores = Array.from(groups.keys()).sort((a, b) => b - a)
-
   const allPairs: Pairing[] = []
-  let floaters: Player[] = []
 
   // Сбрасываем флаги
   for (const p of players) {
     p.paired = false
     p.floated = false
   }
+
+  // Если нечётное число — сначала выбираем bye-кандидата
+  let byePlayer: Player | null = null
+  let activePlayers = players
+
+  if (players.length % 2 === 1) {
+    // Сортируем кандидатов: приоритет — не имел bye, меньше очков, ниже рейтинг
+    const candidates = [...players].sort((a, b) => {
+      // Сначала те, кто НЕ имел bye
+      if (a.hadBye !== b.hadBye) return a.hadBye ? 1 : -1
+      // Потом по очкам (меньше — приоритетнее для bye)
+      if (a.score !== b.score) return a.score - b.score
+      // Потом по рейтингу (ниже рейтинг — приоритетнее)
+      return a.rating - b.rating
+    })
+    byePlayer = candidates[0]
+    byePlayer.paired = true
+    activePlayers = players.filter(p => p !== byePlayer)
+  }
+
+  const groups = groupByScore(activePlayers)
+  const sortedScores = Array.from(groups.keys()).sort((a, b) => b - a)
+
+  let floaters: Player[] = []
 
   // Обрабатываем группы от большего количества очков к меньшему
   for (let i = 0; i < sortedScores.length; i++) {
@@ -434,10 +454,15 @@ function generateSubsequentRoundPairings(players: Player[]): Pairing[] {
     }
   }
 
-  // Последний непарованный получает bye
+  // Fallback: если остался непарованный (не должно быть при нечётном — мы уже выбрали bye)
   if (floaters.length === 1) {
+    byePlayer = floaters[0]
+  }
+
+  // Добавляем bye-пару, если есть
+  if (byePlayer) {
     allPairs.push({
-      white: floaters[0].id,
+      white: byePlayer.id,
       black: null,
       boardNo: 0
     })
