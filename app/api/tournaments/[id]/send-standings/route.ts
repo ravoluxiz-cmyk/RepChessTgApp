@@ -85,7 +85,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         const tiebreakerKeys = tiebreakerString.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
         const totalRounds = sorted.reduce((max, s) => Math.max(max, s.roundNumbers.length), 0)
 
-        const isFinal = tournament.rounds > 0 && totalRounds >= tournament.rounds
+        const effectiveRound = roundNumber ?? totalRounds
+        const isFinal = tournament.rounds > 0 && effectiveRound >= tournament.rounds
 
         // Build row data
         const rows = sorted.map((s, idx) => {
