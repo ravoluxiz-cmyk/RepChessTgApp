@@ -56,7 +56,7 @@ function resolveBbpBinary(): { ok: boolean; bin?: string; reason?: string } {
     } else if (platform === 'win32') {
       candidates.push(path.join(bbpDir, 'bbpPairings.exe'))
     }
-  } catch {}
+  } catch { }
 
   // Fallback to PATH name
   candidates.push('bbpPairings')
@@ -68,7 +68,7 @@ function resolveBbpBinary(): { ok: boolean; bin?: string; reason?: string } {
       if (existsSync(c)) {
         return { ok: true, bin: c }
       }
-    } catch {}
+    } catch { }
   }
 
   // If env was provided but not found as a file, still return it (spawn will error if invalid)
@@ -87,7 +87,7 @@ function resolveBbpBinary(): { ok: boolean; bin?: string; reason?: string } {
 async function ensureFileDir(dir: string) {
   try {
     await fs.mkdir(dir, { recursive: true })
-  } catch {}
+  } catch { }
 }
 
 function toOneDecimal(n: number | undefined | null): string {
@@ -277,7 +277,7 @@ async function runBbpBinary(trfPath: string, outPath: string, listPath: string, 
     let killed = false
     const timer = setTimeout(() => {
       killed = true
-      try { child.kill('SIGKILL') } catch {}
+      try { child.kill('SIGKILL') } catch { }
       reject(new Error(`Timeout after ${timeoutMs}ms`))
     }, timeoutMs)
 
@@ -324,7 +324,7 @@ export async function generatePairingsWithBBP(tournamentId: number, roundId: num
   lastBbpReason = undefined
 
   // Всегда используем встроенный Swiss pairing генератор (FIDE Dutch System)
-  console.log('[BBP] Using built-in Swiss pairing generator (FIDE Dutch System)')
+  // Using built-in Swiss pairing generator (FIDE Dutch System)
   try {
     const swiss = await generateSwissPairings(tournamentId, roundId)
     if (!swiss || swiss.length === 0) {

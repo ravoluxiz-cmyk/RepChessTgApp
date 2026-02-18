@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect, useRef } from "react"
 
 interface TelegramWebApp {
   initData: string
@@ -65,10 +65,6 @@ export function useTelegramWebApp() {
       // Expand to full height
       tg.expand()
 
-      console.log("Telegram WebApp initialized")
-      console.log("initData available:", !!tg.initData)
-      console.log("User:", tg.initDataUnsafe?.user)
-
       setIsReady(true)
     } else {
       // For development/testing outside Telegram
@@ -78,8 +74,12 @@ export function useTelegramWebApp() {
   }, [])
 
   // For development: create mock initData if not available
-  const getMockInitData = () => {
+  const mockInitDataRef = useRef<string | null>(null)
+
+  const getMockInitData = (): string => {
     if (webApp?.initData) return webApp.initData
+
+    if (mockInitDataRef.current) return mockInitDataRef.current
 
     // Create mock data for development
     const mockUser = {
@@ -92,7 +92,7 @@ export function useTelegramWebApp() {
     const userJson = JSON.stringify(mockUser)
     const mockInitData = `user=${encodeURIComponent(userJson)}&auth_date=${Math.floor(Date.now() / 1000)}&hash=mock_hash_for_development`
 
-    console.log("Using mock initData for development")
+    mockInitDataRef.current = mockInitData
     return mockInitData
   }
 

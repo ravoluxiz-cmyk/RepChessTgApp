@@ -3,6 +3,19 @@
 import { motion } from "framer-motion";
 import { HoverButton } from "@/components/ui/hover-button";
 
+// Static animation variants hoisted out of component (rendering-hoist-jsx)
+const fadeUpVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1,
+      delay: 0.5 + i * 0.2,
+      ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number],
+    },
+  }),
+};
 // Checkered pattern background
 function ChessboardPattern() {
   return (
@@ -42,19 +55,6 @@ export default function ChessBackground({
   description?: string;
   children?: React.ReactNode;
 }) {
-  const fadeUpVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 1,
-        delay: 0.5 + i * 0.2,
-        ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number],
-      },
-    }),
-  };
-
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Gradient overlays */}

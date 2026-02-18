@@ -124,7 +124,7 @@ export function getTelegramUserFromHeaders(
     console.error("initData is empty")
     return null
   }
-  console.log("Processing Telegram auth, NODE_ENV:", process.env.NODE_ENV)
+
 
   // In production, use full validation
   if (process.env.NODE_ENV === "production") {
@@ -145,8 +145,6 @@ export function getTelegramUserFromHeaders(
   const user = parseTelegramWebAppData(initData)
   if (!user) {
     console.error("Failed to parse Telegram data in development")
-  } else {
-    console.log("Successfully parsed Telegram user:", user.id, user.first_name)
   }
   return user
 }

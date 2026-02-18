@@ -6,6 +6,13 @@ import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import { ArrowLeft, LogOut, Trash2 } from "lucide-react"
 
+const Toggle = ({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) => (
+  <label className="flex items-center gap-3 text-white">
+    <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5" />
+    {label}
+  </label>
+)
+
 export default function AdminCreateTournamentPage() {
   const router = useRouter()
   const { initData } = useTelegramWebApp()
@@ -181,7 +188,7 @@ export default function AdminCreateTournamentPage() {
       }
       const created = await res.json()
       // Clear draft after successful creation
-      try { if (typeof window !== "undefined") localStorage.removeItem("tournament_draft") } catch {}
+      try { if (typeof window !== "undefined") localStorage.removeItem("tournament_draft") } catch { }
       router.push(`/admin/tournaments/${created.id}/participants`)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Неизвестная ошибка")
@@ -189,13 +196,6 @@ export default function AdminCreateTournamentPage() {
       setSaving(false)
     }
   }
-
-  const Toggle = ({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) => (
-    <label className="flex items-center gap-3 text-white">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5" />
-      {label}
-    </label>
-  )
 
   return (
     <ChessBackground>
@@ -260,7 +260,7 @@ export default function AdminCreateTournamentPage() {
               >
                 <option value="swiss_bbp_dutch">Швейцарская система (BBP Dutch)</option>
                 <option value="swiss_bbp_burstein">Швейцарская система (BBP Burstein)</option>
-                
+
               </select>
             </div>
 

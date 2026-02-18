@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from '@supabase/supabase-js'
 
 // Supabase configuration
@@ -10,6 +9,7 @@ const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 const nowIso = () => new Date().toISOString()
 
 // In-memory fallback store (dev/testing)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface MemRow { [key: string]: any }
 interface MemStore {
   users: MemRow[]
@@ -22,6 +22,7 @@ interface MemStore {
 }
 
 function getGlobalStore(): MemStore {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const g = globalThis as any
   if (!g.__MEM_SUPABASE_STORE__) {
     g.__MEM_SUPABASE_STORE__ = {
@@ -77,7 +78,9 @@ class QueryBuilder {
     return this
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   eq(column: string, value: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.filters.push((row) => (row as any)[column] === value)
     return this
   }
@@ -85,6 +88,7 @@ class QueryBuilder {
   ilike(column: string, pattern: string) {
     const needle = String(pattern).replace(/%/g, '').toLowerCase()
     this.filters.push((row) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const v = String((row as any)[column] ?? '').toLowerCase()
       return needle ? v.includes(needle) : true
     })
@@ -114,7 +118,9 @@ class QueryBuilder {
     if (!this.orderBy) return rows
     const { column, ascending } = this.orderBy
     return rows.slice().sort((a, b) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const av = (a as any)[column]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const bv = (b as any)[column]
       if (av === bv) return 0
       if (av === undefined) return ascending ? 1 : -1
@@ -129,6 +135,7 @@ class QueryBuilder {
     return rows.slice(0, this.limitCount)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private execInsert(): { data: any; error: any } {
     if (!this.insertValues) return { data: null, error: null }
     const arr = Array.isArray(this.insertValues) ? this.insertValues : [this.insertValues]
@@ -147,6 +154,7 @@ class QueryBuilder {
     return { data: inserted, error: null }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private execUpdate(): { data: any; error: any } {
     const target = (this.store[this.table] as MemRow[])
     const rows = this.applyFilters(target)
@@ -160,15 +168,17 @@ class QueryBuilder {
     return { data, error: null }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private execDelete(): { data: any; error: any } {
     const target = (this.store[this.table] as MemRow[])
     const before = target.length
     const kept = target.filter((r) => !this.applyFilters([r]).length)
-    ;(this.store[this.table] as MemRow[]) = kept
+      ; (this.store[this.table] as MemRow[]) = kept
     const deleted = before - kept.length
     return { data: { deleted }, error: null }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private execSelect(): { data: any; error: any } {
     let rows = this.applyFilters(this.store[this.table] as MemRow[])
     rows = this.sortRows(rows)
@@ -186,8 +196,10 @@ class QueryBuilder {
   }
 
   // Emulate Supabase promise behavior
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   then(onFulfilled: (value: { data: any; error: any }) => any, onRejected?: (reason: any) => any) {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let result: { data: any; error: any }
       switch (this.action) {
         case 'insert':
@@ -215,10 +227,12 @@ function createMemoryClient() {
     from(table: keyof MemStore) {
       return new QueryBuilder(table, store)
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any
 }
 
 // Create Supabase client for client-side operations (uses anon key, subject to RLS)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const supabase: any = (() => {
   const hasReal = !!(supabaseUrl && supabaseAnonKey)
   if (hasReal) {
@@ -236,6 +250,7 @@ export const supabase: any = (() => {
 
 // Create Supabase client for server-side operations (uses service role key, bypasses RLS)
 // Use this for admin operations like creating tournaments, managing users, etc.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const supabaseAdmin: any = (() => {
   const hasReal = !!(supabaseUrl && supabaseServiceRoleKey)
   if (hasReal) {

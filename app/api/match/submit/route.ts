@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "Missing or invalid result" }, { status: 400 })
     }
 
-    const allowed = new Set(["white", "black", "draw", "bye", "forfeit_white", "forfeit_black", "not_played"]) 
+    const allowed = new Set(["white", "black", "draw", "bye", "forfeit_white", "forfeit_black", "not_played"])
     const finalResult = allowed.has(result) ? result : "not_played"
 
     const updated = await updateMatchResult(matchId, finalResult)
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       try {
         const ratingResult = await processMatchResultWithRatings(matchId, finalResult)
         if (ratingResult.success) {
-          console.log('Rating updates processed successfully:', ratingResult.ratingUpdates)
+          // Rating updates processed successfully
         } else {
           console.warn('Rating update failed:', ratingResult.error)
         }

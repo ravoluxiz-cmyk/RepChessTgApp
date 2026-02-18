@@ -23,14 +23,29 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
     const createCircle = React.useCallback((x: number, y: number) => {
       const buttonWidth = buttonRef.current?.offsetWidth || 0
       const xPos = x / buttonWidth
-      const color = `linear-gradient(to right, var(--circle-start) ${xPos * 100}%, var(--circle-end) ${
-        xPos * 100
-      }%)`
+      const color = `linear-gradient(to right, var(--circle-start) ${xPos * 100}%, var(--circle-end) ${xPos * 100
+        }%)`
 
+      const id = Date.now() + Math.random()
+
+      // Создаём кружок сразу с fadeState "in" (вместо null → useEffect loop)
       setCircles((prev) => [
         ...prev,
-        { id: Date.now(), x, y, color, fadeState: null },
+        { id, x, y, color, fadeState: "in" as const },
       ])
+
+      // Планируем fade-out и удаление
+      setTimeout(() => {
+        setCircles((prev) =>
+          prev.map((c) =>
+            c.id === id ? { ...c, fadeState: "out" as const } : c
+          )
+        )
+      }, 1000)
+
+      setTimeout(() => {
+        setCircles((prev) => prev.filter((c) => c.id !== id))
+      }, 2200)
     }, [])
 
     const handlePointerMove = React.useCallback(
@@ -57,31 +72,9 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
       setIsListening(false)
     }, [])
 
-    React.useEffect(() => {
-      circles.forEach((circle) => {
-        if (!circle.fadeState) {
-          setTimeout(() => {
-            setCircles((prev) =>
-              prev.map((c) =>
-                c.id === circle.id ? { ...c, fadeState: "in" } : c
-              )
-            )
-          }, 0)
-
-          setTimeout(() => {
-            setCircles((prev) =>
-              prev.map((c) =>
-                c.id === circle.id ? { ...c, fadeState: "out" } : c
-              )
-            )
-          }, 1000)
-
-          setTimeout(() => {
-            setCircles((prev) => prev.filter((c) => c.id !== circle.id))
-          }, 2200)
-        }
-      })
-    }, [circles])
+    // Вместо useEffect с зависимостью от circles (бесконечный цикл),
+    // планируем timeout-ы прямо при создании кружка в createCircle.
+    // Кружки создаются сразу с fadeState: "in".
 
     const setCombinedRef = (node: HTMLButtonElement | null) => {
       buttonRef.current = node
@@ -90,7 +83,7 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
         ref(node)
       } else {
         try {
-          ;(ref as React.MutableRefObject<HTMLButtonElement | null>).current = node
+          ; (ref as React.MutableRefObject<HTMLButtonElement | null>).current = node
         } catch {
           // ignore
         }

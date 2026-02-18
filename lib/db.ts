@@ -118,7 +118,7 @@ export async function getUserByTelegramId(telegramId: number): Promise<User | nu
 }
 
 export async function createUser(user: User): Promise<User | null> {
-  const { data, error} = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from('users')
     .insert({
       telegram_id: user.telegram_id,
@@ -257,7 +257,7 @@ export async function seedTestUsers(count = 20): Promise<{ inserted: number }> {
 // ===== TOURNAMENT FUNCTIONS =====
 
 export async function createTournament(t: Tournament): Promise<Tournament | null> {
-  console.log('[createTournament] Attempting to create tournament:', { title: t.title, creator_telegram_id: t.creator_telegram_id })
+
 
   const { data, error } = await supabaseAdmin
     .from('tournaments')
@@ -293,7 +293,7 @@ export async function createTournament(t: Tournament): Promise<Tournament | null
     return null
   }
 
-  console.log('[createTournament] Tournament created successfully:', data)
+
   return data as Tournament
 }
 
@@ -788,41 +788,51 @@ export async function updateMatchResult(matchId: number, result: string): Promis
 // ===== STANDINGS =====
 
 export async function getStandings(tournamentId: number): Promise<Array<{ participant_id: number; nickname: string; points: number }>> {
-  const participants = await listTournamentParticipants(tournamentId)
-  const rounds = await listRounds(tournamentId)
+  const [participants, rounds] = await Promise.all([
+    listTournamentParticipants(tournamentId),
+    listRounds(tournamentId)
+  ])
 
-  const standings = await Promise.all(
-    participants.map(async (p) => {
-      let points = 0
+  // Batch-загрузка всех матчей одним запросом вместо N+1 waterfall
+  const roundIds = rounds.map(r => r.id!).filter(id => id != null)
+  let allMatches: Array<Match & { white_nickname?: string | null; black_nickname?: string | null }> = []
 
-      for (const round of rounds) {
-        const matches = await listMatches(round.id!)
+  if (roundIds.length > 0) {
+    const { data, error } = await supabaseAdmin
+      .from('matches')
+      .select('*')
+      .in('round_id', roundIds)
 
-        for (const match of matches) {
-          if (match.white_participant_id === p.id) {
-            points += match.score_white
-          } else if (match.black_participant_id === p.id) {
-            points += match.score_black
-          }
-        }
-      }
+    if (error) {
+      console.error('Error batch-loading matches for standings:', error)
+    } else {
+      allMatches = (data || []) as typeof allMatches
+    }
+  }
 
-      return {
-        participant_id: p.id!,
-        nickname: p.nickname,
-        points
-      }
-    })
-  )
+  // Агрегация очков в памяти
+  const pointsMap = new Map<number, number>()
+  for (const match of allMatches) {
+    if (match.white_participant_id) {
+      pointsMap.set(match.white_participant_id, (pointsMap.get(match.white_participant_id) || 0) + match.score_white)
+    }
+    if (match.black_participant_id) {
+      pointsMap.set(match.black_participant_id, (pointsMap.get(match.black_participant_id) || 0) + match.score_black)
+    }
+  }
 
-  standings.sort((a, b) => {
+  const standings = participants.map(p => ({
+    participant_id: p.id!,
+    nickname: p.nickname,
+    points: pointsMap.get(p.id!) || 0
+  }))
+
+  return standings.toSorted((a, b) => {
     if (b.points !== a.points) {
       return b.points - a.points
     }
     return a.nickname.localeCompare(b.nickname)
   })
-
-  return standings
 }
 
 // ===== AUTO-FINALIZATION =====

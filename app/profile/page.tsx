@@ -8,14 +8,19 @@ import { User, Edit, Link as LinkIcon, ArrowLeft } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import RatingDisplay from "@/components/rating/RatingDisplay"
 
+// Pure helper — hoisted out of component (rendering-hoist-jsx)
+function isProfileIncomplete(profile: { chesscom_url?: string | null; lichess_url?: string | null; bio?: string | null }): boolean {
+  return !profile.chesscom_url && !profile.lichess_url && !profile.bio
+}
+
 // Success banner component that uses searchParams
 function SuccessBanner() {
   const searchParams = useSearchParams()
-  
+
   if (searchParams.get('saved') !== '1') {
     return null
   }
-  
+
   return (
     <div className="mb-6 bg-green-600/80 border border-green-400 text-white rounded-lg p-4 text-center font-bold">
       Chess Ratings Verified Successfully
@@ -50,7 +55,7 @@ export default function ProfilePage() {
 
     async function fetchProfile() {
       try {
-        console.log("Fetching profile with initData:", initData ? "present" : "missing")
+
 
         const response = await fetch("/api/profile", {
           headers: {
@@ -67,12 +72,12 @@ export default function ProfilePage() {
         const data = await response.json()
         const userProfile = data.user
 
-        console.log("Profile loaded:", userProfile)
+
         setProfile(userProfile)
 
         // Check if profile is incomplete (just created) - redirect to edit
         if (userProfile && isProfileIncomplete(userProfile)) {
-          console.log("Profile incomplete, redirecting to edit...")
+
           router.push("/profile/edit")
         }
       } catch (err) {
@@ -90,22 +95,17 @@ export default function ProfilePage() {
     fetchProfile()
   }, [initData, isReady, router])
 
-  // Check if profile has only basic Telegram data (needs completion)
-  function isProfileIncomplete(profile: UserProfile): boolean {
-    return (
-      !profile.chesscom_url &&
-      !profile.lichess_url &&
-      !profile.bio
-    )
-  }
+  // isProfileIncomplete вынесена на уровень модуля (rendering-hoist-jsx)
 
   // Setup back button
   useEffect(() => {
     if (webApp?.BackButton) {
+      const goHome = () => router.push("/")
       webApp.BackButton.show()
-      webApp.BackButton.onClick(() => router.push("/"))
+      webApp.BackButton.onClick(goHome)
 
       return () => {
+        webApp.BackButton.offClick(goHome)
         webApp.BackButton.hide()
       }
     }
@@ -198,10 +198,10 @@ export default function ProfilePage() {
 
             {/* Glicko2 Rating Display */}
             <div className="pt-4 border-t border-white/20">
-              <RatingDisplay 
-                userId={profile.id} 
-                showHistory={true} 
-                showRank={true} 
+              <RatingDisplay
+                userId={profile.id}
+                showHistory={true}
+                showRank={true}
               />
             </div>
 

@@ -1,3 +1,3 @@
 export * from '@/lib/utils'
-export * from '@/lib/supabase'
-export * from '@/lib/telegram'
+// supabase и telegram не реэкспортируются — серверный код не должен попадать в клиентские бандлы.
+// Импортируйте напрямую: import { supabase } from '@/lib/supabase'

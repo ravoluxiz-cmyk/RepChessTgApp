@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       // Auto-create profile with Telegram data
-      console.log(`Auto-creating profile for Telegram user ${telegramUser.id}`)
+      // Auto-create profile for new Telegram user
       user = await createUser({
         telegram_id: telegramUser.id,
         username: telegramUser.username,
@@ -71,7 +71,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request body
-    const body = await request.json()
+    let body;
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON body" },
+        { status: 400 }
+      )
+    }
     const {
       first_name,
       last_name,
@@ -125,7 +133,15 @@ export async function PUT(request: NextRequest) {
     }
 
     // Parse request body
-    const body = await request.json()
+    let body;
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON body" },
+        { status: 400 }
+      )
+    }
     const {
       first_name,
       last_name,

@@ -517,7 +517,7 @@ export async function generateSwissPairings(
     })
   }
 
-  // Загружаем историю всех предыдущих раундов
+  // Загружаем историю всех предыдущих раундов одним батч-запросом
   if (currentRoundNum > 1) {
     const { data: prevRounds } = await supabaseAdmin
       .from('rounds')
@@ -526,45 +526,46 @@ export async function generateSwissPairings(
       .lt('number', currentRoundNum)
       .order('number', { ascending: true })
 
-    if (prevRounds) {
-      for (const round of prevRounds) {
-        const { data: matches } = await supabaseAdmin
-          .from('matches')
-          .select('*')
-          .eq('round_id', round.id)
+    if (prevRounds && prevRounds.length > 0) {
+      const roundIds = prevRounds.map(r => r.id)
 
-        if (matches) {
-          for (const match of matches) {
-            // Обрабатываем white player
-            if (match.white_participant_id) {
-              const playerData = playerDataMap.get(match.white_participant_id)
-              if (playerData) {
-                playerData.score += match.score_white
+      // Один запрос вместо N (async-parallel)
+      const { data: allMatches } = await supabaseAdmin
+        .from('matches')
+        .select('*')
+        .in('round_id', roundIds)
 
-                playerData.rounds.push({
-                  opponent: match.black_participant_id || 0,
-                  color: match.black_participant_id ? 'w' : null,
-                  result: match.result === 'white' || match.result === 'forfeit_black' ? 'win' :
-                          match.result === 'black' || match.result === 'forfeit_white' ? 'loss' :
-                          match.result === 'draw' ? 'draw' : 'bye'
-                })
-              }
+      if (allMatches) {
+        for (const match of allMatches) {
+          // Обрабатываем white player
+          if (match.white_participant_id) {
+            const playerData = playerDataMap.get(match.white_participant_id)
+            if (playerData) {
+              playerData.score += match.score_white
+
+              playerData.rounds.push({
+                opponent: match.black_participant_id || 0,
+                color: match.black_participant_id ? 'w' : null,
+                result: match.result === 'white' || match.result === 'forfeit_black' ? 'win' :
+                  match.result === 'black' || match.result === 'forfeit_white' ? 'loss' :
+                    match.result === 'draw' ? 'draw' : 'bye'
+              })
             }
+          }
 
-            // Обрабатываем black player
-            if (match.black_participant_id) {
-              const playerData = playerDataMap.get(match.black_participant_id)
-              if (playerData) {
-                playerData.score += match.score_black
+          // Обрабатываем black player
+          if (match.black_participant_id) {
+            const playerData = playerDataMap.get(match.black_participant_id)
+            if (playerData) {
+              playerData.score += match.score_black
 
-                playerData.rounds.push({
-                  opponent: match.white_participant_id || 0,
-                  color: 'b',
-                  result: match.result === 'black' || match.result === 'forfeit_white' ? 'win' :
-                          match.result === 'white' || match.result === 'forfeit_black' ? 'loss' :
-                          match.result === 'draw' ? 'draw' : 'bye'
-                })
-              }
+              playerData.rounds.push({
+                opponent: match.white_participant_id || 0,
+                color: 'b',
+                result: match.result === 'black' || match.result === 'forfeit_white' ? 'win' :
+                  match.result === 'white' || match.result === 'forfeit_black' ? 'loss' :
+                    match.result === 'draw' ? 'draw' : 'bye'
+              })
             }
           }
         }
@@ -584,31 +585,27 @@ export async function generateSwissPairings(
     pairings = generateSubsequentRoundPairings(players)
   }
 
-  // Сохраняем пары в БД
-  const matches: Match[] = []
-
-  for (const pairing of pairings) {
+  // Сохраняем пары в БД одним батч-запросом
+  const insertPayload = pairings.map(pairing => {
     const isBye = pairing.black === null
-
-    const { data } = await supabaseAdmin
-      .from('matches')
-      .insert({
-        round_id: roundId,
-        white_participant_id: pairing.white,
-        black_participant_id: pairing.black,
-        board_no: pairing.boardNo,
-        result: isBye ? 'bye' : 'not_played',
-        score_white: isBye ? byePoints : 0,
-        score_black: 0,
-        source: 'swiss_system'
-      })
-      .select()
-      .single()
-
-    if (data) {
-      matches.push(data as Match)
+    return {
+      round_id: roundId,
+      white_participant_id: pairing.white,
+      black_participant_id: pairing.black,
+      board_no: pairing.boardNo,
+      result: isBye ? 'bye' : 'not_played',
+      score_white: isBye ? byePoints : 0,
+      score_black: 0,
+      source: 'swiss_system'
     }
-  }
+  })
+
+  const { data: insertedMatches } = await supabaseAdmin
+    .from('matches')
+    .insert(insertPayload)
+    .select()
+
+  const matches: Match[] = (insertedMatches || []) as Match[]
 
   // Обновляем статус раунда
   await supabaseAdmin

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground";
 import { HoverButton } from "@/components/ui/hover-button";
 import { ShoppingBag, Calendar, GraduationCap, User } from "lucide-react";
-import { useEffect } from "react"
+import { useEffect, useCallback } from "react"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 
 export default function Home() {
@@ -32,7 +32,7 @@ export default function Home() {
         }
 
         const data = await response.json()
-        console.log("Auto-saved user profile on enter:", data.user?.telegram_id)
+        // Профиль успешно сохранён
       } catch (e) {
         console.error("Auto-save on enter error:", e)
       }
@@ -41,6 +41,31 @@ export default function Home() {
     saveOnEnter()
   }, [isReady, initData])
 
+
+  const handleAdminGate = useCallback(async () => {
+    try {
+      if (!initData) {
+        const resp = await fetch("/api/admin/check")
+        if (resp.ok) {
+          router.push("/admin")
+        } else {
+          alert("Откройте приложение через Telegram, чтобы продолжить")
+        }
+        return
+      }
+      const resp = await fetch("/api/admin/check", {
+        headers: { Authorization: `Bearer ${initData}` },
+      })
+      if (resp.ok) {
+        router.push("/admin")
+      } else {
+        alert("Доступ запрещён")
+      }
+    } catch (e) {
+      console.error("Admin gate failed:", e)
+      alert("Ошибка проверки доступа")
+    }
+  }, [initData, router])
 
   return (
     <ChessBackground>
@@ -54,32 +79,8 @@ export default function Home() {
                 <span>R</span>
                 <span
                   className="cursor-pointer inline-block select-none hover:text-blue-400"
-                  title="Admin access"
-                  onClick={async () => {
-                    try {
-                      if (!initData) {
-                        // Dev fallback: allow admin page if /api/admin/check returns OK without Authorization
-                        const resp = await fetch("/api/admin/check")
-                        if (resp.ok) {
-                          router.push("/admin")
-                        } else {
-                          alert("Откройте приложение через Telegram, чтобы продолжить")
-                        }
-                        return
-                      }
-                      const resp = await fetch("/api/admin/check", {
-                        headers: { Authorization: `Bearer ${initData}` },
-                      })
-                      if (resp.ok) {
-                        router.push("/admin")
-                      } else {
-                        alert("Доступ запрещён")
-                      }
-                    } catch (e) {
-                      console.error("Admin gate failed:", e)
-                      alert("Ошибка проверки доступа")
-                    }
-                  }}
+
+                  onClick={handleAdminGate}
                 >
                   E
                 </span>

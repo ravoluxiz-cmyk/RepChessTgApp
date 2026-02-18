@@ -11,7 +11,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 })
     }
 
-    const body = await request.json()
+    let body: { tournament_id?: number; user_id?: number; nickname?: string }
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+    }
     const { tournament_id, user_id, nickname } = body as {
       tournament_id?: number
       user_id?: number
