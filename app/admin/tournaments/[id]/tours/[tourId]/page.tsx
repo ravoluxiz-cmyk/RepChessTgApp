@@ -309,8 +309,8 @@ export default function TourManagePage() {
           <div className="mb-3">
             <button
               className="flex items-center gap-2 text-white/80 hover:text-white"
-              onClick={() => router.push(`/admin/tournaments/${tournamentId}/participants`)}
-              title="Назад к добавлению участников"
+              onClick={() => router.push(`/admin/tournaments`)}
+              title="Назад к списку турниров"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="font-semibold">Назад</span>
