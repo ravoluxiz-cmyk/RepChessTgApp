@@ -86,38 +86,38 @@ export default function TournamentResultsPage() {
 
           {!loading && leaderboard.length > 0 && (
             <div className="overflow-x-auto bg-white/5 border border-white/10 rounded-lg">
-              <table className="min-w-full text-left text-sm">
+              <table className="w-full text-left text-xs sm:text-sm" style={{ tableLayout: 'auto' }}>
                 <thead className="text-white/70">
                   <tr>
-                    <th className="px-3 py-3 whitespace-nowrap">Место</th>
-                    <th className="px-3 py-3 whitespace-nowrap">Имя</th>
-                    <th className="px-3 py-3 text-center whitespace-nowrap">Очки</th>
+                    <th className="px-1.5 sm:px-3 py-2 text-center whitespace-nowrap">№</th>
+                    <th className="px-1.5 sm:px-3 py-2 whitespace-nowrap">Имя</th>
+                    <th className="px-1 sm:px-3 py-2 text-center whitespace-nowrap">Оч</th>
                     {Array.from({ length: totalRounds }, (_, i) => (
-                      <th key={`rh-${i}`} className="px-2 py-3 text-center whitespace-nowrap">Тур<br />#{i + 1}</th>
+                      <th key={`rh-${i}`} className="px-1 sm:px-2 py-2 text-center whitespace-nowrap">T{i + 1}</th>
                     ))}
                     {tbKeys.map(k => (
-                      <th key={`tbh-${k}`} className="px-2 py-3 text-center whitespace-nowrap">{tbLabels[k] || k}</th>
+                      <th key={`tbh-${k}`} className="px-1 sm:px-2 py-2 text-center whitespace-nowrap">{(tbLabels[k] || k).slice(0, 4)}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {leaderboard.map((row) => (
                     <tr key={row.participant_id} className="border-t border-white/10 hover:bg-white/5">
-                      <td className="px-3 py-3 font-bold text-center">{row.rank}</td>
-                      <td className="px-3 py-3 whitespace-nowrap">{row.nickname}</td>
-                      <td className="px-3 py-3 text-center font-semibold">{row.points}</td>
+                      <td className="px-1.5 sm:px-3 py-2 font-bold text-center">{row.rank}</td>
+                      <td className="px-1.5 sm:px-3 py-2 whitespace-nowrap max-w-[120px] sm:max-w-none truncate">{row.nickname}</td>
+                      <td className="px-1 sm:px-3 py-2 text-center font-semibold">{row.points}</td>
                       {row.rounds ? row.rounds.map((r, i) => {
                         const label = r.label || ''
                         const color = label.startsWith('+') ? 'text-green-400'
                           : label.startsWith('-') ? 'text-red-400'
                             : label.startsWith('=') ? 'text-yellow-400'
                               : 'text-white/50'
-                        return <td key={`r-${i}`} className={`px-2 py-3 text-center whitespace-nowrap font-mono text-xs ${color}`}>{label}</td>
+                        return <td key={`r-${i}`} className={`px-1 sm:px-2 py-2 text-center whitespace-nowrap font-mono text-xs ${color}`}>{label}</td>
                       }) : Array.from({ length: totalRounds }, (_, i) => (
-                        <td key={`r-${i}`} className="px-2 py-3 text-center">–</td>
+                        <td key={`r-${i}`} className="px-1 sm:px-2 py-2 text-center">–</td>
                       ))}
                       {tbKeys.map(k => (
-                        <td key={`tb-${k}`} className="px-2 py-3 text-center whitespace-nowrap">
+                        <td key={`tb-${k}`} className="px-1 sm:px-2 py-2 text-center whitespace-nowrap">
                           {row.tbValues?.[k] != null ? Number(row.tbValues[k]).toFixed(1) : '–'}
                         </td>
                       ))}
