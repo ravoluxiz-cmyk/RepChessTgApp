@@ -346,7 +346,7 @@ function pairGroup(
 function generateRound1Pairings(players: Player[]): Pairing[] {
   const pairs: Pairing[] = []
 
-  let activePlayers = [...players]
+  const activePlayers = [...players]
   let byePlayer: Player | null = null
 
   // Если нечётное количество — bye последнему записавшемуся (наибольший participantId)
