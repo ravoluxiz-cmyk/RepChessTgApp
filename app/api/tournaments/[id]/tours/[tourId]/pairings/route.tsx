@@ -52,7 +52,8 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     return NextResponse.json(matches, { status: 201 })
   } catch (err) {
-    console.error('[Pairings] generation failed:', err)
-    return NextResponse.json({ error: 'Pairings generation failed' }, { status: 500 })
+    const reason = getLastBbpReason()
+    console.error('[Pairings] generation failed:', err, 'bbpReason:', reason)
+    return NextResponse.json({ error: 'Pairings generation failed', details: err instanceof Error ? err.message : String(err), bbpReason: reason }, { status: 500 })
   }
 }

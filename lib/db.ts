@@ -730,8 +730,10 @@ export async function updateMatchResult(matchId: number, result: string): Promis
   }
 
   const tournamentId = (() => {
-    const r = (match as { rounds?: Array<{ tournament_id: number }> }).rounds
-    return Array.isArray(r) && r.length > 0 ? r[0].tournament_id : 0
+    const r = (match as { rounds?: { tournament_id: number } | Array<{ tournament_id: number }> }).rounds
+    if (!r) return 0
+    if (Array.isArray(r)) return r.length > 0 ? r[0].tournament_id : 0
+    return (r as { tournament_id: number }).tournament_id || 0
   })()
   const scoring = await getTournamentScoring(tournamentId)
 
@@ -797,8 +799,10 @@ export async function updateMatchResult(matchId: number, result: string): Promis
 
         // Trigger finalization check based on locked rounds
         const tournamentId2 = (() => {
-          const r = (match as { rounds?: Array<{ tournament_id: number }> }).rounds
-          return Array.isArray(r) && r.length > 0 ? r[0].tournament_id : 0
+          const r = (match as { rounds?: { tournament_id: number } | Array<{ tournament_id: number }> }).rounds
+          if (!r) return 0
+          if (Array.isArray(r)) return r.length > 0 ? r[0].tournament_id : 0
+          return (r as { tournament_id: number }).tournament_id || 0
         })()
         if (Number.isFinite(tournamentId2)) {
           try {

@@ -538,8 +538,11 @@ export async function generateSwissPairings(
     .neq('active', false) // Фильтруем неактивных (withdrawn)
 
   if (!participants || participants.length === 0) {
+    console.error(`[SwissPairings] tournamentId=${tournamentId} roundId=${roundId}: No active participants found`)
     throw new Error('No active participants found')
   }
+
+  console.log(`[SwissPairings] tournamentId=${tournamentId} roundId=${roundId} roundNum=${currentRoundNum} participants=${participants.length}`)
 
   // Получаем историю матчей для каждого участника
   const playerDataMap = new Map<number, PlayerData>()
