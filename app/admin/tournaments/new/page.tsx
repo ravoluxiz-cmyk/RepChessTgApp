@@ -21,7 +21,7 @@ export default function AdminCreateTournamentPage() {
   const [pointsWin, setPointsWin] = useState(1)
   const [pointsLoss, setPointsLoss] = useState(0)
   const [pointsDraw, setPointsDraw] = useState(0.5)
-  const [byePoints, setByePoints] = useState(0)
+  const [byePoints, setByePoints] = useState(1)
   const [rounds, setRounds] = useState(5)
 
   // Все доступные тай-брейкеры
@@ -324,9 +324,9 @@ export default function AdminCreateTournamentPage() {
                 onChange={(e) => setByePoints(Number(e.target.value))}
                 className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
               >
-                <option value={0}>Ничья</option>
-                <option value={0.5}>0.5</option>
-                <option value={1}>1</option>
+                <option value={1}>1 очко (победа)</option>
+                <option value={0.5}>0.5 очка (ничья)</option>
+                <option value={0}>0 очков</option>
               </select>
             </div>
 
