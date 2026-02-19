@@ -283,6 +283,17 @@ export default function TourManagePage() {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error || "Не удалось завершить турнир")
       }
+
+      // Send final standings screenshot to Telegram (fire-and-forget)
+      fetch(`/api/tournaments/${tournamentId}/send-standings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(initData ? { Authorization: `Bearer ${initData}` } : {}),
+        },
+        body: JSON.stringify({ roundNumber: tournamentMeta?.rounds ?? roundNumber ?? 0 }),
+      }).catch((e) => console.error("[send-standings] final failed:", e))
+
       router.push(`/admin/tournaments/${tournamentId}/results`)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Неизвестная ошибка")
