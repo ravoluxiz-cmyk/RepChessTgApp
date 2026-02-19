@@ -69,7 +69,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         const chatId = tournament.chat_id || (tournament.creator_telegram_id ? String(tournament.creator_telegram_id) : null)
         const token = String(process.env.TELEGRAM_BOT_TOKEN || '').trim()
 
+        console.log(`[send-standings] tournamentId=${tournamentId} chat_id=${tournament.chat_id} creator_telegram_id=${tournament.creator_telegram_id} resolved_chatId=${chatId} token_present=${!!token} token_len=${token.length}`)
+
         if (!chatId || !token) {
+            console.error(`[send-standings] Missing: chatId=${chatId}, token_present=${!!token}`)
             return NextResponse.json({ error: "chat_id/creator_telegram_id и TELEGRAM_BOT_TOKEN не настроены" }, { status: 400 })
         }
 
