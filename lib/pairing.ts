@@ -16,6 +16,7 @@ interface PlayerData {
   nickname: string
   rating: number
   score: number
+  buchholz: number
   rounds: RoundHistory[]
 }
 
@@ -38,6 +39,7 @@ class Player {
   nickname: string
   rating: number
   score: number
+  buchholz: number
   rounds: RoundHistory[] = []
 
   // Статистика цветов
@@ -68,6 +70,7 @@ class Player {
     this.nickname = data.nickname
     this.rating = data.rating
     this.score = data.score
+    this.buchholz = data.buchholz
     this.rounds = data.rounds
 
     // Инициализация статистики
@@ -342,9 +345,20 @@ function pairGroup(
  */
 function generateRound1Pairings(players: Player[]): Pairing[] {
   const pairs: Pairing[] = []
-  const sorted = [...players].sort((a, b) => b.rating - a.rating)
 
-  const half = Math.ceil(sorted.length / 2)
+  let activePlayers = [...players]
+  let byePlayer: Player | null = null
+
+  // Если нечётное количество — bye последнему записавшемуся (наибольший participantId)
+  if (activePlayers.length % 2 === 1) {
+    activePlayers.sort((a, b) => b.id - a.id)
+    byePlayer = activePlayers.shift()! // наибольший id = последний записавшийся
+  }
+
+  // Сортируем оставшихся по рейтингу для FIDE-паринга
+  const sorted = activePlayers.sort((a, b) => b.rating - a.rating)
+
+  const half = sorted.length / 2
   const top = sorted.slice(0, half)
   const bottom = sorted.slice(half)
 
@@ -362,10 +376,10 @@ function generateRound1Pairings(players: Player[]): Pairing[] {
     })
   }
 
-  // Если нечетное количество, последний получает bye
-  if (sorted.length % 2 === 1) {
+  // Добавляем bye
+  if (byePlayer) {
     pairs.push({
-      white: top[top.length - 1].id,
+      white: byePlayer.id,
       black: null,
       boardNo: pairs.length + 1
     })
@@ -391,14 +405,14 @@ function generateSubsequentRoundPairings(players: Player[]): Pairing[] {
   let activePlayers = players
 
   if (players.length % 2 === 1) {
-    // Сортируем кандидатов: приоритет — не имел bye, меньше очков, ниже рейтинг
+    // Сортируем кандидатов: приоритет — не имел bye, меньше очков, ниже Бухгольц
     const candidates = [...players].sort((a, b) => {
       // Сначала те, кто НЕ имел bye
       if (a.hadBye !== b.hadBye) return a.hadBye ? 1 : -1
       // Потом по очкам (меньше — приоритетнее для bye)
       if (a.score !== b.score) return a.score - b.score
-      // Потом по рейтингу (ниже рейтинг — приоритетнее)
-      return a.rating - b.rating
+      // Потом по Бухгольцу (меньше — приоритетнее для bye)
+      return a.buchholz - b.buchholz
     })
     byePlayer = candidates[0]
     byePlayer.paired = true
@@ -538,6 +552,7 @@ export async function generateSwissPairings(
       nickname: p.nickname,
       rating: user?.rating || 0,
       score: 0,
+      buchholz: 0,
       rounds: []
     })
   }
@@ -596,6 +611,18 @@ export async function generateSwissPairings(
         }
       }
     }
+  }
+
+  // Вычисляем Бухгольц для каждого игрока (сумма очков оппонентов)
+  for (const [, pd] of playerDataMap) {
+    let buch = 0
+    for (const round of pd.rounds) {
+      if (round.opponent && round.opponent !== 0) {
+        const opp = playerDataMap.get(round.opponent)
+        if (opp) buch += opp.score
+      }
+    }
+    pd.buchholz = buch
   }
 
   // Создаем объекты Player
