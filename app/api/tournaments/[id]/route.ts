@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/telegram"
-import { deleteTournament, getTournamentById, updateTournamentArchived, updateTournamentChatId } from "@/lib/db"
+import { deleteTournament, getTournamentById, updateTournament } from "@/lib/db"
 
 export async function GET(_request: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -74,32 +74,36 @@ export async function PATCH(request: NextRequest, ctx: { params: Promise<{ id: s
       return NextResponse.json({ error: "Тело запроса обязательно" }, { status: 400 })
     }
 
-    const result: Record<string, unknown> = { ok: true, id: tournamentId }
+    // Build update fields from allowed keys
+    const allowedKeys = [
+      'title', 'format', 'points_win', 'points_loss', 'points_draw',
+      'bye_points', 'rounds', 'tiebreakers', 'chat_id', 'archived',
+      'forbid_repeat_bye', 'late_join_points', 'hide_rating', 'hide_new_rating',
+      'compute_performance', 'hide_color_names', 'show_opponent_names',
+    ]
 
-    // Update archived if provided
-    if (body.archived !== undefined) {
-      const archived = typeof body.archived === "number" ? body.archived : (body.archived ? 1 : 0)
-      if (archived !== 0 && archived !== 1) {
-        return NextResponse.json({ error: "archived должен быть 0 или 1" }, { status: 400 })
+    const updates: Record<string, unknown> = {}
+    for (const key of allowedKeys) {
+      if (body[key] !== undefined) {
+        // Handle chat_id special case (empty string → null)
+        if (key === 'chat_id') {
+          updates[key] = body[key] ? String(body[key]) : null
+        } else {
+          updates[key] = body[key]
+        }
       }
-      const ok = await updateTournamentArchived(tournamentId, archived)
-      if (!ok) {
-        return NextResponse.json({ error: "Не удалось обновить archived" }, { status: 500 })
-      }
-      result.archived = archived
     }
 
-    // Update chat_id if provided
-    if (body.chat_id !== undefined) {
-      const chatId = body.chat_id ? String(body.chat_id) : null
-      const ok = await updateTournamentChatId(tournamentId, chatId)
-      if (!ok) {
-        return NextResponse.json({ error: "Не удалось обновить chat_id" }, { status: 500 })
-      }
-      result.chat_id = chatId
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "Нет полей для обновления" }, { status: 400 })
     }
 
-    return NextResponse.json(result)
+    const ok = await updateTournament(tournamentId, updates)
+    if (!ok) {
+      return NextResponse.json({ error: "Не удалось обновить турнир" }, { status: 500 })
+    }
+
+    return NextResponse.json({ ok: true, id: tournamentId, ...updates })
   } catch (e) {
     console.error("Failed to patch tournament:", e)
     return NextResponse.json({ error: "Внутренняя ошибка" }, { status: 500 })

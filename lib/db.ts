@@ -384,6 +384,20 @@ export async function updateTournamentChatId(id: number, chatId: string | null):
   return true
 }
 
+export async function updateTournament(id: number, fields: Partial<Omit<Tournament, 'id' | 'created_at'>>): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('tournaments')
+    .update(fields)
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error updating tournament:', error)
+    return false
+  }
+
+  return true
+}
+
 // ===== TOURNAMENT PARTICIPANTS =====
 
 export async function addTournamentParticipant(tp: TournamentParticipant): Promise<TournamentParticipant | null> {
