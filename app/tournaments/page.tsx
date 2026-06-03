@@ -14,12 +14,22 @@ export default function TournamentsPage() {
   useEffect(() => {
     async function fetchTournaments() {
       try {
-        // TODO: Replace with backend API when available
-        // For now, show empty state with message about upcoming tournaments
-        setTournaments([])
-        setError("Турниры скоро будут доступны. Проверяйте обновления!")
+        setLoading(true)
+        setError(null)
+
+        const response = await fetch("/api/tournaments")
+        if (!response.ok) {
+          throw new Error("Не удалось загрузить турниры")
+        }
+
+        const data = await response.json()
+        const activeTournaments = Array.isArray(data)
+          ? data.filter((tournament: Tournament) => Number(tournament.archived ?? 0) === 0)
+          : []
+
+        setTournaments(activeTournaments)
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error")
+        setError(err instanceof Error ? err.message : "Неизвестная ошибка")
       } finally {
         setLoading(false)
       }
@@ -63,7 +73,7 @@ export default function TournamentsPage() {
 
             {error && (
               <div className="flex items-center justify-center py-20">
-                <div className="text-red-400 text-lg">Ошибка: {error}</div>
+                <div className="text-red-400 text-lg">{error}</div>
               </div>
             )}
 
