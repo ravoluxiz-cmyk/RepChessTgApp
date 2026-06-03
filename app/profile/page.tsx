@@ -7,6 +7,7 @@ import ChessBackground from "@/components/ChessBackground"
 import { User, Edit, Link as LinkIcon, ArrowLeft } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import RatingDisplay from "@/components/rating/RatingDisplay"
+import { getProfileAuthHeaders } from "@/lib/web-user"
 
 // Pure helper — hoisted out of component (rendering-hoist-jsx)
 function isProfileIncomplete(profile: { chesscom_url?: string | null; lichess_url?: string | null; bio?: string | null }): boolean {
@@ -51,16 +52,13 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!isReady) return
-    if (!initData) return
 
     async function fetchProfile() {
       try {
 
 
         const response = await fetch("/api/profile", {
-          headers: {
-            Authorization: `Bearer ${initData}`,
-          },
+          headers: getProfileAuthHeaders(initData),
         })
 
         if (!response.ok) {
@@ -76,7 +74,7 @@ export default function ProfilePage() {
         setProfile(userProfile)
 
         // Check if profile is incomplete (just created) - redirect to edit
-        if (userProfile && isProfileIncomplete(userProfile)) {
+        if (initData && userProfile && isProfileIncomplete(userProfile)) {
 
           router.push("/profile/edit")
         }

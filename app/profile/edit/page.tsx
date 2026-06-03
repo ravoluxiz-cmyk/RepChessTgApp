@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import ChessBackground from "@/components/ChessBackground"
 import { ArrowLeft } from "lucide-react"
+import { getProfileAuthHeaders } from "@/lib/web-user"
 
 interface ProfileFormData {
   first_name: string
@@ -34,14 +35,11 @@ export default function ProfileEditPage() {
   // Fetch existing profile
   useEffect(() => {
     if (!isReady) return
-    if (!initData) return
 
     async function fetchProfile() {
       try {
         const response = await fetch("/api/profile", {
-          headers: {
-            Authorization: `Bearer ${initData}`,
-          },
+          headers: getProfileAuthHeaders(initData),
         })
 
         if (!response.ok) {
@@ -125,7 +123,7 @@ export default function ProfileEditPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${initData}`,
+          ...getProfileAuthHeaders(initData),
         },
         body: JSON.stringify(profileData),
       })

@@ -1,0 +1,35 @@
+import { NextRequest, NextResponse } from "next/server"
+import {
+  createWebAdminSessionCookie,
+  getWebAdminCookieName,
+  isWebAdminPasswordConfigured,
+  verifyWebAdminPassword,
+} from "@/lib/web-auth"
+
+export async function POST(request: NextRequest) {
+  if (!isWebAdminPasswordConfigured()) {
+    return NextResponse.json(
+      { error: "WEB_ADMIN_PASSWORD is not configured" },
+      { status: 503 }
+    )
+  }
+
+  const body = await request.json().catch(() => null) as { password?: string } | null
+  const password = String(body?.password || "")
+
+  if (!verifyWebAdminPassword(password)) {
+    return NextResponse.json({ error: "Invalid password" }, { status: 401 })
+  }
+
+  const response = NextResponse.json({ ok: true })
+  response.cookies.set({
+    name: getWebAdminCookieName(),
+    value: createWebAdminSessionCookie(),
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 14,
+  })
+  return response
+}

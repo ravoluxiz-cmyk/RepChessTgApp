@@ -49,7 +49,7 @@ export default function Home() {
         if (resp.ok) {
           router.push("/admin")
         } else {
-          alert("Откройте приложение через Telegram, чтобы продолжить")
+          router.push("/admin/login")
         }
         return
       }

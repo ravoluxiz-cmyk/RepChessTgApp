@@ -1,4 +1,5 @@
 import crypto from "crypto"
+import { verifyWebAdminSessionFromHeaders } from "./web-auth"
 
 interface TelegramUser {
   id: number
@@ -188,6 +189,18 @@ export async function isAdmin(user: TelegramUser | null): Promise<boolean> {
  * Require admin from request headers. Returns user if admin, otherwise null.
  */
 export async function requireAdmin(headers: Headers): Promise<TelegramUser | null> {
+  if (verifyWebAdminSessionFromHeaders(headers)) {
+    return {
+      id: 0,
+      first_name: 'Web',
+      last_name: 'Admin',
+      username: 'web_admin',
+      photo_url: '',
+      auth_date: Math.floor(Date.now() / 1000),
+      hash: ''
+    }
+  }
+
   // In development, optionally enforce strict admin based on TESTSTRICT flag
   const isDev = process.env.NODE_ENV !== 'production'
   const testStrict = String(process.env.TESTSTRICT || '').toLowerCase()

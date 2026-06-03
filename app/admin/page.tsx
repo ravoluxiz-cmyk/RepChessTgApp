@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { Shield, PlusCircle, Archive, ArrowLeft, List } from "lucide-react"
+import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut } from "lucide-react"
 
 export default function AdminMainMenuPage() {
   const router = useRouter()
@@ -42,6 +42,12 @@ export default function AdminMainMenuPage() {
     checkAdmin()
   }, [initData])
 
+  const handleLogout = async () => {
+    await fetch("/api/admin/web-logout", { method: "POST" }).catch(() => null)
+    setAuthorized(false)
+    router.push("/admin/login")
+  }
+
   return (
     <ChessBackground>
       <div className="min-h-screen flex flex-col">
@@ -60,6 +66,15 @@ export default function AdminMainMenuPage() {
             <div className="flex items-center gap-2 text-white/80">
               <Shield className="w-5 h-5 text-emerald-400" />
               <span className="font-semibold">Админ‑панель</span>
+              {authorized && (
+                <button
+                  onClick={handleLogout}
+                  className="ml-2 rounded-lg bg-white/10 p-2 text-white/70 hover:bg-white/20 hover:text-white"
+                  title="Выйти из веб-админки"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
         </header>
@@ -82,10 +97,10 @@ export default function AdminMainMenuPage() {
               <div className="font-bold mb-1">Нет доступа</div>
               <div className="text-white/80 mb-4">{error || "Проверка доступа не пройдена"}</div>
               <button
-                onClick={() => router.push("/")}
+                onClick={() => router.push("/admin/login")}
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg"
               >
-                <ArrowLeft className="w-4 h-4" /> На главную
+                <LogIn className="w-4 h-4" /> Войти в веб-админку
               </button>
             </div>
           )}
