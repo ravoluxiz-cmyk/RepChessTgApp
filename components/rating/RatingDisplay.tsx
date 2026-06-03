@@ -33,6 +33,54 @@ interface RatingDisplayProps {
   theme?: 'dark' | 'light'
 }
 
+function isRatingRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object"
+}
+
+function normalizeTimeControl(
+  value: unknown,
+  fallback: 'blitz' | 'rapid' | 'classical'
+): 'blitz' | 'rapid' | 'classical' {
+  return value === 'blitz' || value === 'rapid' || value === 'classical'
+    ? value
+    : fallback
+}
+
+function normalizeRating(
+  value: unknown,
+  fallbackTimeControl: 'blitz' | 'rapid' | 'classical'
+): PlayerRating | null {
+  if (!isRatingRecord(value)) return null
+
+  const ratingValue = Number(value.rating)
+  if (!Number.isFinite(ratingValue)) return null
+
+  const gamesPlayed = Number(value.games_played ?? value.games_count ?? 0)
+  const wins = Number(value.wins_count ?? 0)
+  const losses = Number(value.losses_count ?? 0)
+  const draws = Number(value.draws_count ?? 0)
+  const winRate = Number(value.win_rate ?? (gamesPlayed > 0 ? wins / gamesPlayed : 0))
+
+  return {
+    user_id: Number(value.user_id ?? 0),
+    rating: ratingValue,
+    rd: Number(value.rd ?? 350),
+    volatility: Number(value.volatility ?? 0.06),
+    games_played: Number.isFinite(gamesPlayed) ? gamesPlayed : 0,
+    wins_count: Number.isFinite(wins) ? wins : 0,
+    losses_count: Number.isFinite(losses) ? losses : 0,
+    draws_count: Number.isFinite(draws) ? draws : 0,
+    win_rate: Number.isFinite(winRate) ? winRate : 0,
+    recent_change: Number(value.recent_change ?? 0),
+    rank: Number(value.rank ?? value.global_rank ?? 0),
+    time_control: normalizeTimeControl(value.time_control, fallbackTimeControl),
+    highest_rating: typeof value.highest_rating === "number" ? value.highest_rating : undefined,
+    lowest_rating: typeof value.lowest_rating === "number" ? value.lowest_rating : undefined,
+    rating_volatility: typeof value.rating_volatility === "number" ? value.rating_volatility : undefined,
+    last_game_at: typeof value.last_game_at === "string" ? value.last_game_at : undefined,
+  }
+}
+
 export default function RatingDisplay({ 
   userId, 
   timeControl = 'blitz',
@@ -52,8 +100,24 @@ export default function RatingDisplay({
       try {
         const response = await fetch(`/api/rating/player/${userId}?timeControl=${timeControl}`)
         if (!response.ok) throw new Error("Failed to fetch ratings")
-        const data = await response.json()
-        setRatings(Array.isArray(data) ? data : [data])
+        const data = await response.json() as unknown
+        let rawRatings: unknown[]
+
+        if (Array.isArray(data)) {
+          rawRatings = data
+        } else if (isRatingRecord(data) && Array.isArray(data.ratings)) {
+          rawRatings = data.ratings
+        } else if (isRatingRecord(data) && data.rating) {
+          rawRatings = [data.rating]
+        } else {
+          rawRatings = [data]
+        }
+
+        setRatings(
+          rawRatings
+            .map((rating) => normalizeRating(rating, timeControl))
+            .filter((rating): rating is PlayerRating => Boolean(rating))
+        )
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error")
       } finally {
