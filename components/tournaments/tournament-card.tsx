@@ -159,135 +159,146 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       variants={fadeUpVariant}
       initial="hidden"
       animate="visible"
-      className="relative backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300"
+      className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-lg transition-all duration-300 hover:bg-white/10"
     >
-      {/* Header */}
-      {tournament.poster_url && (
-        <div className="mb-5 overflow-hidden rounded-lg border border-white/10 bg-black/20">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={tournament.poster_url}
-            alt={tournament.title}
-            className="aspect-[16/9] w-full object-cover"
-            loading="lazy"
-          />
-        </div>
-      )}
-
-      <div className="mb-5 flex items-start justify-between gap-3">
-        <h3 className="min-w-0 text-2xl font-bold text-white">{tournament.title}</h3>
-        {Number(tournament.allow_join) === 1 && (
-          <span className="shrink-0 rounded-lg border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-100">
-            Запись открыта
-          </span>
-        )}
-        {tournament.source === "google_calendar" && (
-          <span className="shrink-0 rounded-lg border border-cyan-400/30 bg-cyan-500/15 px-2.5 py-1 text-xs font-semibold text-cyan-100">
-            Google Calendar
-          </span>
-        )}
-      </div>
-
-      {/* Info Grid */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-3 text-white/70">
-          <Trophy className="w-5 h-5 text-emerald-400" />
-          <span className="text-base">{formatLabels[tournament.format] || tournament.format}</span>
+      <div className="grid md:grid-cols-[minmax(220px,320px)_1fr]">
+        <div className="relative min-h-56 bg-black/25 md:min-h-full">
+          {tournament.poster_url ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={tournament.poster_url}
+              alt={tournament.title}
+              className="h-full min-h-56 w-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-full min-h-56 flex-col items-center justify-center gap-3 p-6 text-white/45">
+              <CalendarDays className="h-12 w-12 text-emerald-300/70" />
+              <span className="text-sm font-semibold uppercase tracking-wide">Афиша скоро</span>
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-3 text-white/70">
-          <ListChecks className="w-5 h-5 text-amber-400" />
-          <span className="text-base">{tournament.rounds} раундов</span>
-        </div>
-
-        <div className="flex items-center gap-3 text-white/70">
-          <Scale className="w-5 h-5 text-blue-400" />
-          <span className="text-base">
-            {tournament.points_win}/{tournament.points_draw}/{tournament.points_loss}, bye {tournament.bye_points}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3 text-white/70">
-          <Users className="w-5 h-5 text-purple-400" />
-          <span className="text-base">{teamModeLabels[tournament.team_mode] || tournament.team_mode}</span>
-        </div>
-
-        <div className="flex items-center gap-3 text-white/70">
-          <CalendarDays className="w-5 h-5 text-cyan-400" />
-          <span className="text-base">
-            {tournament.start_at ? formatSchedule(tournament.start_at) : formatCreatedAt(tournament.created_at)}
-          </span>
-        </div>
-
-        {tournament.location && (
-          <div className="flex items-center gap-3 text-white/70">
-            <MapPin className="w-5 h-5 text-rose-300" />
-            <span className="text-base">{tournament.location}</span>
+        <div className="p-5 sm:p-6">
+          {/* Header */}
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <h3 className="min-w-0 text-2xl font-bold text-white">{tournament.title}</h3>
+            <div className="flex flex-wrap gap-2">
+              {Number(tournament.allow_join) === 1 && (
+                <span className="shrink-0 rounded-lg border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-100">
+                  Запись открыта
+                </span>
+              )}
+              {tournament.source === "google_calendar" && (
+                <span className="shrink-0 rounded-lg border border-cyan-400/30 bg-cyan-500/15 px-2.5 py-1 text-xs font-semibold text-cyan-100">
+                  Google Calendar
+                </span>
+              )}
+            </div>
           </div>
-        )}
 
-        {tournament.address && (
-          <div className="flex items-center gap-3 text-white/70">
-            <MapPin className="w-5 h-5 text-orange-300" />
-            <span className="text-base">{tournament.address}</span>
+          {/* Info Grid */}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex items-center gap-3 text-white/70">
+              <Trophy className="w-5 h-5 text-emerald-400" />
+              <span className="text-base">{formatLabels[tournament.format] || tournament.format}</span>
+            </div>
+
+            <div className="flex items-center gap-3 text-white/70">
+              <ListChecks className="w-5 h-5 text-amber-400" />
+              <span className="text-base">{tournament.rounds} раундов</span>
+            </div>
+
+            <div className="flex items-center gap-3 text-white/70">
+              <Scale className="w-5 h-5 text-blue-400" />
+              <span className="text-base">
+                {tournament.points_win}/{tournament.points_draw}/{tournament.points_loss}, bye {tournament.bye_points}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3 text-white/70">
+              <Users className="w-5 h-5 text-purple-400" />
+              <span className="text-base">{teamModeLabels[tournament.team_mode] || tournament.team_mode}</span>
+            </div>
+
+            <div className="flex items-center gap-3 text-white/70 sm:col-span-2">
+              <CalendarDays className="w-5 h-5 text-cyan-400" />
+              <span className="text-base">
+                {tournament.start_at ? formatSchedule(tournament.start_at) : formatCreatedAt(tournament.created_at)}
+              </span>
+            </div>
+
+            {tournament.location && (
+              <div className="flex items-center gap-3 text-white/70">
+                <MapPin className="w-5 h-5 text-rose-300" />
+                <span className="text-base">{tournament.location}</span>
+              </div>
+            )}
+
+            {tournament.address && (
+              <div className="flex items-center gap-3 text-white/70">
+                <MapPin className="w-5 h-5 text-orange-300" />
+                <span className="text-base">{tournament.address}</span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Description */}
-      <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-white/60">
-        {tournament.description || `Тай-брейки: ${tournament.tiebreakers || "по регламенту турнира"}`}
-      </p>
+          {/* Description */}
+          <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-white/60">
+            {tournament.description || `Тай-брейки: ${tournament.tiebreakers || "по регламенту турнира"}`}
+          </p>
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        {Number(tournament.allow_join) === 1 && typeof tournament.id === "number" && (
-          <button
-            type="button"
-            onClick={handleRegister}
-            disabled={registering || registered}
-            className="inline-flex items-center gap-2 rounded-lg border border-emerald-400/30 bg-emerald-500/20 px-3 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/30 disabled:cursor-default disabled:opacity-70"
-          >
-            <CheckCircle2 className="h-4 w-4" />
-            {registered ? "Вы зарегистрированы" : registering ? "Регистрация..." : "Зарегистрироваться"}
-          </button>
-        )}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {Number(tournament.allow_join) === 1 && typeof tournament.id === "number" && (
+              <button
+                type="button"
+                onClick={handleRegister}
+                disabled={registering || registered}
+                className="inline-flex items-center gap-2 rounded-lg border border-emerald-400/30 bg-emerald-500/20 px-3 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/30 disabled:cursor-default disabled:opacity-70"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                {registered ? "Вы зарегистрированы" : registering ? "Регистрация..." : "Зарегистрироваться"}
+              </button>
+            )}
 
-        {tournament.yandex_maps_url && (
-          <a
-            href={tournament.yandex_maps_url}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
-          >
-            <MapPin className="h-4 w-4" />
-            Яндекс Карты
-          </a>
-        )}
+            {tournament.yandex_maps_url && (
+              <a
+                href={tournament.yandex_maps_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+              >
+                <MapPin className="h-4 w-4" />
+                Яндекс Карты
+              </a>
+            )}
 
-        {tournament.event_url && (
-          <a
-            href={tournament.event_url}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Открыть событие
-          </a>
-        )}
-      </div>
+            {tournament.event_url && (
+              <a
+                href={tournament.event_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Открыть событие
+              </a>
+            )}
+          </div>
 
-      {registrationError && (
-        <div className="mt-3 rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-sm text-red-100">
-          {registrationError}
+          {registrationError && (
+            <div className="mt-3 rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-sm text-red-100">
+              {registrationError}
+            </div>
+          )}
+
+          {registrationNote && (
+            <div className="mt-3 rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-50">
+              {registrationNote}
+            </div>
+          )}
         </div>
-      )}
-
-      {registrationNote && (
-        <div className="mt-3 rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-50">
-          {registrationNote}
-        </div>
-      )}
+      </div>
 
       {/* Gradient border effect */}
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-blue-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />

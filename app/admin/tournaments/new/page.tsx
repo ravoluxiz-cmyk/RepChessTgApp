@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import { ArrowLeft, LogOut, Trash2, Search, X } from "lucide-react"
+import { PosterUploadField } from "@/components/admin/poster-upload-field"
 
 const Toggle = ({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) => (
   <label className="flex items-center gap-3 text-white">
@@ -382,12 +383,12 @@ export default function AdminCreateTournamentPage() {
                 />
               </div>
               <div>
-                <label className="text-white block mb-2">Ссылка на афишу</label>
-                <input
+                <PosterUploadField
                   value={posterUrl}
-                  onChange={(e) => setPosterUrl(e.target.value)}
-                  className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
-                  placeholder="https://..."
+                  onChange={setPosterUrl}
+                  authHeader={initData ? `Bearer ${initData}` : undefined}
+                  inputClassName="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                  labelClassName="text-white block mb-2"
                 />
               </div>
               <div>

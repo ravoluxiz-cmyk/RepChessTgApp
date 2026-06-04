@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import { ArrowLeft } from "lucide-react"
+import { PosterUploadField } from "@/components/admin/poster-upload-field"
 
 type TournamentSettings = {
     title: string
@@ -257,13 +258,12 @@ export default function TournamentSettingsPage() {
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Афиша</label>
-                                <input
-                                    type="url"
+                                <PosterUploadField
                                     value={settings.poster_url}
-                                    onChange={(e) => setSettings(prev => ({ ...prev, poster_url: e.target.value }))}
-                                    className={inputClass}
-                                    placeholder="https://..."
+                                    onChange={(value) => setSettings(prev => ({ ...prev, poster_url: value }))}
+                                    authHeader={initData ? `Bearer ${initData}` : undefined}
+                                    inputClassName={inputClass}
+                                    labelClassName={labelClass}
                                 />
                             </div>
                             <div>

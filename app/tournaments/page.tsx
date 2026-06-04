@@ -97,7 +97,7 @@ export default function TournamentsPage() {
             )}
 
             {!loading && !error && tournaments.length > 0 && (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+              <div className="space-y-5">
                 {tournaments.map((tournament, index) => (
                   <TournamentCard key={tournament.id} tournament={tournament} index={index} />
                 ))}
