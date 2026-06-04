@@ -29,6 +29,34 @@ interface RatingPredictionProps {
   theme?: 'light' | 'dark';
 }
 
+type RatingApiPayload = {
+  rating?: {
+    user_id?: number;
+    userId?: string;
+    rating?: number;
+    rd?: number;
+    volatility?: number;
+  };
+  user_id?: number;
+  userId?: string;
+  rating?: number;
+  rd?: number;
+  volatility?: number;
+};
+
+function normalizePlayerRating(payload: RatingApiPayload, fallbackUserId: number): PlayerRating {
+  const rating = payload.rating && typeof payload.rating === 'object'
+    ? payload.rating
+    : payload;
+
+  return {
+    userId: String(rating.user_id ?? rating.userId ?? fallbackUserId),
+    rating: Number(rating.rating ?? 800),
+    rd: Number(rating.rd ?? 350),
+    volatility: Number(rating.volatility ?? 0.06)
+  };
+}
+
 export default function RatingPrediction({ 
   player1Id, 
   player2Id,
@@ -50,12 +78,7 @@ export default function RatingPrediction({
         const player1Response = await fetch(`/api/rating/player/${player1Id}?timeControl=${timeControl}`);
         if (player1Response.ok) {
           const player1Data = await player1Response.json();
-          setPlayer1({
-            userId: player1Data.userId,
-            rating: player1Data.rating,
-            rd: player1Data.rd,
-            volatility: player1Data.volatility
-          });
+          setPlayer1(normalizePlayerRating(player1Data, player1Id));
         }
 
         // Fetch player 2 rating if specified
@@ -63,12 +86,7 @@ export default function RatingPrediction({
           const player2Response = await fetch(`/api/rating/player/${player2Id}?timeControl=${timeControl}`);
           if (player2Response.ok) {
             const player2Data = await player2Response.json();
-            setPlayer2({
-              userId: player2Data.userId,
-              rating: player2Data.rating,
-              rd: player2Data.rd,
-              volatility: player2Data.volatility
-            });
+            setPlayer2(normalizePlayerRating(player2Data, player2Id));
           }
         } else {
           // Use default opponent for demo

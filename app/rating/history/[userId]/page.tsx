@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { BackButton } from "@/components/ui/back-button"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
@@ -17,26 +18,84 @@ interface RatingHistoryPoint {
 
 interface PlayerRatingInfo {
   user_id: number
-  username: string
+  username?: string
   first_name: string
-  last_name: string
+  last_name?: string
   current_rating: number
   current_rd: number
   current_volatility: number
   total_games: number
   win_rate: number
-  recent_form: string // "WWDLW" format
+  recent_form: string
   highest_rating: number
   lowest_rating: number
   rating_trend: 'up' | 'down' | 'stable'
 }
 
-interface RatingHistoryPageProps {
-  params: { userId: string }
+type RatingApiPayload = {
+  rating?: {
+    user_id?: number
+    rating?: number
+    rd?: number
+    volatility?: number
+    games_count?: number
+    wins_count?: number
+    losses_count?: number
+    draws_count?: number
+  }
 }
 
-export default function RatingHistoryPage({ params }: RatingHistoryPageProps) {
-  // router variable will be used for navigation in the future
+type RatingHistoryApiPayload = {
+  history?: RatingHistoryApiPoint[]
+}
+
+type RatingHistoryApiPoint = {
+  new_rating?: number
+  old_rating?: number
+  new_rd?: number
+  rating_change?: number
+  created_at?: string
+}
+
+function normalizePlayerInfo(userId: string, payload: RatingApiPayload): PlayerRatingInfo {
+  const rating = payload.rating
+  const wins = Number(rating?.wins_count ?? 0)
+  const games = Number(rating?.games_count ?? 0)
+
+  return {
+    user_id: Number(rating?.user_id ?? userId),
+    first_name: `Игрок #${rating?.user_id ?? userId}`,
+    last_name: "",
+    current_rating: Number(rating?.rating ?? 800),
+    current_rd: Number(rating?.rd ?? 350),
+    current_volatility: Number(rating?.volatility ?? 0.06),
+    total_games: games,
+    win_rate: games > 0 ? wins / games : 0,
+    recent_form: "",
+    highest_rating: Number(rating?.rating ?? 800),
+    lowest_rating: Number(rating?.rating ?? 800),
+    rating_trend: "stable",
+  }
+}
+
+function normalizeHistory(payload: unknown): RatingHistoryPoint[] {
+  const rawHistory: RatingHistoryApiPoint[] = Array.isArray(payload)
+    ? payload
+    : payload && typeof payload === "object" && "history" in payload
+      ? (payload as RatingHistoryApiPayload).history || []
+      : []
+
+  return rawHistory.map((point, index) => ({
+    date: point.created_at || new Date().toISOString(),
+    rating: Number(point.new_rating ?? point.old_rating ?? 800),
+    rd: Number(point.new_rd ?? 350),
+    games_played: rawHistory.length - index,
+    change: Number(point.rating_change ?? 0),
+  }))
+}
+
+export default function RatingHistoryPage() {
+  const params = useParams<{ userId: string }>()
   const userId = params.userId
   
   const [playerInfo, setPlayerInfo] = useState<PlayerRatingInfo | null>(null)
@@ -48,21 +107,24 @@ export default function RatingHistoryPage({ params }: RatingHistoryPageProps) {
   useEffect(() => {
     async function fetchRatingData() {
       try {
+        setLoading(true)
+        setError(null)
+
         // Fetch player info
         const playerResponse = await fetch(`/api/rating/player/${userId}`)
         if (!playerResponse.ok) throw new Error("Failed to fetch player info")
-        const playerData = await playerResponse.json()
-        setPlayerInfo(playerData)
+        const playerData: RatingApiPayload = await playerResponse.json()
+        setPlayerInfo(normalizePlayerInfo(userId, playerData))
 
         // Fetch rating history
         const historyParams = new URLSearchParams({
-          time_range: timeRange,
-          include_games: 'true'
+          range: timeRange,
+          limit: '100'
         })
         const historyResponse = await fetch(`/api/rating/history/${userId}?${historyParams}`)
         if (!historyResponse.ok) throw new Error("Failed to fetch rating history")
         const historyData = await historyResponse.json()
-        setHistory(historyData)
+        setHistory(normalizeHistory(historyData))
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error")
       } finally {
@@ -76,6 +138,8 @@ export default function RatingHistoryPage({ params }: RatingHistoryPageProps) {
   }, [userId, timeRange])
 
   const formatForm = (form: string) => {
+    if (!form) return <span className="text-white/40">—</span>
+
     return form.split('').map((result, index) => {
       const color = result === 'W' ? 'text-green-400' : result === 'L' ? 'text-red-400' : 'text-yellow-400'
       return (

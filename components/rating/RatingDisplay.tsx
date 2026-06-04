@@ -485,7 +485,7 @@ export default function RatingDisplay({
                   </button>
                 )}
                 <button
-                  onClick={() => window.location.href = `/rating/predict?opponent=${rating.user_id}`}
+                  onClick={() => window.location.href = `/rating/predict?player=${rating.user_id}`}
                   className={`flex-1 py-2 rounded-lg transition-colors text-sm ${
                     theme === 'dark'
                       ? 'bg-blue-600/20 hover:bg-blue-600/30 text-blue-400'

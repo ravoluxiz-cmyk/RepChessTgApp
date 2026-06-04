@@ -6,6 +6,48 @@ import { BackButton } from "@/components/ui/back-button"
 import { TournamentCard, Tournament } from "@/components/tournaments/tournament-card"
 import { motion } from "framer-motion"
 
+type CalendarEvent = {
+  id?: string
+  title: string
+  description?: string | null
+  location?: string | null
+  start_at?: string | null
+  end_at?: string | null
+  event_url?: string | null
+  source?: "google_calendar"
+}
+
+function calendarEventToTournament(event: CalendarEvent, index: number): Tournament {
+  return {
+    id: event.id ? `calendar-${event.id}` : `calendar-${index}`,
+    title: event.title,
+    format: "calendar",
+    points_win: 1,
+    points_loss: 0,
+    points_draw: 0.5,
+    bye_points: 0,
+    rounds: 1,
+    tiebreakers: "",
+    team_mode: "none",
+    allow_join: 0,
+    archived: 0,
+    start_at: event.start_at,
+    end_at: event.end_at,
+    location: event.location,
+    event_url: event.event_url,
+    description: event.description,
+    source: "google_calendar",
+  }
+}
+
+function getTournamentTime(tournament: Tournament) {
+  const value = tournament.start_at || tournament.created_at
+  if (!value) return Number.MAX_SAFE_INTEGER
+
+  const time = new Date(value).getTime()
+  return Number.isNaN(time) ? Number.MAX_SAFE_INTEGER : time
+}
+
 export default function TournamentsPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [loading, setLoading] = useState(true)
@@ -17,17 +59,29 @@ export default function TournamentsPage() {
         setLoading(true)
         setError(null)
 
-        const response = await fetch("/api/tournaments")
-        if (!response.ok) {
+        const [tournamentsResponse, calendarResponse] = await Promise.all([
+          fetch("/api/tournaments"),
+          fetch("/api/calendar/events"),
+        ])
+
+        if (!tournamentsResponse.ok) {
           throw new Error("Не удалось загрузить турниры")
         }
 
-        const data = await response.json()
-        const activeTournaments = Array.isArray(data)
-          ? data.filter((tournament: Tournament) => Number(tournament.archived ?? 0) === 0)
-          : []
+        const tournamentsData = await tournamentsResponse.json()
+        const calendarData = calendarResponse.ok ? await calendarResponse.json() : { events: [] }
 
-        setTournaments(activeTournaments)
+        const activeTournaments = Array.isArray(tournamentsData)
+          ? tournamentsData.filter((tournament: Tournament) => Number(tournament.archived ?? 0) === 0)
+          : []
+        const calendarTournaments = Array.isArray(calendarData.events)
+          ? calendarData.events.map(calendarEventToTournament)
+          : []
+        const mergedTournaments = [...activeTournaments, ...calendarTournaments].sort(
+          (a, b) => getTournamentTime(a) - getTournamentTime(b)
+        )
+
+        setTournaments(mergedTournaments)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Неизвестная ошибка")
       } finally {

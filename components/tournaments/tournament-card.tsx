@@ -1,10 +1,10 @@
 "use client"
 
-import { CalendarDays, ListChecks, Scale, Trophy, Users } from "lucide-react"
+import { CalendarDays, ExternalLink, ListChecks, MapPin, Scale, Trophy, Users } from "lucide-react"
 import { motion } from "framer-motion"
 
 export interface Tournament {
-  id: number
+  id: number | string
   title: string
   format: string
   points_win: number
@@ -17,6 +17,12 @@ export interface Tournament {
   allow_join?: number
   archived?: number
   created_at?: string
+  start_at?: string | null
+  end_at?: string | null
+  location?: string | null
+  event_url?: string | null
+  description?: string | null
+  source?: "supabase" | "google_calendar"
 }
 
 interface TournamentCardProps {
@@ -29,6 +35,7 @@ const formatLabels: Record<string, string> = {
   swiss_bbp_dutch: "Швейцарская BBP Dutch",
   round_robin: "Круговая",
   knockout: "На выбывание",
+  calendar: "Событие календаря",
 }
 
 const teamModeLabels: Record<string, string> = {
@@ -46,6 +53,21 @@ function formatCreatedAt(value?: string) {
     day: "2-digit",
     month: "long",
     year: "numeric",
+  }).format(date)
+}
+
+function formatSchedule(value?: string | null) {
+  if (!value) return "Дата уточняется"
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return "Дата уточняется"
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: value.includes("T") ? "2-digit" : undefined,
+    minute: value.includes("T") ? "2-digit" : undefined,
   }).format(date)
 }
 
@@ -78,6 +100,11 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
             Запись открыта
           </span>
         )}
+        {tournament.source === "google_calendar" && (
+          <span className="shrink-0 rounded-lg border border-cyan-400/30 bg-cyan-500/15 px-2.5 py-1 text-xs font-semibold text-cyan-100">
+            Google Calendar
+          </span>
+        )}
       </div>
 
       {/* Info Grid */}
@@ -106,14 +133,35 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
 
         <div className="flex items-center gap-3 text-white/70">
           <CalendarDays className="w-5 h-5 text-cyan-400" />
-          <span className="text-base">{formatCreatedAt(tournament.created_at)}</span>
+          <span className="text-base">
+            {tournament.start_at ? formatSchedule(tournament.start_at) : formatCreatedAt(tournament.created_at)}
+          </span>
         </div>
+
+        {tournament.location && (
+          <div className="flex items-center gap-3 text-white/70">
+            <MapPin className="w-5 h-5 text-rose-300" />
+            <span className="text-base">{tournament.location}</span>
+          </div>
+        )}
       </div>
 
       {/* Description */}
       <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-white/60">
-        Тай-брейки: {tournament.tiebreakers || "по регламенту турнира"}
+        {tournament.description || `Тай-брейки: ${tournament.tiebreakers || "по регламенту турнира"}`}
       </p>
+
+      {tournament.event_url && (
+        <a
+          href={tournament.event_url}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Открыть событие
+        </a>
+      )}
 
       {/* Gradient border effect */}
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-blue-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
