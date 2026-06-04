@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { CalendarDays, CheckCircle2, ExternalLink, ListChecks, MapPin, Scale, Trophy, Users } from "lucide-react"
 import { motion } from "framer-motion"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
@@ -79,16 +79,47 @@ function formatSchedule(value?: string | null) {
 }
 
 export function TournamentCard({ tournament, index }: TournamentCardProps) {
-  const { initData } = useTelegramWebApp()
+  const { initData, isReady } = useTelegramWebApp()
   const [registering, setRegistering] = useState(false)
   const [registered, setRegistered] = useState(false)
+  const [registrationNote, setRegistrationNote] = useState<string | null>(null)
   const [registrationError, setRegistrationError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isReady || Number(tournament.allow_join) !== 1 || typeof tournament.id !== "number") return
+
+    let cancelled = false
+
+    async function fetchRegistrationStatus() {
+      try {
+        const response = await fetch(`/api/tournaments/${tournament.id}/register`, {
+          headers: getProfileAuthHeaders(initData),
+        })
+        if (!response.ok) return
+
+        const data = await response.json().catch(() => ({}))
+        if (cancelled || !data.registered) return
+
+        setRegistered(true)
+        setRegistrationNote(data.registration_notice || "Вы уже зарегистрированы. Чтобы отменить регистрацию, напишите в чат «-».")
+      } catch {
+        // Status check is best-effort; registration itself still handles errors.
+      }
+    }
+
+    fetchRegistrationStatus()
+
+    return () => {
+      cancelled = true
+    }
+  }, [initData, isReady, tournament.allow_join, tournament.id])
 
   async function handleRegister() {
     if (typeof tournament.id !== "number") return
 
     setRegistering(true)
     setRegistrationError(null)
+    setRegistrationNote(null)
     try {
       const response = await fetch(`/api/tournaments/${tournament.id}/register`, {
         method: "POST",
@@ -99,6 +130,10 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
         throw new Error(data.error || "Не удалось зарегистрироваться")
       }
       setRegistered(true)
+      setRegistrationNote(data.registration_notice || "Вы уже зарегистрированы. Чтобы отменить регистрацию, напишите в чат «-».")
+      if (data.telegram_warning && !data.already_registered) {
+        setRegistrationError(data.telegram_warning)
+      }
     } catch (error) {
       setRegistrationError(error instanceof Error ? error.message : "Неизвестная ошибка")
     } finally {
@@ -245,6 +280,12 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       {registrationError && (
         <div className="mt-3 rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-sm text-red-100">
           {registrationError}
+        </div>
+      )}
+
+      {registrationNote && (
+        <div className="mt-3 rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-50">
+          {registrationNote}
         </div>
       )}
 

@@ -549,6 +549,26 @@ export async function addTournamentRegistration(registration: TournamentRegistra
   return { registration: data as TournamentRegistration, alreadyRegistered: false }
 }
 
+export async function getTournamentRegistration(
+  tournamentId: number,
+  userTelegramId: number
+): Promise<TournamentRegistration | null> {
+  const { data, error } = await supabaseAdmin
+    .from('tournament_registrations')
+    .select('*')
+    .eq('tournament_id', tournamentId)
+    .eq('user_telegram_id', userTelegramId)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null
+    console.error('Error getting tournament registration:', error)
+    return null
+  }
+
+  return data as TournamentRegistration
+}
+
 // ===== TOURNAMENT PARTICIPANTS =====
 
 export async function addTournamentParticipant(tp: TournamentParticipant): Promise<TournamentParticipant | null> {
