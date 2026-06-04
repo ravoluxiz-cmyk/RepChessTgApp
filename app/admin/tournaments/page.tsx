@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { ArrowLeft, List, CalendarDays, Archive, ArchiveRestore, Trash2, ListOrdered, Settings, RefreshCw, Users } from "lucide-react"
+import { ArrowLeft, List, CalendarDays, Archive, ArchiveRestore, Trash2, ListOrdered, Settings, RefreshCw, Users, MessageCircle } from "lucide-react"
 
 type DbTournament = {
   id: number
@@ -18,6 +18,13 @@ type DbTournament = {
   registration_count?: number
 }
 
+type TelegramChat = {
+  id: number
+  title: string
+  type: string
+  username?: string
+}
+
 export default function AdminAllTournamentsPage() {
   const router = useRouter()
   const { initData } = useTelegramWebApp()
@@ -26,6 +33,11 @@ export default function AdminAllTournamentsPage() {
   const [error, setError] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(false)
   const [syncMessage, setSyncMessage] = useState<string | null>(null)
+  const [telegramChats, setTelegramChats] = useState<TelegramChat[]>([])
+  const [selectedChatId, setSelectedChatId] = useState("")
+  const [loadingChats, setLoadingChats] = useState(false)
+  const [applyingChat, setApplyingChat] = useState(false)
+  const [chatMessage, setChatMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -84,6 +96,63 @@ export default function AdminAllTournamentsPage() {
     }
   }
 
+  async function handleFindTelegramChats() {
+    setLoadingChats(true)
+    setError(null)
+    setChatMessage(null)
+    try {
+      const res = await fetch("/api/admin/telegram-chats", {
+        headers: initData ? { Authorization: `Bearer ${initData}` } : undefined,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || "Не удалось найти чаты")
+
+      const chats = Array.isArray(data.chats) ? data.chats : []
+      setTelegramChats(chats)
+      if (chats.length > 0) {
+        setSelectedChatId(String(chats[0].id))
+        setChatMessage(`Найдено чатов: ${chats.length}`)
+      } else {
+        setChatMessage("Чаты не найдены. Напишите любое сообщение в нужном Telegram-чате и нажмите «Найти чаты» ещё раз.")
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка поиска чатов")
+    } finally {
+      setLoadingChats(false)
+    }
+  }
+
+  async function handleApplyTelegramChat() {
+    if (!selectedChatId) {
+      setError("Сначала выберите чат")
+      return
+    }
+
+    if (!confirm(`Проставить chat_id ${selectedChatId} во все турниры?`)) return
+
+    setApplyingChat(true)
+    setError(null)
+    setChatMessage(null)
+    try {
+      const res = await fetch("/api/admin/telegram-chats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(initData ? { Authorization: `Bearer ${initData}` } : {}),
+        },
+        body: JSON.stringify({ chat_id: selectedChatId }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || "Не удалось обновить турниры")
+
+      setChatMessage(`Готово: chat_id проставлен в турниры (${data.updated || 0}).`)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка обновления чата")
+    } finally {
+      setApplyingChat(false)
+    }
+  }
+
   async function handleDelete(t: DbTournament) {
     if (!confirm(`Удалить турнир «${t.title}»? Действие необратимо.`)) return
     try {
@@ -127,6 +196,47 @@ export default function AdminAllTournamentsPage() {
             <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
             {syncing ? "Импорт..." : "Импорт из Google Calendar"}
           </button>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-white">
+            <div className="flex items-center gap-2 text-lg font-bold">
+              <MessageCircle className="h-5 w-5 text-emerald-300" />
+              Telegram чат регистраций
+            </div>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <button
+                onClick={handleFindTelegramChats}
+                disabled={loadingChats}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-400/30 bg-emerald-500/15 px-4 py-2 font-semibold text-emerald-50 hover:bg-emerald-500/25 disabled:opacity-60"
+              >
+                <RefreshCw className={`h-4 w-4 ${loadingChats ? "animate-spin" : ""}`} />
+                {loadingChats ? "Ищу..." : "Найти чаты"}
+              </button>
+
+              <select
+                value={selectedChatId}
+                onChange={(event) => setSelectedChatId(event.target.value)}
+                className="min-w-0 flex-1 rounded-lg border border-white/10 bg-[#1a1f2e] px-3 py-2 text-white"
+              >
+                <option value="">Чат не выбран</option>
+                {telegramChats.map((chat) => (
+                  <option key={chat.id} value={chat.id}>
+                    {chat.title} ({chat.id})
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={handleApplyTelegramChat}
+                disabled={applyingChat || !selectedChatId}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-violet-400/30 bg-violet-500/15 px-4 py-2 font-semibold text-violet-50 hover:bg-violet-500/25 disabled:opacity-60"
+              >
+                {applyingChat ? "Ставлю..." : "Проставить всем"}
+              </button>
+            </div>
+            <p className="mt-2 text-sm text-white/55">
+              Если список пустой, напишите любое новое сообщение в нужном Telegram-чате, где есть бот, и повторите поиск.
+            </p>
+          </div>
         </div>
 
         {/* Content */}
@@ -144,6 +254,12 @@ export default function AdminAllTournamentsPage() {
           {syncMessage && (
             <div className="backdrop-blur-lg bg-cyan-500/10 border border-cyan-400/30 rounded-2xl p-4 text-cyan-100 mb-4">
               {syncMessage}
+            </div>
+          )}
+
+          {chatMessage && (
+            <div className="backdrop-blur-lg bg-emerald-500/10 border border-emerald-400/30 rounded-2xl p-4 text-emerald-100 mb-4">
+              {chatMessage}
             </div>
           )}
 
