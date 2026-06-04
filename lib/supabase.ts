@@ -69,7 +69,7 @@ class QueryBuilder {
     return this
   }
 
-  upsert(values: MemRow | MemRow[], _opts?: { onConflict?: string }) {
+  upsert(values: MemRow | MemRow[]) {
     this.action = 'upsert'
     this.insertValues = values
     return this
