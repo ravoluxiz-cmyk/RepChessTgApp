@@ -24,7 +24,7 @@ async function ensurePosterBucket() {
     return false
   }
 
-  if (buckets?.some((bucket) => bucket.name === BUCKET)) {
+  if (buckets?.some((bucket: { name: string }) => bucket.name === BUCKET)) {
     return true
   }
 
