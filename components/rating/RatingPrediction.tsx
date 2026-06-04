@@ -29,14 +29,7 @@ interface RatingPredictionProps {
   theme?: 'light' | 'dark';
 }
 
-type RatingApiPayload = {
-  rating?: {
-    user_id?: number;
-    userId?: string;
-    rating?: number;
-    rd?: number;
-    volatility?: number;
-  };
+type RatingRecord = {
   user_id?: number;
   userId?: string;
   rating?: number;
@@ -44,16 +37,24 @@ type RatingApiPayload = {
   volatility?: number;
 };
 
+type RatingApiPayload = RatingRecord | {
+  rating?: RatingRecord;
+};
+
+function isWrappedRatingPayload(payload: RatingApiPayload): payload is { rating?: RatingRecord } {
+  return typeof payload.rating === 'object' && payload.rating !== null;
+}
+
 function normalizePlayerRating(payload: RatingApiPayload, fallbackUserId: number): PlayerRating {
-  const rating = payload.rating && typeof payload.rating === 'object'
+  const rating = isWrappedRatingPayload(payload)
     ? payload.rating
     : payload;
 
   return {
-    userId: String(rating.user_id ?? rating.userId ?? fallbackUserId),
-    rating: Number(rating.rating ?? 800),
-    rd: Number(rating.rd ?? 350),
-    volatility: Number(rating.volatility ?? 0.06)
+    userId: String(rating?.user_id ?? rating?.userId ?? fallbackUserId),
+    rating: Number(rating?.rating ?? 800),
+    rd: Number(rating?.rd ?? 350),
+    volatility: Number(rating?.volatility ?? 0.06)
   };
 }
 
