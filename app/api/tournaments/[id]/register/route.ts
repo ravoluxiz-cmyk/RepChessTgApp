@@ -3,9 +3,13 @@ import { addTournamentRegistration, getTournamentById, getUserByTelegramId } fro
 import { getTelegramUserFromHeaders, sendTelegramMessage } from "@/lib/telegram"
 import { getWebProfileUserFromHeaders } from "@/lib/web-auth"
 
-function getDisplayName(user: { first_name: string; last_name?: string; username?: string }) {
-  const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ").trim()
-  return fullName || user.username || "Участник"
+function getDisplayName(user: { first_name?: string | null; last_name?: string | null; username?: string | null }) {
+  const fullName = [user.first_name, user.last_name]
+    .map((part) => String(part || "").trim())
+    .filter(Boolean)
+    .join(" ")
+  const username = String(user.username || "").trim()
+  return fullName || username || "Участник"
 }
 
 export async function POST(request: NextRequest, ctx: { params: Promise<{ id: string }> }) {
