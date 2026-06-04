@@ -55,6 +55,15 @@ export default function AdminCreateTournamentPage() {
   const [hideColorNames, setHideColorNames] = useState(false)
   const [showOpponentNames, setShowOpponentNames] = useState(true)
   const [chatId, setChatId] = useState("")
+  const [registrationChatId, setRegistrationChatId] = useState("")
+  const [startAt, setStartAt] = useState("")
+  const [endAt, setEndAt] = useState("")
+  const [location, setLocation] = useState("")
+  const [address, setAddress] = useState("")
+  const [yandexMapsUrl, setYandexMapsUrl] = useState("")
+  const [posterUrl, setPosterUrl] = useState("")
+  const [description, setDescription] = useState("")
+  const [eventUrl, setEventUrl] = useState("")
   const [archived, setArchived] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -99,6 +108,15 @@ export default function AdminCreateTournamentPage() {
           if (d.hide_color_names !== undefined) setHideColorNames(Boolean(d.hide_color_names))
           if (d.show_opponent_names !== undefined) setShowOpponentNames(Boolean(d.show_opponent_names))
           if (d.chat_id !== undefined) setChatId(String(d.chat_id))
+          if (d.registration_chat_id !== undefined) setRegistrationChatId(String(d.registration_chat_id))
+          if (d.start_at !== undefined) setStartAt(String(d.start_at))
+          if (d.end_at !== undefined) setEndAt(String(d.end_at))
+          if (d.location !== undefined) setLocation(String(d.location))
+          if (d.address !== undefined) setAddress(String(d.address))
+          if (d.yandex_maps_url !== undefined) setYandexMapsUrl(String(d.yandex_maps_url))
+          if (d.poster_url !== undefined) setPosterUrl(String(d.poster_url))
+          if (d.description !== undefined) setDescription(String(d.description))
+          if (d.event_url !== undefined) setEventUrl(String(d.event_url))
           if (d.archived !== undefined) setArchived(Boolean(d.archived))
         }
       }
@@ -130,6 +148,15 @@ export default function AdminCreateTournamentPage() {
         hide_color_names: hideColorNames,
         show_opponent_names: showOpponentNames,
         chat_id: chatId,
+        registration_chat_id: registrationChatId,
+        start_at: startAt,
+        end_at: endAt,
+        location,
+        address,
+        yandex_maps_url: yandexMapsUrl,
+        poster_url: posterUrl,
+        description,
+        event_url: eventUrl,
         archived,
       }
       if (typeof window !== "undefined") {
@@ -165,6 +192,15 @@ export default function AdminCreateTournamentPage() {
     hideColorNames,
     showOpponentNames,
     chatId,
+    registrationChatId,
+    startAt,
+    endAt,
+    location,
+    address,
+    yandexMapsUrl,
+    posterUrl,
+    description,
+    eventUrl,
     archived,
   ])
 
@@ -216,6 +252,16 @@ export default function AdminCreateTournamentPage() {
           hide_color_names: hideColorNames ? 1 : 0,
           show_opponent_names: showOpponentNames ? 1 : 0,
           chat_id: chatId || null,
+          registration_chat_id: registrationChatId || chatId || null,
+          start_at: startAt || null,
+          end_at: endAt || null,
+          location: location || null,
+          address: address || null,
+          yandex_maps_url: yandexMapsUrl || null,
+          poster_url: posterUrl || null,
+          description: description || null,
+          event_url: eventUrl || null,
+          source: "manual",
           archived: archived ? 1 : 0,
         }),
       })
@@ -285,6 +331,83 @@ export default function AdminCreateTournamentPage() {
                 className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
                 placeholder="My Tournament"
               />
+            </div>
+
+            {/* Формат турнира */}
+            <div className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-4">
+              <h2 className="text-white text-xl font-bold">Карточка события</h2>
+              <div>
+                <label className="text-white block mb-2">Дата и время начала</label>
+                <input
+                  type="datetime-local"
+                  value={startAt}
+                  onChange={(e) => setStartAt(e.target.value)}
+                  className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-white block mb-2">Дата и время окончания</label>
+                <input
+                  type="datetime-local"
+                  value={endAt}
+                  onChange={(e) => setEndAt(e.target.value)}
+                  className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-white block mb-2">Название заведения</label>
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                  placeholder="RepChess Club"
+                />
+              </div>
+              <div>
+                <label className="text-white block mb-2">Адрес</label>
+                <input
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                  placeholder="Москва, ..."
+                />
+              </div>
+              <div>
+                <label className="text-white block mb-2">Ссылка на Яндекс Карты</label>
+                <input
+                  value={yandexMapsUrl}
+                  onChange={(e) => setYandexMapsUrl(e.target.value)}
+                  className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                  placeholder="https://yandex.ru/maps/-/..."
+                />
+              </div>
+              <div>
+                <label className="text-white block mb-2">Ссылка на афишу</label>
+                <input
+                  value={posterUrl}
+                  onChange={(e) => setPosterUrl(e.target.value)}
+                  className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <label className="text-white block mb-2">Описание</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="min-h-28 w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                  placeholder="Короткое описание турнира"
+                />
+              </div>
+              <div>
+                <label className="text-white block mb-2">Внешняя ссылка события</label>
+                <input
+                  value={eventUrl}
+                  onChange={(e) => setEventUrl(e.target.value)}
+                  className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
+                  placeholder="https://..."
+                />
+              </div>
             </div>
 
             {/* Формат турнира */}
@@ -486,6 +609,16 @@ export default function AdminCreateTournamentPage() {
                   type="text"
                   value={chatId}
                   onChange={(e) => setChatId(e.target.value)}
+                  placeholder="-1001234567890"
+                  className="w-full bg-[#1a1f2e] text-white border border-gray-700 rounded-lg p-3 mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-gray-300 text-sm">Chat ID для регистраций</label>
+                <input
+                  type="text"
+                  value={registrationChatId}
+                  onChange={(e) => setRegistrationChatId(e.target.value)}
                   placeholder="-1001234567890"
                   className="w-full bg-[#1a1f2e] text-white border border-gray-700 rounded-lg p-3 mt-1"
                 />

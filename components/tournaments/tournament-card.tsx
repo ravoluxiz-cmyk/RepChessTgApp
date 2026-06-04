@@ -1,7 +1,10 @@
 "use client"
 
-import { CalendarDays, ExternalLink, ListChecks, MapPin, Scale, Trophy, Users } from "lucide-react"
+import { useState } from "react"
+import { CalendarDays, CheckCircle2, ExternalLink, ListChecks, MapPin, Scale, Trophy, Users } from "lucide-react"
 import { motion } from "framer-motion"
+import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
+import { getProfileAuthHeaders } from "@/lib/web-user"
 
 export interface Tournament {
   id: number | string
@@ -21,8 +24,12 @@ export interface Tournament {
   end_at?: string | null
   location?: string | null
   event_url?: string | null
+  address?: string | null
+  yandex_maps_url?: string | null
+  poster_url?: string | null
+  registration_count?: number
   description?: string | null
-  source?: "supabase" | "google_calendar"
+  source?: "manual" | "google_calendar" | "supabase"
 }
 
 interface TournamentCardProps {
@@ -72,6 +79,33 @@ function formatSchedule(value?: string | null) {
 }
 
 export function TournamentCard({ tournament, index }: TournamentCardProps) {
+  const { initData } = useTelegramWebApp()
+  const [registering, setRegistering] = useState(false)
+  const [registered, setRegistered] = useState(false)
+  const [registrationError, setRegistrationError] = useState<string | null>(null)
+
+  async function handleRegister() {
+    if (typeof tournament.id !== "number") return
+
+    setRegistering(true)
+    setRegistrationError(null)
+    try {
+      const response = await fetch(`/api/tournaments/${tournament.id}/register`, {
+        method: "POST",
+        headers: getProfileAuthHeaders(initData),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(data.error || "Не удалось зарегистрироваться")
+      }
+      setRegistered(true)
+    } catch (error) {
+      setRegistrationError(error instanceof Error ? error.message : "Неизвестная ошибка")
+    } finally {
+      setRegistering(false)
+    }
+  }
+
   const fadeUpVariant = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -93,6 +127,18 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       className="relative backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300"
     >
       {/* Header */}
+      {tournament.poster_url && (
+        <div className="mb-5 overflow-hidden rounded-lg border border-white/10 bg-black/20">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={tournament.poster_url}
+            alt={tournament.title}
+            className="aspect-[16/9] w-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
+
       <div className="mb-5 flex items-start justify-between gap-3">
         <h3 className="min-w-0 text-2xl font-bold text-white">{tournament.title}</h3>
         {Number(tournament.allow_join) === 1 && (
@@ -144,6 +190,13 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
             <span className="text-base">{tournament.location}</span>
           </div>
         )}
+
+        {tournament.address && (
+          <div className="flex items-center gap-3 text-white/70">
+            <MapPin className="w-5 h-5 text-orange-300" />
+            <span className="text-base">{tournament.address}</span>
+          </div>
+        )}
       </div>
 
       {/* Description */}
@@ -151,16 +204,48 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
         {tournament.description || `Тай-брейки: ${tournament.tiebreakers || "по регламенту турнира"}`}
       </p>
 
-      {tournament.event_url && (
-        <a
-          href={tournament.event_url}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
-        >
-          <ExternalLink className="h-4 w-4" />
-          Открыть событие
-        </a>
+      <div className="mt-5 flex flex-wrap gap-2">
+        {Number(tournament.allow_join) === 1 && typeof tournament.id === "number" && (
+          <button
+            type="button"
+            onClick={handleRegister}
+            disabled={registering || registered}
+            className="inline-flex items-center gap-2 rounded-lg border border-emerald-400/30 bg-emerald-500/20 px-3 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/30 disabled:cursor-default disabled:opacity-70"
+          >
+            <CheckCircle2 className="h-4 w-4" />
+            {registered ? "Вы зарегистрированы" : registering ? "Регистрация..." : "Зарегистрироваться"}
+          </button>
+        )}
+
+        {tournament.yandex_maps_url && (
+          <a
+            href={tournament.yandex_maps_url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+          >
+            <MapPin className="h-4 w-4" />
+            Яндекс Карты
+          </a>
+        )}
+
+        {tournament.event_url && (
+          <a
+            href={tournament.event_url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Открыть событие
+          </a>
+        )}
+      </div>
+
+      {registrationError && (
+        <div className="mt-3 rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-sm text-red-100">
+          {registrationError}
+        </div>
       )}
 
       {/* Gradient border effect */}

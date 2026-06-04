@@ -1,0 +1,64 @@
+import { NextRequest, NextResponse } from "next/server"
+import { addTournamentRegistration, getTournamentById } from "@/lib/db"
+import { getTelegramUserFromHeaders, sendTelegramMessage } from "@/lib/telegram"
+import { getWebProfileUserFromHeaders } from "@/lib/web-auth"
+
+function getUserName(user: { first_name: string; last_name?: string; username?: string }) {
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ").trim()
+  return fullName || user.username || "Участник"
+}
+
+export async function POST(request: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await ctx.params
+    const tournamentId = Number(id)
+    if (!Number.isFinite(tournamentId)) {
+      return NextResponse.json({ error: "Некорректный ID турнира" }, { status: 400 })
+    }
+
+    const user =
+      getTelegramUserFromHeaders(request.headers) ||
+      getWebProfileUserFromHeaders(request.headers)
+
+    if (!user) {
+      return NextResponse.json({ error: "Нужно открыть приложение через Telegram или профиль веб-версии" }, { status: 401 })
+    }
+
+    const tournament = await getTournamentById(tournamentId)
+    if (!tournament) {
+      return NextResponse.json({ error: "Турнир не найден" }, { status: 404 })
+    }
+
+    if (Number(tournament.allow_join ?? 0) !== 1) {
+      return NextResponse.json({ error: "Регистрация закрыта" }, { status: 400 })
+    }
+
+    const userName = getUserName(user)
+    const venueTitle = tournament.location || tournament.title
+    const result = await addTournamentRegistration({
+      tournament_id: tournamentId,
+      user_telegram_id: user.id,
+      user_name: userName,
+      venue_title: venueTitle,
+    })
+
+    if (!result.registration) {
+      return NextResponse.json({ error: "Не удалось зарегистрироваться" }, { status: 500 })
+    }
+
+    let messageSent = false
+    const chatId = tournament.registration_chat_id || tournament.chat_id
+    if (!result.alreadyRegistered && chatId) {
+      messageSent = await sendTelegramMessage(chatId, `${userName}\n${venueTitle}\n+`)
+    }
+
+    return NextResponse.json({
+      ok: true,
+      already_registered: result.alreadyRegistered,
+      message_sent: messageSent,
+    })
+  } catch (error) {
+    console.error("Failed to register for tournament:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}

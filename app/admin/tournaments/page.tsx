@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { ArrowLeft, List, CalendarDays, Archive, ArchiveRestore, Trash2, ListOrdered, Settings } from "lucide-react"
+import { ArrowLeft, List, CalendarDays, Archive, ArchiveRestore, Trash2, ListOrdered, Settings, RefreshCw, Users } from "lucide-react"
 
 type DbTournament = {
   id: number
@@ -13,6 +13,9 @@ type DbTournament = {
   rounds: number
   archived: number
   created_at: string
+  start_at?: string | null
+  location?: string | null
+  registration_count?: number
 }
 
 export default function AdminAllTournamentsPage() {
@@ -21,6 +24,8 @@ export default function AdminAllTournamentsPage() {
   const [tournaments, setTournaments] = useState<DbTournament[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [syncing, setSyncing] = useState(false)
+  const [syncMessage, setSyncMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -54,6 +59,28 @@ export default function AdminAllTournamentsPage() {
       setTournaments(prev => prev.map(it => it.id === t.id ? { ...it, archived: makeArchived ? 1 : 0 } : it))
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка выполнения")
+    }
+  }
+
+  async function handleSyncCalendar() {
+    setSyncing(true)
+    setError(null)
+    setSyncMessage(null)
+    try {
+      const res = await fetch("/api/tournaments/sync-calendar", {
+        method: "POST",
+        headers: initData ? { Authorization: `Bearer ${initData}` } : undefined,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || "Не удалось импортировать календарь")
+
+      setSyncMessage(`Импортировано событий: ${data.imported || 0}`)
+      const listRes = await fetch("/api/tournaments")
+      if (listRes.ok) setTournaments(await listRes.json())
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка импорта")
+    } finally {
+      setSyncing(false)
     }
   }
 
@@ -92,6 +119,14 @@ export default function AdminAllTournamentsPage() {
             <List className="w-8 h-8 text-violet-400" /> Турниры
           </h1>
           <p className="mt-2 text-white/60">Список турниров с действиями управления</p>
+          <button
+            onClick={handleSyncCalendar}
+            disabled={syncing}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-cyan-400/30 bg-cyan-500/15 px-4 py-2 font-semibold text-cyan-50 hover:bg-cyan-500/25 disabled:opacity-60"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? "Импорт..." : "Импорт из Google Calendar"}
+          </button>
         </div>
 
         {/* Content */}
@@ -103,6 +138,12 @@ export default function AdminAllTournamentsPage() {
           {error && (
             <div className="backdrop-blur-lg bg-red-500/10 border border-red-400/30 rounded-2xl p-4 text-red-200 mb-4">
               {error}
+            </div>
+          )}
+
+          {syncMessage && (
+            <div className="backdrop-blur-lg bg-cyan-500/10 border border-cyan-400/30 rounded-2xl p-4 text-cyan-100 mb-4">
+              {syncMessage}
             </div>
           )}
 
@@ -123,7 +164,14 @@ export default function AdminAllTournamentsPage() {
                   <div className="text-white/70 text-sm">Формат: {t.format}, Раундов: {t.rounds}</div>
                   <div className="text-white/70 text-xs flex items-center gap-2 mt-1 min-w-0">
                     <CalendarDays className="w-3 h-3 text-white/60" />
-                    <span className="truncate">{new Date(t.created_at).toLocaleString()}</span>
+                    <span className="truncate">{new Date(t.start_at || t.created_at).toLocaleString("ru-RU")}</span>
+                  </div>
+                  {t.location && (
+                    <div className="mt-1 text-white/70 text-xs truncate">{t.location}</div>
+                  )}
+                  <div className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/80">
+                    <Users className="h-4 w-4 text-emerald-300" />
+                    Регистраций: {t.registration_count || 0}
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <button

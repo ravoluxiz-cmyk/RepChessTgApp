@@ -227,3 +227,33 @@ export async function requireAdmin(headers: Headers): Promise<TelegramUser | nul
   const userIsAdmin = await isAdmin(user)
   return userIsAdmin ? user : null
 }
+
+export async function sendTelegramMessage(chatId: string, text: string): Promise<boolean> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN
+  if (!botToken || !chatId) {
+    console.error("Telegram message skipped: TELEGRAM_BOT_TOKEN or chat id is missing")
+    return false
+  }
+
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+      }),
+    })
+
+    if (!response.ok) {
+      const data = await response.text().catch(() => "")
+      console.error("Telegram sendMessage failed:", response.status, data)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error("Telegram sendMessage exception:", error)
+    return false
+  }
+}

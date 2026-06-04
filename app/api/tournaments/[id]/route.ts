@@ -80,13 +80,16 @@ export async function PATCH(request: NextRequest, ctx: { params: Promise<{ id: s
       'bye_points', 'rounds', 'tiebreakers', 'chat_id', 'archived',
       'forbid_repeat_bye', 'late_join_points', 'hide_rating', 'hide_new_rating',
       'compute_performance', 'hide_color_names', 'show_opponent_names',
+      'allow_join', 'registration_chat_id', 'start_at', 'end_at', 'location',
+      'address', 'yandex_maps_url', 'poster_url', 'description', 'event_url',
+      'source', 'google_event_id',
     ]
 
     const updates: Record<string, unknown> = {}
     for (const key of allowedKeys) {
       if (body[key] !== undefined) {
         // Handle chat_id special case (empty string → null)
-        if (key === 'chat_id') {
+        if (key === 'chat_id' || key === 'registration_chat_id') {
           updates[key] = body[key] ? String(body[key]) : null
         } else {
           updates[key] = body[key]

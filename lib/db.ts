@@ -47,9 +47,21 @@ export interface Tournament {
   hide_color_names?: number
   show_opponent_names?: number
   chat_id?: string | null
+  registration_chat_id?: string | null
   creator_telegram_id?: number | null
   archived?: number
   created_at?: string
+  start_at?: string | null
+  end_at?: string | null
+  location?: string | null
+  address?: string | null
+  yandex_maps_url?: string | null
+  poster_url?: string | null
+  description?: string | null
+  event_url?: string | null
+  source?: string
+  google_event_id?: string | null
+  registration_count?: number
 }
 
 export interface TournamentParticipant {
@@ -58,6 +70,15 @@ export interface TournamentParticipant {
   user_id: number
   nickname: string
   active?: boolean
+  created_at?: string
+}
+
+export interface TournamentRegistration {
+  id?: number
+  tournament_id: number
+  user_telegram_id: number
+  user_name: string
+  venue_title: string
   created_at?: string
 }
 
@@ -282,8 +303,20 @@ export async function createTournament(t: Tournament): Promise<Tournament | null
       compute_performance: t.compute_performance ?? 0,
       hide_color_names: t.hide_color_names ?? 0,
       show_opponent_names: t.show_opponent_names ?? 1,
+      chat_id: t.chat_id ?? null,
+      registration_chat_id: t.registration_chat_id ?? null,
       creator_telegram_id: t.creator_telegram_id ?? null,
-      archived: t.archived ?? 0
+      archived: t.archived ?? 0,
+      start_at: t.start_at ?? null,
+      end_at: t.end_at ?? null,
+      location: t.location ?? null,
+      address: t.address ?? null,
+      yandex_maps_url: t.yandex_maps_url ?? null,
+      poster_url: t.poster_url ?? null,
+      description: t.description ?? null,
+      event_url: t.event_url ?? null,
+      source: t.source ?? 'manual',
+      google_event_id: t.google_event_id ?? null
     })
     .select()
     .single()
@@ -309,7 +342,8 @@ export async function listTournaments(): Promise<Tournament[]> {
     return []
   }
 
-  return data as Tournament[]
+  const tournaments = (data || []) as Tournament[]
+  return attachTournamentRegistrationCounts(tournaments)
 }
 
 export async function listTournamentsByCreator(telegramId: number): Promise<Tournament[]> {
@@ -324,7 +358,8 @@ export async function listTournamentsByCreator(telegramId: number): Promise<Tour
     return []
   }
 
-  return data as Tournament[]
+  const tournaments = (data || []) as Tournament[]
+  return attachTournamentRegistrationCounts(tournaments)
 }
 
 export async function getTournamentById(id: number): Promise<Tournament | null> {
@@ -339,7 +374,8 @@ export async function getTournamentById(id: number): Promise<Tournament | null> 
     return null
   }
 
-  return data as Tournament
+  const withCounts = await attachTournamentRegistrationCounts([data as Tournament])
+  return withCounts[0] || null
 }
 
 export async function deleteTournament(id: number): Promise<boolean> {
@@ -396,6 +432,121 @@ export async function updateTournament(id: number, fields: Partial<Omit<Tourname
   }
 
   return true
+}
+
+export async function upsertCalendarTournament(t: Tournament): Promise<Tournament | null> {
+  if (!t.google_event_id) return null
+
+  const { data, error } = await supabaseAdmin
+    .from('tournaments')
+    .upsert({
+      title: t.title,
+      format: t.format,
+      points_win: t.points_win,
+      points_loss: t.points_loss,
+      points_draw: t.points_draw,
+      bye_points: t.bye_points,
+      rounds: t.rounds,
+      tiebreakers: t.tiebreakers,
+      team_mode: t.team_mode,
+      allow_join: t.allow_join ?? 1,
+      allow_edit_results: t.allow_edit_results ?? 0,
+      allow_danger_changes: t.allow_danger_changes ?? 0,
+      forbid_repeat_bye: t.forbid_repeat_bye ?? 1,
+      late_join_points: t.late_join_points ?? 0,
+      hide_rating: t.hide_rating ?? 0,
+      hide_new_rating: t.hide_new_rating ?? 0,
+      compute_performance: t.compute_performance ?? 0,
+      hide_color_names: t.hide_color_names ?? 0,
+      show_opponent_names: t.show_opponent_names ?? 1,
+      archived: t.archived ?? 0,
+      start_at: t.start_at ?? null,
+      end_at: t.end_at ?? null,
+      location: t.location ?? null,
+      event_url: t.event_url ?? null,
+      description: t.description ?? null,
+      source: 'google_calendar',
+      google_event_id: t.google_event_id,
+    }, { onConflict: 'google_event_id' })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error upserting calendar tournament:', error)
+    return null
+  }
+
+  return data as Tournament
+}
+
+export async function attachTournamentRegistrationCounts(tournaments: Tournament[]): Promise<Tournament[]> {
+  if (!tournaments.length) return tournaments
+
+  const ids = tournaments
+    .map((tournament) => tournament.id)
+    .filter((id): id is number => typeof id === 'number')
+
+  if (!ids.length) return tournaments
+
+  const { data, error } = await supabaseAdmin
+    .from('tournament_registrations')
+    .select('tournament_id')
+    .in('tournament_id', ids)
+
+  if (error) {
+    console.error('Error counting tournament registrations:', error)
+    return tournaments.map((tournament) => ({ ...tournament, registration_count: 0 }))
+  }
+
+  const counts = new Map<number, number>()
+  for (const row of data || []) {
+    const id = Number(row.tournament_id)
+    counts.set(id, (counts.get(id) || 0) + 1)
+  }
+
+  return tournaments.map((tournament) => ({
+    ...tournament,
+    registration_count: typeof tournament.id === 'number' ? counts.get(tournament.id) || 0 : 0,
+  }))
+}
+
+export async function addTournamentRegistration(registration: TournamentRegistration): Promise<{
+  registration: TournamentRegistration | null
+  alreadyRegistered: boolean
+}> {
+  const { data: existing, error: existingError } = await supabaseAdmin
+    .from('tournament_registrations')
+    .select('*')
+    .eq('tournament_id', registration.tournament_id)
+    .eq('user_telegram_id', registration.user_telegram_id)
+    .single()
+
+  if (existing) {
+    return { registration: existing as TournamentRegistration, alreadyRegistered: true }
+  }
+
+  if (existingError && existingError.code !== 'PGRST116') {
+    console.error('Error checking tournament registration:', existingError)
+    return { registration: null, alreadyRegistered: false }
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('tournament_registrations')
+    .insert({
+      tournament_id: registration.tournament_id,
+      user_telegram_id: registration.user_telegram_id,
+      user_name: registration.user_name,
+      venue_title: registration.venue_title,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error adding tournament registration:', error)
+    return { registration: null, alreadyRegistered: false }
+  }
+
+  return { registration: data as TournamentRegistration, alreadyRegistered: false }
 }
 
 // ===== TOURNAMENT PARTICIPANTS =====

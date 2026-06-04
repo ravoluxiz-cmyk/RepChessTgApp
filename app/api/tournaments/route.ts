@@ -52,8 +52,19 @@ export async function POST(request: NextRequest) {
       hide_color_names: body.hide_color_names ?? 0,
       show_opponent_names: body.show_opponent_names ?? 1,
       chat_id: body.chat_id || null,
+      registration_chat_id: body.registration_chat_id || body.chat_id || null,
       creator_telegram_id: adminUser.id,
       archived: body.archived ?? 0,
+      start_at: body.start_at || null,
+      end_at: body.end_at || null,
+      location: body.location || null,
+      address: body.address || null,
+      yandex_maps_url: body.yandex_maps_url || null,
+      poster_url: body.poster_url || null,
+      description: body.description || null,
+      event_url: body.event_url || null,
+      source: body.source || "manual",
+      google_event_id: body.google_event_id || null,
     }
 
     const created = await createTournament(tournament)

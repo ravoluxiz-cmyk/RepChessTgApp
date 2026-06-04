@@ -16,6 +16,16 @@ type TournamentSettings = {
     points_win: number
     points_loss: number
     points_draw: number
+    allow_join: number
+    registration_chat_id: string
+    start_at: string
+    end_at: string
+    location: string
+    address: string
+    yandex_maps_url: string
+    poster_url: string
+    description: string
+    event_url: string
 }
 
 const ALL_TIEBREAKERS = [
@@ -44,6 +54,8 @@ export default function TournamentSettingsPage() {
     const [settings, setSettings] = useState<TournamentSettings>({
         title: "", bye_points: 1, rounds: 5, tiebreakers: "buchholz,buchholz_cut1",
         chat_id: "", forbid_repeat_bye: 1, points_win: 1, points_loss: 0, points_draw: 0.5,
+        allow_join: 1, registration_chat_id: "", start_at: "", end_at: "", location: "",
+        address: "", yandex_maps_url: "", poster_url: "", description: "", event_url: "",
     })
 
     useEffect(() => {
@@ -63,6 +75,16 @@ export default function TournamentSettingsPage() {
                     points_win: t.points_win ?? 1,
                     points_loss: t.points_loss ?? 0,
                     points_draw: t.points_draw ?? 0.5,
+                    allow_join: t.allow_join ?? 1,
+                    registration_chat_id: t.registration_chat_id || "",
+                    start_at: t.start_at ? String(t.start_at).slice(0, 16) : "",
+                    end_at: t.end_at ? String(t.end_at).slice(0, 16) : "",
+                    location: t.location || "",
+                    address: t.address || "",
+                    yandex_maps_url: t.yandex_maps_url || "",
+                    poster_url: t.poster_url || "",
+                    description: t.description || "",
+                    event_url: t.event_url || "",
                 })
             } catch (e) {
                 setError(e instanceof Error ? e.message : "Неизвестная ошибка")
@@ -90,6 +112,16 @@ export default function TournamentSettingsPage() {
                     rounds: settings.rounds,
                     tiebreakers: settings.tiebreakers,
                     chat_id: settings.chat_id || null,
+                    registration_chat_id: settings.registration_chat_id || settings.chat_id || null,
+                    allow_join: settings.allow_join,
+                    start_at: settings.start_at || null,
+                    end_at: settings.end_at || null,
+                    location: settings.location || null,
+                    address: settings.address || null,
+                    yandex_maps_url: settings.yandex_maps_url || null,
+                    poster_url: settings.poster_url || null,
+                    description: settings.description || null,
+                    event_url: settings.event_url || null,
                     forbid_repeat_bye: settings.forbid_repeat_bye,
                     points_win: settings.points_win,
                     points_loss: settings.points_loss,
@@ -162,6 +194,96 @@ export default function TournamentSettingsPage() {
                                 onChange={(e) => setSettings(prev => ({ ...prev, title: e.target.value }))}
                                 className={inputClass}
                             />
+                        </div>
+
+                        {/* Points row */}
+                        <div className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-4">
+                            <h2 className="text-xl font-bold text-white">Карточка события</h2>
+                            <label className="flex items-center gap-3 text-white cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.allow_join === 1}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, allow_join: e.target.checked ? 1 : 0 }))}
+                                    className="w-5 h-5 rounded bg-[#1a1f2e] border-gray-700"
+                                />
+                                <span className="text-sm">Открыть регистрацию на карточке</span>
+                            </label>
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <div>
+                                    <label className={labelClass}>Начало</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={settings.start_at}
+                                        onChange={(e) => setSettings(prev => ({ ...prev, start_at: e.target.value }))}
+                                        className={inputClass}
+                                    />
+                                </div>
+                                <div>
+                                    <label className={labelClass}>Окончание</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={settings.end_at}
+                                        onChange={(e) => setSettings(prev => ({ ...prev, end_at: e.target.value }))}
+                                        className={inputClass}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className={labelClass}>Название заведения</label>
+                                <input
+                                    type="text"
+                                    value={settings.location}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, location: e.target.value }))}
+                                    className={inputClass}
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Адрес</label>
+                                <input
+                                    type="text"
+                                    value={settings.address}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, address: e.target.value }))}
+                                    className={inputClass}
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Яндекс Карты</label>
+                                <input
+                                    type="url"
+                                    value={settings.yandex_maps_url}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, yandex_maps_url: e.target.value }))}
+                                    className={inputClass}
+                                    placeholder="https://yandex.ru/maps/-/..."
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Афиша</label>
+                                <input
+                                    type="url"
+                                    value={settings.poster_url}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, poster_url: e.target.value }))}
+                                    className={inputClass}
+                                    placeholder="https://..."
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Описание</label>
+                                <textarea
+                                    value={settings.description}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, description: e.target.value }))}
+                                    className={`${inputClass} min-h-28`}
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Внешняя ссылка события</label>
+                                <input
+                                    type="url"
+                                    value={settings.event_url}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, event_url: e.target.value }))}
+                                    className={inputClass}
+                                    placeholder="https://..."
+                                />
+                            </div>
                         </div>
 
                         {/* Points row */}
@@ -262,6 +384,17 @@ export default function TournamentSettingsPage() {
                                 type="text"
                                 value={settings.chat_id}
                                 onChange={(e) => setSettings(prev => ({ ...prev, chat_id: e.target.value }))}
+                                placeholder="-1001234567890"
+                                className={inputClass}
+                            />
+                        </div>
+                        <div>
+                            <label className={labelClass}>Telegram Chat ID для регистраций</label>
+                            <p className="text-gray-500 text-xs mb-2">Сюда уйдет сообщение: имя, заведение, +.</p>
+                            <input
+                                type="text"
+                                value={settings.registration_chat_id}
+                                onChange={(e) => setSettings(prev => ({ ...prev, registration_chat_id: e.target.value }))}
                                 placeholder="-1001234567890"
                                 className={inputClass}
                             />

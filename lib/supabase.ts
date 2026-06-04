@@ -15,6 +15,7 @@ interface MemStore {
   users: MemRow[]
   tournaments: MemRow[]
   tournament_participants: MemRow[]
+  tournament_registrations: MemRow[]
   rounds: MemRow[]
   matches: MemRow[]
   leaderboard: MemRow[]
@@ -29,10 +30,11 @@ function getGlobalStore(): MemStore {
       users: [],
       tournaments: [],
       tournament_participants: [],
+      tournament_registrations: [],
       rounds: [],
       matches: [],
       leaderboard: [],
-      counters: { users: 0, tournaments: 0, tournament_participants: 0, rounds: 0, matches: 0, leaderboard: 0 }
+      counters: { users: 0, tournaments: 0, tournament_participants: 0, tournament_registrations: 0, rounds: 0, matches: 0, leaderboard: 0 }
     } as MemStore
   }
   return g.__MEM_SUPABASE_STORE__ as MemStore
@@ -41,7 +43,7 @@ function getGlobalStore(): MemStore {
 class QueryBuilder {
   private table: keyof MemStore
   private store: MemStore
-  private action: 'select' | 'insert' | 'update' | 'delete' = 'select'
+  private action: 'select' | 'insert' | 'update' | 'delete' | 'upsert' = 'select'
   private filters: Array<(row: MemRow) => boolean> = []
   private updateValues: MemRow | null = null
   private insertValues: MemRow | MemRow[] | null = null
@@ -63,6 +65,12 @@ class QueryBuilder {
 
   insert(values: MemRow | MemRow[]) {
     this.action = 'insert'
+    this.insertValues = values
+    return this
+  }
+
+  upsert(values: MemRow | MemRow[], _opts?: { onConflict?: string }) {
+    this.action = 'upsert'
     this.insertValues = values
     return this
   }
@@ -92,6 +100,14 @@ class QueryBuilder {
       const v = String((row as any)[column] ?? '').toLowerCase()
       return needle ? v.includes(needle) : true
     })
+    return this
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  in(column: string, values: any[]) {
+    const set = new Set(values)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.filters.push((row) => set.has((row as any)[column]))
     return this
   }
 
@@ -155,6 +171,36 @@ class QueryBuilder {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private execUpsert(): { data: any; error: any } {
+    if (!this.insertValues) return { data: null, error: null }
+    const arr = Array.isArray(this.insertValues) ? this.insertValues : [this.insertValues]
+    const target = (this.store[this.table] as MemRow[])
+    const counterKey = this.table as string
+    const upserted = arr.map((row) => {
+      const conflictKey = row.google_event_id ? "google_event_id" : row.id ? "id" : null
+      const existing = conflictKey
+        ? target.find((item) => item[conflictKey] === row[conflictKey])
+        : null
+
+      if (existing) {
+        Object.assign(existing, row)
+        return existing
+      }
+
+      const id = ++this.store.counters[counterKey]
+      const data = {
+        id,
+        ...row,
+        created_at: row.created_at ?? nowIso()
+      }
+      target.push(data)
+      return data
+    })
+
+    return { data: arr.length === 1 ? upserted[0] : upserted, error: null }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private execUpdate(): { data: any; error: any } {
     const target = (this.store[this.table] as MemRow[])
     const rows = this.applyFilters(target)
@@ -204,6 +250,9 @@ class QueryBuilder {
       switch (this.action) {
         case 'insert':
           result = this.execInsert()
+          break
+        case 'upsert':
+          result = this.execUpsert()
           break
         case 'update':
           result = this.execUpdate()
