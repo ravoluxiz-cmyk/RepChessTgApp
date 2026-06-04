@@ -6,6 +6,9 @@ import { BackButton } from "@/components/ui/back-button"
 import { TournamentCard, Tournament } from "@/components/tournaments/tournament-card"
 import { motion } from "framer-motion"
 
+const GOOGLE_CALENDAR_EMBED_URL =
+  "https://calendar.google.com/calendar/embed?src=9cca0ead2265768182e4addb1fb5586c8b83426adc1099349a2b3d7a1424889e%40group.calendar.google.com&ctz=Europe%2FMoscow"
+
 type CalendarEvent = {
   id?: string
   title: string
@@ -148,6 +151,25 @@ export default function TournamentsPage() {
                 ))}
               </div>
             )}
+
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-10"
+            >
+              <h2 className="mb-4 text-2xl font-bold text-white">
+                Google Calendar
+              </h2>
+              <div className="overflow-hidden rounded-lg border border-white/10 bg-white/5">
+                <iframe
+                  src={GOOGLE_CALENDAR_EMBED_URL}
+                  title="RepChess Google Calendar"
+                  className="h-[640px] w-full bg-white"
+                  loading="lazy"
+                />
+              </div>
+            </motion.section>
           </div>
         </div>
       </div>
