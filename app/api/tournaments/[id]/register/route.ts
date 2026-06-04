@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { addTournamentRegistration, getTournamentById } from "@/lib/db"
+import { addTournamentRegistration, getTournamentById, getUserByTelegramId } from "@/lib/db"
 import { getTelegramUserFromHeaders, sendTelegramMessage } from "@/lib/telegram"
 import { getWebProfileUserFromHeaders } from "@/lib/web-auth"
 
-function getUserName(user: { first_name: string; last_name?: string; username?: string }) {
+function getDisplayName(user: { first_name: string; last_name?: string; username?: string }) {
   const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ").trim()
   return fullName || user.username || "Участник"
 }
@@ -33,13 +33,14 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ id: st
       return NextResponse.json({ error: "Регистрация закрыта" }, { status: 400 })
     }
 
-    const userName = getUserName(user)
-    const venueTitle = tournament.location || tournament.title
+    const profile = await getUserByTelegramId(user.id)
+    const userName = profile ? getDisplayName(profile) : getDisplayName(user)
+    const tournamentTitle = tournament.title
     const result = await addTournamentRegistration({
       tournament_id: tournamentId,
       user_telegram_id: user.id,
       user_name: userName,
-      venue_title: venueTitle,
+      venue_title: tournamentTitle,
     })
 
     if (!result.registration) {
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ id: st
     let messageSent = false
     const chatId = tournament.registration_chat_id || tournament.chat_id
     if (!result.alreadyRegistered && chatId) {
-      messageSent = await sendTelegramMessage(chatId, `${userName}\n${venueTitle}\n+`)
+      messageSent = await sendTelegramMessage(chatId, `${userName}\n${tournamentTitle}\n+`)
     }
 
     return NextResponse.json({
