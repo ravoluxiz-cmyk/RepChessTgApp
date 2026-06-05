@@ -35,6 +35,7 @@ export default function AdminAllTournamentsPage() {
   const [syncMessage, setSyncMessage] = useState<string | null>(null)
   const [telegramChats, setTelegramChats] = useState<TelegramChat[]>([])
   const [selectedChatId, setSelectedChatId] = useState("")
+  const [manualChatId, setManualChatId] = useState("")
   const [loadingChats, setLoadingChats] = useState(false)
   const [applyingChat, setApplyingChat] = useState(false)
   const [chatMessage, setChatMessage] = useState<string | null>(null)
@@ -123,12 +124,13 @@ export default function AdminAllTournamentsPage() {
   }
 
   async function handleApplyTelegramChat() {
-    if (!selectedChatId) {
-      setError("Сначала выберите чат")
+    const chatId = (manualChatId || selectedChatId).trim()
+    if (!chatId) {
+      setError("Сначала выберите чат или вставьте chat_id вручную")
       return
     }
 
-    if (!confirm(`Проставить chat_id ${selectedChatId} во все турниры?`)) return
+    if (!confirm(`Проставить chat_id ${chatId} во все турниры?`)) return
 
     setApplyingChat(true)
     setError(null)
@@ -140,12 +142,12 @@ export default function AdminAllTournamentsPage() {
           "Content-Type": "application/json",
           ...(initData ? { Authorization: `Bearer ${initData}` } : {}),
         },
-        body: JSON.stringify({ chat_id: selectedChatId }),
+        body: JSON.stringify({ chat_id: chatId }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || "Не удалось обновить турниры")
 
-      setChatMessage(`Готово: chat_id проставлен в турниры (${data.updated || 0}).`)
+      setChatMessage(`Готово: ${data.chat_title || chatId} проставлен в турниры (${data.updated || 0}).`)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка обновления чата")
     } finally {
@@ -225,9 +227,16 @@ export default function AdminAllTournamentsPage() {
                 ))}
               </select>
 
+              <input
+                value={manualChatId}
+                onChange={(event) => setManualChatId(event.target.value)}
+                className="min-w-0 flex-1 rounded-lg border border-white/10 bg-[#1a1f2e] px-3 py-2 text-white outline-none focus:border-emerald-300"
+                placeholder="Или вставьте ID вручную: -100..."
+              />
+
               <button
                 onClick={handleApplyTelegramChat}
-                disabled={applyingChat || !selectedChatId}
+                disabled={applyingChat || !(manualChatId.trim() || selectedChatId)}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-violet-400/30 bg-violet-500/15 px-4 py-2 font-semibold text-violet-50 hover:bg-violet-500/25 disabled:opacity-60"
               >
                 {applyingChat ? "Ставлю..." : "Проставить всем"}

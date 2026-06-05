@@ -90,6 +90,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "chat_id обязателен" }, { status: 400 })
     }
 
+    const token = getToken()
+    if (!token) {
+      return NextResponse.json({ error: "TELEGRAM_BOT_TOKEN не настроен" }, { status: 500 })
+    }
+
+    const chatResponse = await fetch(`https://api.telegram.org/bot${token}/getChat?chat_id=${encodeURIComponent(chatId)}`, {
+      cache: "no-store",
+    })
+    const chatData = await chatResponse.json().catch(() => null)
+
+    if (!chatResponse.ok || !chatData?.ok) {
+      const description = chatData?.description || "Telegram не видит этот чат. Проверьте ID и что бот добавлен в чат."
+      return NextResponse.json({ error: description }, { status: 400 })
+    }
+
     const tournaments = await listTournaments()
     let updated = 0
 
@@ -102,7 +117,12 @@ export async function POST(request: NextRequest) {
       if (ok) updated += 1
     }
 
-    return NextResponse.json({ ok: true, chat_id: chatId, updated })
+    return NextResponse.json({
+      ok: true,
+      chat_id: chatId,
+      chat_title: getChatTitle(chatData.result),
+      updated,
+    })
   } catch (error) {
     console.error("Failed to apply Telegram chat to tournaments:", error)
     return NextResponse.json({ error: "Внутренняя ошибка" }, { status: 500 })
