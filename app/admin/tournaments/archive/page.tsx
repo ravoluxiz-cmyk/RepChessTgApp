@@ -23,7 +23,7 @@ export default function AdminArchivePage() {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch("/api/tournaments")
+        const res = await fetch("/api/tournaments", { cache: "no-store" })
         if (!res.ok) throw new Error("Не удалось загрузить турниры")
         const data = await res.json()
         setTournaments(data.filter((t: DbTournament) => Number(t.archived) === 1))

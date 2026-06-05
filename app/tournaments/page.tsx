@@ -25,7 +25,7 @@ export default function TournamentsPage() {
         setLoading(true)
         setError(null)
 
-        const tournamentsResponse = await fetch("/api/tournaments")
+        const tournamentsResponse = await fetch("/api/tournaments", { cache: "no-store" })
 
         if (!tournamentsResponse.ok) {
           throw new Error("Не удалось загрузить турниры")

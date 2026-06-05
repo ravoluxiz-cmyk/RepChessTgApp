@@ -45,7 +45,7 @@ export default function AdminAllTournamentsPage() {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch("/api/tournaments")
+        const res = await fetch("/api/tournaments", { cache: "no-store" })
         if (!res.ok) throw new Error("Не удалось загрузить турниры")
         const data = await res.json()
         setTournaments(data)
@@ -88,7 +88,7 @@ export default function AdminAllTournamentsPage() {
       if (!res.ok) throw new Error(data.error || "Не удалось импортировать календарь")
 
       setSyncMessage(`Импортировано событий: ${data.imported || 0}`)
-      const listRes = await fetch("/api/tournaments")
+      const listRes = await fetch("/api/tournaments", { cache: "no-store" })
       if (listRes.ok) setTournaments(await listRes.json())
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка импорта")

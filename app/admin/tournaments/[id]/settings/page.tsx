@@ -18,6 +18,7 @@ type TournamentSettings = {
     points_loss: number
     points_draw: number
     allow_join: number
+    archived: number
     registration_chat_id: string
     start_at: string
     end_at: string
@@ -55,7 +56,7 @@ export default function TournamentSettingsPage() {
     const [settings, setSettings] = useState<TournamentSettings>({
         title: "", bye_points: 1, rounds: 5, tiebreakers: "buchholz,buchholz_cut1",
         chat_id: "", forbid_repeat_bye: 1, points_win: 1, points_loss: 0, points_draw: 0.5,
-        allow_join: 1, registration_chat_id: "", start_at: "", end_at: "", location: "",
+        allow_join: 1, archived: 0, registration_chat_id: "", start_at: "", end_at: "", location: "",
         address: "", yandex_maps_url: "", poster_url: "", description: "", event_url: "",
     })
 
@@ -77,6 +78,7 @@ export default function TournamentSettingsPage() {
                     points_loss: t.points_loss ?? 0,
                     points_draw: t.points_draw ?? 0.5,
                     allow_join: t.allow_join ?? 1,
+                    archived: t.archived ?? 0,
                     registration_chat_id: t.registration_chat_id || "",
                     start_at: t.start_at ? String(t.start_at).slice(0, 16) : "",
                     end_at: t.end_at ? String(t.end_at).slice(0, 16) : "",
@@ -115,6 +117,7 @@ export default function TournamentSettingsPage() {
                     chat_id: settings.chat_id || null,
                     registration_chat_id: settings.registration_chat_id || settings.chat_id || null,
                     allow_join: settings.allow_join,
+                    archived: settings.archived,
                     start_at: settings.start_at || null,
                     end_at: settings.end_at || null,
                     location: settings.location || null,
@@ -200,6 +203,15 @@ export default function TournamentSettingsPage() {
                         {/* Points row */}
                         <div className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-4">
                             <h2 className="text-xl font-bold text-white">Карточка события</h2>
+                            <label className="flex items-center gap-3 text-white cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.archived !== 1}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, archived: e.target.checked ? 0 : 1 }))}
+                                    className="w-5 h-5 rounded bg-[#1a1f2e] border-gray-700"
+                                />
+                                <span className="text-sm">Показывать турнир в расписании</span>
+                            </label>
                             <label className="flex items-center gap-3 text-white cursor-pointer">
                                 <input
                                     type="checkbox"

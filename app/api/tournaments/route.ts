@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/telegram"
 import { createTournament, listTournaments, type Tournament } from "@/lib/db"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const tournaments = await listTournaments()
