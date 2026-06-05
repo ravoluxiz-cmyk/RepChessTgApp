@@ -16,24 +16,23 @@ const fadeUpVariants = {
     },
   }),
 };
-// Checkered pattern background
 function ChessboardPattern() {
   return (
-    <div className="absolute inset-0 opacity-10">
+    <div className="absolute inset-0 opacity-[0.07]">
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern
             id="chessboard"
             x="0"
             y="0"
-            width="80"
-            height="80"
+            width="96"
+            height="96"
             patternUnits="userSpaceOnUse"
           >
-            <rect x="0" y="0" width="40" height="40" fill="#ffffff" />
-            <rect x="40" y="0" width="40" height="40" fill="transparent" />
-            <rect x="0" y="40" width="40" height="40" fill="transparent" />
-            <rect x="40" y="40" width="40" height="40" fill="#ffffff" />
+            <rect x="0" y="0" width="48" height="48" fill="#ffffff" />
+            <rect x="48" y="0" width="48" height="48" fill="transparent" />
+            <rect x="0" y="48" width="48" height="48" fill="transparent" />
+            <rect x="48" y="48" width="48" height="48" fill="#ffffff" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#chessboard)" />
@@ -56,16 +55,16 @@ export default function ChessBackground({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/[0.03] via-transparent to-amber-500/[0.03] blur-3xl" />
-      <div className="absolute inset-0 bg-gradient-to-tl from-blue-500/[0.02] via-transparent to-purple-500/[0.02] blur-3xl" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#050505]">
+      <div className="absolute inset-x-0 top-0 h-1 brand-accent-line" />
+      <div className="absolute left-0 top-1 h-[42vh] w-1/3 bg-red-500/[0.08] blur-[120px]" />
+      <div className="absolute right-0 top-1/4 h-[46vh] w-1/3 bg-blue-500/[0.08] blur-[130px]" />
+      <div className="absolute bottom-0 left-1/4 h-[34vh] w-1/2 bg-green-400/[0.055] blur-[130px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(255,255,255,0.16),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_26%,rgba(0,0,0,0.7))]" />
 
-      {/* Checkered pattern */}
       <ChessboardPattern />
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 md:px-6">
+      <div className="relative z-10 mx-auto w-full max-w-[1480px] px-4 md:px-6">
         {children ? (
           children
         ) : (
@@ -75,7 +74,7 @@ export default function ChessBackground({
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.15] mb-8 md:mb-12 backdrop-blur-sm"
+                className="brand-chip inline-flex items-center gap-2 rounded-lg px-4 py-2 mb-8 md:mb-12 backdrop-blur-sm"
             >
               <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-amber-400" />
               <span className="text-sm text-white/70 tracking-wide font-medium">
@@ -89,12 +88,12 @@ export default function ChessBackground({
               initial="hidden"
               animate="visible"
             >
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
-                <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/70">
+              <h1 className="brand-title text-5xl sm:text-6xl md:text-8xl mb-6 md:mb-8">
+                <span className="text-white">
                   {title1}
                 </span>
                 <br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-white to-amber-300">
+                <span className="text-white/80">
                   {title2}
                 </span>
               </h1>
@@ -129,9 +128,7 @@ export default function ChessBackground({
         )}
       </div>
 
-      {/* Vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/80 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/50 via-transparent to-slate-950/50 pointer-events-none" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.7),transparent_18%,transparent_82%,rgba(0,0,0,0.7))]" />
     </div>
   );
 }

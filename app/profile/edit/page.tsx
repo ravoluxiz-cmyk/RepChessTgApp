@@ -171,8 +171,7 @@ export default function ProfileEditPage() {
               <ArrowLeft className="w-6 h-6" />
             </button>
             <h1
-              className="text-4xl font-black text-white uppercase"
-              style={{ fontFamily: "Arial Black, sans-serif" }}
+              className="brand-title text-4xl text-white"
             >
               {isNewProfile ? "Заполнить профиль" : "Редактировать профиль"}
             </h1>
@@ -188,7 +187,7 @@ export default function ProfileEditPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Personal Info */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 space-y-4">
+            <div className="brand-panel rounded-lg p-6 space-y-4">
               <h2 className="text-xl font-bold text-white mb-4">
                 Личная информация
               </h2>
@@ -251,7 +250,7 @@ export default function ProfileEditPage() {
             </div>
 
             {/* Unified Rating */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 space-y-2">
+            <div className="brand-panel rounded-lg p-6 space-y-2">
               <h2 className="text-xl font-bold text-white mb-4">Рейтинг</h2>
               <div className="rounded-lg border border-amber-300/30 bg-amber-400/15 p-4 text-amber-50">
                 Рейтинг устанавливается вручную администратором по ссылке на Lichess или Chess.com. До проверки используется стартовый рейтинг 1500, пожалуйста, дождитесь обработки заявки.
@@ -259,7 +258,7 @@ export default function ProfileEditPage() {
             </div>
 
             {/* Social Links */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 space-y-4">
+            <div className="brand-panel rounded-lg p-6 space-y-4">
               <h2 className="text-xl font-bold text-white mb-4">
                 Ссылки на профили
               </h2>
@@ -305,8 +304,7 @@ export default function ProfileEditPage() {
             <button
               type="submit"
               disabled={saving}
-              className="w-full bg-white text-black py-4 rounded-lg font-bold text-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ fontFamily: "Arial Black, sans-serif" }}
+              className="brand-button w-full py-4 rounded-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? "Сохранение..." : "Сохранить профиль"}
             </button>

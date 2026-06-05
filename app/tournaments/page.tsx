@@ -53,7 +53,7 @@ export default function TournamentsPage() {
 
   return (
     <ChessBackground badge="" title1="" title2="" description="">
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className="w-full max-w-6xl mx-auto px-2 sm:px-4">
         <div className="min-h-screen py-12 flex flex-col gap-8">
           {/* Header */}
           <motion.div
@@ -67,7 +67,8 @@ export default function TournamentsPage() {
             </div>
 
             <div className="text-center">
-              <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-4 uppercase tracking-tight">
+              <div className="brand-chip mx-auto mb-4 w-fit rounded-lg px-3 py-1 text-xs font-bold uppercase">Rep Chess KRD Events</div>
+              <h1 className="brand-title text-4xl text-white sm:text-6xl md:text-7xl">
                 Расписание турниров
               </h1>
               <p className="text-lg text-white/60 max-w-2xl mx-auto">

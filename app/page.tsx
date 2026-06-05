@@ -70,78 +70,78 @@ export default function Home() {
   return (
     <ChessBackground>
 
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 text-center">
-        <div className="flex flex-col gap-6 sm:gap-8 md:gap-10 items-center justify-center min-h-screen py-8">
-          {/* Title */}
-          <div className="flex flex-col items-center gap-2 mb-8">
-            <h1 className="text-7xl xs:text-8xl sm:text-9xl md:text-[10rem] lg:text-[12rem] xl:text-[14rem] font-black tracking-tighter leading-none px-4">
-              <span className="text-white uppercase" style={{ fontFamily: 'Arial Black, sans-serif', letterSpacing: '-0.05em' }}>
-                <span>R</span>
-                <span
-                  className="cursor-pointer inline-block select-none hover:text-blue-400"
-
-                  onClick={handleAdminGate}
-                >
-                  E
-                </span>
-                <span>P</span>
-              </span>
-            </h1>
-            <h1 className="text-7xl xs:text-8xl sm:text-9xl md:text-[10rem] lg:text-[12rem] xl:text-[14rem] font-black tracking-tighter leading-none px-4">
-              <span className="text-white uppercase" style={{ fontFamily: 'Arial Black, sans-serif', letterSpacing: '-0.05em' }}>
+      <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 text-center">
+        <div className="flex min-h-screen flex-col items-center justify-center gap-7 py-8 sm:gap-9">
+          <div className="w-full">
+            <div className="mx-auto mb-5 flex w-fit items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-bold uppercase text-white/65">
+              <span className="h-2 w-2 rounded-full bg-red-500" />
+              <span className="h-2 w-2 rounded-full bg-blue-500" />
+              <span className="h-2 w-2 rounded-full bg-yellow-300" />
+              <span className="h-2 w-2 rounded-full bg-green-400" />
+              Краснодарский шахматный клуб
+            </div>
+            <h1 className="brand-wordmark mx-auto max-w-[980px] text-[4.5rem] text-white sm:text-[7rem] md:text-[9.5rem] lg:text-[12rem]">
+              <span>REP</span>
+              <button
+                type="button"
+                className="inline-block cursor-pointer select-none text-white transition-colors hover:text-blue-400"
+                onClick={handleAdminGate}
+                aria-label="Открыть админку"
+              >
                 CHESS
-              </span>
+              </button>
+              <span>KRD</span>
             </h1>
+            <div className="brand-accent-line mx-auto mt-5 h-1 w-full max-w-[760px]" />
           </div>
 
-          {/* Buttons - optimized for mobile */}
-          <div className="flex flex-col w-full max-w-xs sm:max-w-md md:max-w-2xl gap-4 px-4">
+          <div className="grid w-full max-w-3xl grid-cols-1 gap-3 px-2 sm:grid-cols-2">
             <HoverButton
-              className="flex items-center justify-center gap-3"
+              className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/merch')}
             >
               <ShoppingBag className="w-7 h-7 text-white flex-shrink-0" />
-              <span className="text-xl sm:text-2xl text-white font-black uppercase tracking-tight" style={{ fontFamily: 'Arial Black, sans-serif' }}>
+              <span className="text-lg sm:text-xl">
                 Купить мерч
               </span>
             </HoverButton>
 
             <HoverButton
-              className="flex items-center justify-center gap-3"
+              className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/tournaments')}
             >
               <Calendar className="w-7 h-7 text-white flex-shrink-0" />
-              <span className="text-xl sm:text-2xl text-white font-black uppercase tracking-tight" style={{ fontFamily: 'Arial Black, sans-serif' }}>
+              <span className="text-lg sm:text-xl">
                 Расписание турниров
               </span>
             </HoverButton>
 
             <HoverButton
-              className="flex items-center justify-center gap-3"
+              className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/lessons')}
             >
               <GraduationCap className="w-7 h-7 text-white flex-shrink-0" />
-              <span className="text-xl sm:text-2xl text-white font-black uppercase tracking-tight" style={{ fontFamily: 'Arial Black, sans-serif' }}>
+              <span className="text-lg sm:text-xl">
                 Запись на урок
               </span>
             </HoverButton>
 
             <HoverButton
-              className="flex items-center justify-center gap-3"
+              className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/partners')}
             >
               <Building2 className="w-7 h-7 text-white flex-shrink-0" />
-              <span className="text-xl sm:text-2xl text-white font-black uppercase tracking-tight" style={{ fontFamily: 'Arial Black, sans-serif' }}>
+              <span className="text-lg sm:text-xl">
                 Для компаний
               </span>
             </HoverButton>
 
             <HoverButton
-              className="flex items-center justify-center gap-3"
+              className="flex min-h-16 items-center justify-center gap-3 sm:col-span-2"
               onClick={() => router.push('/profile')}
             >
               <User className="w-7 h-7 text-white flex-shrink-0" />
-              <span className="text-xl sm:text-2xl text-white font-black uppercase tracking-tight" style={{ fontFamily: 'Arial Black, sans-serif' }}>
+              <span className="text-lg sm:text-xl">
                 Мой профиль
               </span>
             </HoverButton>

@@ -153,7 +153,7 @@ export default function ProfilePage() {
             >
               <ArrowLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-4xl font-black text-white uppercase" style={{ fontFamily: 'Arial Black, sans-serif' }}>
+            <h1 className="brand-title text-4xl text-white">
               Профиль
             </h1>
             <button
@@ -171,7 +171,7 @@ export default function ProfilePage() {
           </Suspense>
 
           {/* Profile Card */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 space-y-6">
+          <div className="brand-panel rounded-lg p-6 space-y-6">
             {/* User Info */}
             <div className="flex items-center gap-4">
               <div className="bg-white/20 p-4 rounded-full">

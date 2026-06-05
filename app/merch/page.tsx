@@ -29,49 +29,49 @@ const products = [
   },
   {
     id: "repchess-merch-04",
-    name: "RepChess Merch 04",
+    name: "Rep Chess KRD Merch 04",
     price: 3500,
     image: "/merch/repchess-merch-04.jpg",
     colors: ["Уточнить"],
   },
   {
     id: "repchess-merch-05",
-    name: "RepChess Merch 05",
+    name: "Rep Chess KRD Merch 05",
     price: 3500,
     image: "/merch/repchess-merch-05.jpg",
     colors: ["Уточнить"],
   },
   {
     id: "repchess-merch-06",
-    name: "RepChess Merch 06",
+    name: "Rep Chess KRD Merch 06",
     price: 3500,
     image: "/merch/repchess-merch-06.jpg",
     colors: ["Уточнить"],
   },
   {
     id: "repchess-merch-07",
-    name: "RepChess Merch 07",
+    name: "Rep Chess KRD Merch 07",
     price: 3500,
     image: "/merch/repchess-merch-07.jpg",
     colors: ["Уточнить"],
   },
   {
     id: "repchess-merch-08",
-    name: "RepChess Merch 08",
+    name: "Rep Chess KRD Merch 08",
     price: 3500,
     image: "/merch/repchess-merch-08.jpg",
     colors: ["Уточнить"],
   },
   {
     id: "repchess-merch-09",
-    name: "RepChess Merch 09",
+    name: "Rep Chess KRD Merch 09",
     price: 3500,
     image: "/merch/repchess-merch-09.jpg",
     colors: ["Уточнить"],
   },
   {
     id: "repchess-merch-10",
-    name: "RepChess Merch 10",
+    name: "Rep Chess KRD Merch 10",
     price: 3500,
     image: "/merch/repchess-merch-10.jpg",
     colors: ["Уточнить"],
@@ -94,7 +94,7 @@ export default function MerchPage() {
   const orderText = useMemo(() => {
     const total = product.price * quantity
     return [
-      "Заказ REP CHESS",
+      "Заказ REP CHESS KRD",
       `Товар: ${product.name}`,
       `Артикул: ${product.id}`,
       `Цвет: ${color}`,
@@ -120,7 +120,7 @@ export default function MerchPage() {
     setCopied(false)
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Заказ REP CHESS", text: orderText })
+        await navigator.share({ title: "Заказ REP CHESS KRD", text: orderText })
         return
       }
       await navigator.clipboard.writeText(orderText)
@@ -143,11 +143,16 @@ export default function MerchPage() {
               <ArrowLeft className="h-5 w-5" />
               <span className="font-semibold">Главная</span>
             </button>
-            <div className="inline-flex items-center gap-2 text-white/80">
+            <div className="brand-chip inline-flex items-center gap-2 rounded-lg px-3 py-2">
               <ShoppingBag className="h-5 w-5 text-emerald-300" />
-              <span className="font-semibold">Мерч</span>
+              <span className="brand-font text-sm">Мерч</span>
             </div>
           </header>
+
+          <div>
+            <h1 className="brand-title text-4xl text-white sm:text-6xl">REP CHESS KRD MERCH</h1>
+            <div className="brand-accent-line mt-3 h-1 w-52" />
+          </div>
 
           <section className="grid gap-5 lg:grid-cols-[1fr_360px]">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -155,10 +160,10 @@ export default function MerchPage() {
                 <button
                   key={item.id}
                   onClick={() => selectProduct(item.id)}
-                  className={`group overflow-hidden rounded-lg border text-left text-white transition-colors ${
+                  className={`group overflow-hidden rounded-lg text-left text-white transition-colors ${
                     item.id === product.id
-                      ? "border-emerald-300/70 bg-emerald-400/15"
-                      : "border-white/10 bg-white/5 hover:bg-white/10"
+                      ? "brand-panel border-white/40"
+                      : "brand-panel hover:border-white/30"
                   }`}
                 >
                   <div className="relative bg-black/30">
@@ -169,20 +174,20 @@ export default function MerchPage() {
                       className="aspect-[4/5] w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                       loading={index < 3 ? "eager" : "lazy"}
                     />
-                    <div className="absolute left-3 top-3 rounded-lg bg-black/65 px-2.5 py-1 text-xs font-bold text-white">
+                    <div className="brand-font absolute left-3 top-3 rounded-lg bg-white px-2.5 py-1 text-xs text-black">
                       {item.price.toLocaleString("ru-RU")} ₽
                     </div>
                   </div>
                   <div className="p-4">
-                    <div className="font-bold">{item.name}</div>
+                    <div className="brand-font text-sm">{item.name}</div>
                     <div className="mt-1 text-sm text-white/55">{item.id}</div>
                   </div>
                 </button>
               ))}
             </div>
 
-            <aside className="h-fit rounded-lg border border-white/10 bg-white/5 p-5 text-white backdrop-blur-lg lg:sticky lg:top-6">
-              <h1 className="mb-4 text-3xl font-black">Заказ</h1>
+            <aside className="brand-panel h-fit rounded-lg p-5 text-white lg:sticky lg:top-6">
+              <h2 className="brand-title mb-4 text-3xl">Заказ</h2>
 
               <div className="space-y-5">
                 <div className="overflow-hidden rounded-lg border border-white/10 bg-black/20">
@@ -191,7 +196,7 @@ export default function MerchPage() {
                 </div>
 
                 <div>
-                  <div className="text-xl font-bold">{product.name}</div>
+                  <div className="brand-font text-lg">{product.name}</div>
                   <div className="mt-1 text-white/60">{product.price.toLocaleString("ru-RU")} ₽</div>
                 </div>
 
@@ -247,7 +252,7 @@ export default function MerchPage() {
                   <input
                     value={contact}
                     onChange={(event) => setContact(event.target.value)}
-                    className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-3 text-white outline-none focus:border-emerald-300"
+                    className="w-full rounded-lg border border-white/15 bg-black/55 px-3 py-3 text-white outline-none focus:border-white"
                     placeholder="@username"
                   />
                 </label>
@@ -258,7 +263,7 @@ export default function MerchPage() {
 
                 <button
                   onClick={shareOrder}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 font-bold text-black transition-colors hover:bg-white/90"
+                  className="brand-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3"
                 >
                   {copied ? <Check className="h-5 w-5" /> : canShare ? <Send className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                   {copied ? "Заявка скопирована" : "Отправить заявку"}

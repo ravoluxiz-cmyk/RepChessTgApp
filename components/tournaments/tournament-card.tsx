@@ -159,10 +159,10 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       variants={fadeUpVariant}
       initial="hidden"
       animate="visible"
-      className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-lg transition-all duration-300 hover:bg-white/10"
+      className="brand-panel relative overflow-hidden rounded-lg transition-all duration-300 hover:border-white/30"
     >
       <div className="grid md:grid-cols-[minmax(220px,320px)_1fr]">
-        <div className="relative min-h-56 bg-black/25 md:min-h-full">
+        <div className="relative min-h-56 bg-black/70 md:min-h-full">
           {tournament.poster_url ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
@@ -173,8 +173,8 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
             />
           ) : (
             <div className="flex h-full min-h-56 flex-col items-center justify-center gap-3 p-6 text-white/45">
-              <CalendarDays className="h-12 w-12 text-emerald-300/70" />
-              <span className="text-sm font-semibold uppercase tracking-wide">Афиша скоро</span>
+              <CalendarDays className="h-12 w-12 text-white/55" />
+              <span className="brand-font text-sm uppercase text-white/55">Афиша скоро</span>
             </div>
           )}
         </div>
@@ -182,10 +182,10 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
         <div className="p-5 sm:p-6">
           {/* Header */}
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <h3 className="min-w-0 text-2xl font-bold text-white">{tournament.title}</h3>
+            <h3 className="brand-title min-w-0 text-2xl text-white sm:text-3xl">{tournament.title}</h3>
             <div className="flex flex-wrap gap-2">
               {Number(tournament.allow_join) === 1 && (
-                <span className="shrink-0 rounded-lg border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-100">
+                <span className="shrink-0 rounded-lg border border-green-400/35 bg-green-500/15 px-2.5 py-1 text-xs font-bold uppercase text-green-100">
                   Запись открыта
                 </span>
               )}
@@ -254,7 +254,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 type="button"
                 onClick={handleRegister}
                 disabled={registering || registered}
-                className="inline-flex items-center gap-2 rounded-lg border border-emerald-400/30 bg-emerald-500/20 px-3 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/30 disabled:cursor-default disabled:opacity-70"
+                className="brand-button inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm disabled:cursor-default disabled:opacity-70"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {registered ? "Вы зарегистрированы" : registering ? "Регистрация..." : "Зарегистрироваться"}
@@ -266,7 +266,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 href={tournament.yandex_maps_url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+                className="brand-button-dark inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm"
               >
                 <MapPin className="h-4 w-4" />
                 Яндекс Карты
@@ -278,7 +278,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 href={tournament.event_url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+                className="brand-button-dark inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm"
               >
                 <ExternalLink className="h-4 w-4" />
                 Открыть событие
@@ -301,7 +301,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       </div>
 
       {/* Gradient border effect */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-blue-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-[linear-gradient(90deg,#ff3131,#2563ff,#ffd600,#20d66b)] opacity-80" />
     </motion.div>
   )
 }

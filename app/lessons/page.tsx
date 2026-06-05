@@ -20,7 +20,7 @@ export default function LessonsPage() {
   const [copied, setCopied] = useState(false)
 
   const requestText = useMemo(() => [
-    "Заявка на урок REP CHESS",
+    "Заявка на урок REP CHESS KRD",
     `Уровень: ${level}`,
     `Формат: ${format}`,
     `Время: ${timeSlot}`,
@@ -37,7 +37,7 @@ export default function LessonsPage() {
     try {
       localStorage.setItem("lesson_request", requestText)
       if (navigator.share) {
-        await navigator.share({ title: "Заявка на урок REP CHESS", text: requestText })
+        await navigator.share({ title: "Заявка на урок REP CHESS KRD", text: requestText })
         return
       }
       await navigator.clipboard.writeText(requestText)
@@ -60,15 +60,15 @@ export default function LessonsPage() {
               <ArrowLeft className="h-5 w-5" />
               <span className="font-semibold">Главная</span>
             </button>
-            <div className="inline-flex items-center gap-2 text-white/80">
+            <div className="brand-chip inline-flex items-center gap-2 rounded-lg px-3 py-2">
               <Trophy className="h-5 w-5 text-amber-300" />
-              <span className="font-semibold">Уроки</span>
+              <span className="brand-font text-sm">Уроки</span>
             </div>
           </header>
 
           <main className="grid gap-4 lg:grid-cols-[1fr_360px]">
-            <section className="rounded-lg border border-white/10 bg-white/5 p-5 text-white backdrop-blur-lg">
-              <h1 className="mb-6 text-3xl font-black sm:text-4xl">Запись на урок</h1>
+            <section className="brand-panel rounded-lg p-5 text-white">
+              <h1 className="brand-title mb-6 text-3xl sm:text-5xl">Запись на урок</h1>
 
               <div className="space-y-6">
                 <div>
@@ -150,14 +150,14 @@ export default function LessonsPage() {
               </div>
             </section>
 
-            <aside className="rounded-lg border border-white/10 bg-white/5 p-5 text-white backdrop-blur-lg">
-              <h2 className="mb-4 text-2xl font-black">Заявка</h2>
+            <aside className="brand-panel rounded-lg p-5 text-white">
+              <h2 className="brand-title mb-4 text-2xl">Заявка</h2>
               <div className="rounded-lg bg-black/30 p-4 text-sm text-white/80">
                 <pre className="whitespace-pre-wrap font-sans">{requestText}</pre>
               </div>
               <button
                 onClick={shareRequest}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 font-bold text-black transition-colors hover:bg-white/90"
+                className="brand-button mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3"
               >
                 {copied ? <Check className="h-5 w-5" /> : canShare ? <Send className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                 {copied ? "Заявка скопирована" : "Отправить заявку"}

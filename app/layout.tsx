@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RepChess - Шахматы",
+  title: "Rep Chess KRD",
   description: "Шахматное приложение для турниров, обучения и общения",
 };
 

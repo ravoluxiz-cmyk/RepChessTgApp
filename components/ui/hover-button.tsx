@@ -94,16 +94,18 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
       <button
         ref={setCombinedRef}
         className={cn(
-          "relative isolate px-8 py-3 rounded-3xl",
-          "text-foreground font-medium text-base leading-6",
-          "backdrop-blur-lg bg-[rgba(43,55,80,0.1)]",
+          "relative isolate px-8 py-4 rounded-lg",
+          "brand-font text-base leading-6 uppercase",
+          "text-white font-black",
+          "backdrop-blur-lg bg-white/[0.075] border border-white/15",
           "cursor-pointer overflow-hidden",
           "before:content-[''] before:absolute before:inset-0",
           "before:rounded-[inherit] before:pointer-events-none",
           "before:z-[1]",
-          "before:shadow-[inset_0_0_0_1px_rgba(170,202,255,0.2),inset_0_0_16px_0_rgba(170,202,255,0.1),inset_0_-3px_12px_0_rgba(170,202,255,0.15),0_1px_3px_0_rgba(0,0,0,0.50),0_4px_12px_0_rgba(0,0,0,0.45)]",
-          "before:mix-blend-multiply before:transition-transform before:duration-300",
+          "before:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_1px_3px_0_rgba(0,0,0,0.50),0_12px_28px_0_rgba(0,0,0,0.35)]",
+          "before:transition-transform before:duration-300",
           "active:before:scale-[0.975]",
+          "hover:bg-white/[0.14] hover:border-white/35",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           className
         )}
@@ -112,8 +114,8 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
         onPointerLeave={handlePointerLeave}
         {...props}
         style={{
-          "--circle-start": "var(--tw-gradient-from, #a0d9f8)",
-          "--circle-end": "var(--tw-gradient-to, #3a5bbf)",
+          "--circle-start": "var(--tw-gradient-from, #ff3131)",
+          "--circle-end": "var(--tw-gradient-to, #2563ff)",
         } as React.CSSProperties}
       >
         {circles.map(({ id, x, y, color, fadeState }) => (

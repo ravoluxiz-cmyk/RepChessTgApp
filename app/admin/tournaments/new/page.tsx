@@ -361,7 +361,7 @@ export default function AdminCreateTournamentPage() {
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
-                  placeholder="RepChess Club"
+                  placeholder="Rep Chess KRD Club"
                 />
               </div>
               <div>
