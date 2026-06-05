@@ -10,7 +10,6 @@ import { getProfileAuthHeaders } from "@/lib/web-user"
 interface ProfileFormData {
   first_name: string
   last_name: string
-  rating: string
   chesscom_url: string
   lichess_url: string
   bio: string
@@ -22,7 +21,6 @@ export default function ProfileEditPage() {
   const [formData, setFormData] = useState<ProfileFormData>({
     first_name: tgUser?.first_name || "",
     last_name: tgUser?.last_name || "",
-    rating: "",
     chesscom_url: "",
     lichess_url: "",
     bio: "",
@@ -53,7 +51,6 @@ export default function ProfileEditPage() {
           setFormData({
             first_name: data.user.first_name || "",
             last_name: data.user.last_name || "",
-            rating: data.user.rating?.toString() || "",
             chesscom_url: data.user.chesscom_url || "",
             lichess_url: data.user.lichess_url || "",
             bio: data.user.bio || "",
@@ -108,11 +105,16 @@ export default function ProfileEditPage() {
         return
       }
 
+      if (!formData.chesscom_url && !formData.lichess_url) {
+        setError("Прикрепите ссылку на Lichess или Chess.com, чтобы администратор установил рейтинг")
+        setSaving(false)
+        return
+      }
+
       // Prepare data
       const profileData = {
         first_name: formData.first_name,
         last_name: formData.last_name,
-        rating: formData.rating ? parseInt(formData.rating) : undefined,
         chesscom_url: formData.chesscom_url || null,
         lichess_url: formData.lichess_url || null,
         bio: formData.bio || null,
@@ -251,19 +253,9 @@ export default function ProfileEditPage() {
             {/* Unified Rating */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 space-y-2">
               <h2 className="text-xl font-bold text-white mb-4">Рейтинг</h2>
-              <label htmlFor="rating" className="block text-white font-semibold mb-2">Рейтинг</label>
-              <input
-                type="number"
-                id="rating"
-                name="rating"
-                value={formData.rating}
-                onChange={handleChange}
-                min="100"
-                max="3000"
-                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:border-white focus:outline-none"
-                placeholder="Например: 2000"
-              />
-              <p className="text-white/60 text-sm mt-2">Ваш текущий рейтинг (100-3000)</p>
+              <div className="rounded-lg border border-amber-300/30 bg-amber-400/15 p-4 text-amber-50">
+                Рейтинг устанавливается вручную администратором по ссылке на Lichess или Chess.com. До проверки используется стартовый рейтинг 1500, пожалуйста, дождитесь обработки заявки.
+              </div>
             </div>
 
             {/* Social Links */}

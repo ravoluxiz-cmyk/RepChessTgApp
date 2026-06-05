@@ -16,6 +16,10 @@ interface MemStore {
   tournaments: MemRow[]
   tournament_participants: MemRow[]
   tournament_registrations: MemRow[]
+  rating_requests: MemRow[]
+  partnership_requests: MemRow[]
+  lesson_requests: MemRow[]
+  merch_orders: MemRow[]
   rounds: MemRow[]
   matches: MemRow[]
   leaderboard: MemRow[]
@@ -31,10 +35,14 @@ function getGlobalStore(): MemStore {
       tournaments: [],
       tournament_participants: [],
       tournament_registrations: [],
+      rating_requests: [],
+      partnership_requests: [],
+      lesson_requests: [],
+      merch_orders: [],
       rounds: [],
       matches: [],
       leaderboard: [],
-      counters: { users: 0, tournaments: 0, tournament_participants: 0, tournament_registrations: 0, rounds: 0, matches: 0, leaderboard: 0 }
+      counters: { users: 0, tournaments: 0, tournament_participants: 0, tournament_registrations: 0, rating_requests: 0, partnership_requests: 0, lesson_requests: 0, merch_orders: 0, rounds: 0, matches: 0, leaderboard: 0 }
     } as MemStore
   }
   return g.__MEM_SUPABASE_STORE__ as MemStore

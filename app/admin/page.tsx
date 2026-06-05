@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut } from "lucide-react"
+import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut, BarChart3, BadgeCheck, Building2 } from "lucide-react"
 
 export default function AdminMainMenuPage() {
   const router = useRouter()
@@ -106,7 +106,7 @@ export default function AdminMainMenuPage() {
           )}
 
           {authorized && (
-            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {/* Create Tournament */}
               <button
                 onClick={() => router.push("/admin/tournaments/new")}
@@ -142,6 +142,39 @@ export default function AdminMainMenuPage() {
                   <span className="text-lg sm:text-xl font-bold">Архив завершённых турниров</span>
                 </div>
                 <div className="text-white/70">Просмотр архивных турниров</div>
+              </button>
+
+              <button
+                onClick={() => router.push("/admin/rating-requests")}
+                className="w-full backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6 text-left hover:bg-white/10 transition-all"
+              >
+                <div className="flex items-center gap-3 text-white mb-2">
+                  <BadgeCheck className="w-6 h-6 text-cyan-400" />
+                  <span className="text-lg sm:text-xl font-bold">Заявки рейтинга</span>
+                </div>
+                <div className="text-white/70">Проверка Lichess / Chess.com и ручное установление рейтинга</div>
+              </button>
+
+              <button
+                onClick={() => router.push("/admin/partnership-requests")}
+                className="w-full backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6 text-left hover:bg-white/10 transition-all"
+              >
+                <div className="flex items-center gap-3 text-white mb-2">
+                  <Building2 className="w-6 h-6 text-emerald-400" />
+                  <span className="text-lg sm:text-xl font-bold">B2B-заявки</span>
+                </div>
+                <div className="text-white/70">Компании, площадки и партнерские мероприятия</div>
+              </button>
+
+              <button
+                onClick={() => router.push("/admin/stats")}
+                className="w-full backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6 text-left hover:bg-white/10 transition-all"
+              >
+                <div className="flex items-center gap-3 text-white mb-2">
+                  <BarChart3 className="w-6 h-6 text-amber-400" />
+                  <span className="text-lg sm:text-xl font-bold">Статистика</span>
+                </div>
+                <div className="text-white/70">Регистрации, посещаемость, заявки и спрос</div>
               </button>
             </div>
           )}

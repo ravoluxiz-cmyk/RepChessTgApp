@@ -23,14 +23,28 @@ type Participant = {
   created_at: string
 }
 
+type Registration = {
+  id: number
+  tournament_id: number
+  user_telegram_id: number
+  user_name: string
+  venue_title: string
+  attendance_status?: "registered" | "attended" | "no_show"
+  result_place?: number | null
+  result_points?: number | null
+  admin_note?: string | null
+  created_at: string
+}
+
 export default function TournamentParticipantsPage() {
   const params = useParams<{ id: string }>()
   const tournamentId = Number(params.id)
   const router = useRouter()
-  const { initData } = useTelegramWebApp()
+  const { initData, isReady } = useTelegramWebApp()
 
   const [users, setUsers] = useState<User[]>([])
   const [participants, setParticipants] = useState<Participant[]>([])
+  const [registrations, setRegistrations] = useState<Registration[]>([])
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
   const [query, setQuery] = useState("")
   const [nickname, setNickname] = useState("")
@@ -45,37 +59,45 @@ export default function TournamentParticipantsPage() {
   const [showDropdown, setShowDropdown] = useState(false)
   const [tours, setTours] = useState<Array<{ id: number; number: number; status: string; created_at: string }>>([])
   const [tournamentMeta, setTournamentMeta] = useState<{ rounds: number; archived: number } | null>(null)
+  const [attendanceSavingId, setAttendanceSavingId] = useState<number | null>(null)
 
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true)
       try {
-        const [usersRes, partsRes, toursRes, tournamentRes] = await Promise.all([
+        const [usersRes, partsRes, toursRes, tournamentRes, registrationsRes] = await Promise.all([
           fetch("/api/users"),
           fetch(`/api/tournaments/${tournamentId}/participants`),
           fetch(`/api/tournaments/${tournamentId}/tours`),
           fetch(`/api/tournaments/${tournamentId}`),
+          fetch(`/api/tournaments/${tournamentId}/registrations`, {
+            headers: initData ? { Authorization: `Bearer ${initData}` } : undefined,
+            cache: "no-store",
+          }),
         ])
         if (!usersRes.ok) throw new Error("Не удалось загрузить пользователей")
         if (!partsRes.ok) throw new Error("Не удалось загрузить участников")
         if (!toursRes.ok) throw new Error("Не удалось загрузить туры")
         if (!tournamentRes.ok) throw new Error("Не удалось загрузить турнир")
+        if (!registrationsRes.ok) throw new Error("Не удалось загрузить регистрации")
         const usersData = await usersRes.json()
         const partsData = await partsRes.json()
         const toursData = await toursRes.json()
         const tournamentData = await tournamentRes.json()
+        const registrationsData = await registrationsRes.json()
         setUsers(Array.isArray(usersData) ? usersData : [])
         setParticipants(Array.isArray(partsData) ? partsData : [])
         setTours(Array.isArray(toursData) ? toursData : [])
         setTournamentMeta(tournamentData && typeof tournamentData === 'object' ? { rounds: Number(tournamentData.rounds || 0), archived: Number(tournamentData.archived || 0) } : null)
+        setRegistrations(Array.isArray(registrationsData.registrations) ? registrationsData.registrations : [])
       } catch (e) {
         setError(e instanceof Error ? e.message : "Неизвестная ошибка")
       } finally {
         setLoading(false)
       }
     }
-    if (Number.isFinite(tournamentId)) fetchAll()
-  }, [tournamentId])
+    if (isReady && Number.isFinite(tournamentId)) fetchAll()
+  }, [initData, isReady, tournamentId])
 
   const addParticipant = async () => {
     if (!selectedUserId) return setError("Выберите пользователя")
@@ -345,6 +367,41 @@ export default function TournamentParticipantsPage() {
     }
   }
 
+  const updateRegistration = async (
+    registration: Registration,
+    fields: Partial<Pick<Registration, "attendance_status" | "result_place" | "result_points" | "admin_note">>
+  ) => {
+    setAttendanceSavingId(registration.id)
+    setError(null)
+    const next = { ...registration, ...fields }
+    try {
+      const res = await fetch(`/api/tournaments/${tournamentId}/registrations`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(initData ? { Authorization: `Bearer ${initData}` } : {}),
+        },
+        body: JSON.stringify({
+          id: registration.id,
+          attendance_status: next.attendance_status || "registered",
+          result_place: next.result_place ?? null,
+          result_points: next.result_points ?? null,
+          admin_note: next.admin_note ?? null,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || "Не удалось обновить регистрацию")
+      setRegistrations((prev) => prev.map((item) => item.id === registration.id ? data.registration : item))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Неизвестная ошибка")
+    } finally {
+      setAttendanceSavingId(null)
+    }
+  }
+
+  const attendedCount = registrations.filter((registration) => registration.attendance_status === "attended").length
+  const noShowCount = registrations.filter((registration) => registration.attendance_status === "no_show").length
+
   return (
     <ChessBackground>
       <div className="min-h-screen px-4 py-10">
@@ -361,6 +418,84 @@ export default function TournamentParticipantsPage() {
           {error && (
             <div className="bg-red-500/20 border border-red-500 text-white rounded-lg p-4 mb-6">{error}</div>
           )}
+
+          <div className="mb-8 rounded-lg border border-white/10 bg-white/5 p-4 text-white">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-xl font-bold">Зарегистрированные</h2>
+                <div className="text-sm text-white/60">Отметьте фактическую посещаемость и результаты после мероприятия</div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                <div className="rounded-lg bg-black/20 px-3 py-2">
+                  <div className="font-bold">{registrations.length}</div>
+                  <div className="text-white/55">заявок</div>
+                </div>
+                <div className="rounded-lg bg-emerald-500/15 px-3 py-2">
+                  <div className="font-bold">{attendedCount}</div>
+                  <div className="text-white/55">пришли</div>
+                </div>
+                <div className="rounded-lg bg-red-500/15 px-3 py-2">
+                  <div className="font-bold">{noShowCount}</div>
+                  <div className="text-white/55">нет</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {registrations.map((registration) => (
+                <div key={registration.id} className="rounded-lg border border-white/10 bg-black/20 p-3">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold">{registration.user_name}</div>
+                      <div className="text-xs text-white/55">Telegram ID: {registration.user_telegram_id}</div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => updateRegistration(registration, { attendance_status: "attended" })}
+                        disabled={attendanceSavingId === registration.id}
+                        className={`rounded-lg px-3 py-2 text-sm font-semibold ${registration.attendance_status === "attended" ? "bg-emerald-600 text-white" : "bg-white/10 text-white/75 hover:bg-white/20"}`}
+                      >
+                        Пришел
+                      </button>
+                      <button
+                        onClick={() => updateRegistration(registration, { attendance_status: "no_show" })}
+                        disabled={attendanceSavingId === registration.id}
+                        className={`rounded-lg px-3 py-2 text-sm font-semibold ${registration.attendance_status === "no_show" ? "bg-red-700 text-white" : "bg-white/10 text-white/75 hover:bg-white/20"}`}
+                      >
+                        Не пришел
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                    <input
+                      type="number"
+                      value={registration.result_place ?? ""}
+                      onChange={(event) => updateRegistration(registration, { result_place: event.target.value ? Number(event.target.value) : null })}
+                      className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none focus:border-emerald-300"
+                      placeholder="Место"
+                    />
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={registration.result_points ?? ""}
+                      onChange={(event) => updateRegistration(registration, { result_points: event.target.value ? Number(event.target.value) : null })}
+                      className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none focus:border-emerald-300"
+                      placeholder="Очки"
+                    />
+                    <input
+                      value={registration.admin_note || ""}
+                      onChange={(event) => updateRegistration(registration, { admin_note: event.target.value })}
+                      className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none focus:border-emerald-300"
+                      placeholder="Комментарий"
+                    />
+                  </div>
+                </div>
+              ))}
+              {registrations.length === 0 && (
+                <div className="rounded-lg bg-black/20 p-4 text-white/60">Регистраций пока нет</div>
+              )}
+            </div>
+          </div>
 
           {/* Форма добавления участника */}
           <div className="space-y-4 bg-white/5 p-4 rounded-lg">

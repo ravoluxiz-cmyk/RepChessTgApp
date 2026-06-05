@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground";
 import { HoverButton } from "@/components/ui/hover-button";
-import { ShoppingBag, Calendar, GraduationCap, User } from "lucide-react";
+import { Building2, ShoppingBag, Calendar, GraduationCap, User } from "lucide-react";
 import { useEffect, useCallback } from "react"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 
@@ -123,6 +123,16 @@ export default function Home() {
               <GraduationCap className="w-7 h-7 text-white flex-shrink-0" />
               <span className="text-xl sm:text-2xl text-white font-black uppercase tracking-tight" style={{ fontFamily: 'Arial Black, sans-serif' }}>
                 Запись на урок
+              </span>
+            </HoverButton>
+
+            <HoverButton
+              className="flex items-center justify-center gap-3"
+              onClick={() => router.push('/partners')}
+            >
+              <Building2 className="w-7 h-7 text-white flex-shrink-0" />
+              <span className="text-xl sm:text-2xl text-white font-black uppercase tracking-tight" style={{ fontFamily: 'Arial Black, sans-serif' }}>
+                Для компаний
               </span>
             </HoverButton>
 

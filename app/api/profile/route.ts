@@ -5,8 +5,27 @@ import {
   getUserByTelegramId,
   createUser,
   updateUserProfile,
+  createRatingRequest,
   type UserProfileData,
 } from "@/lib/db"
+
+const DEFAULT_RATING = 1500
+
+function getDisplayName(user: { first_name?: string | null; last_name?: string | null; username?: string | null }) {
+  const fullName = [user.first_name, user.last_name]
+    .map((part) => String(part || "").trim())
+    .filter(Boolean)
+    .join(" ")
+  return fullName || user.username || "Участник"
+}
+
+function detectRatingPlatform(url: string | null | undefined): "lichess" | "chesscom" | null {
+  const value = String(url || "").trim().toLowerCase()
+  if (!value) return null
+  if (value.includes("lichess.org")) return "lichess"
+  if (value.includes("chess.com")) return "chesscom"
+  return null
+}
 
 // GET /api/profile - Get user profile (auto-creates if not exists)
 export async function GET(request: NextRequest) {
@@ -34,7 +53,7 @@ export async function GET(request: NextRequest) {
         username: telegramUser.username,
         first_name: telegramUser.first_name,
         last_name: telegramUser.last_name || "",
-        rating: 800,
+        rating: DEFAULT_RATING,
         chesscom_url: null,
         lichess_url: null,
         bio: null,
@@ -88,7 +107,6 @@ export async function POST(request: NextRequest) {
     const {
       first_name,
       last_name,
-      rating,
       chesscom_url,
       lichess_url,
       bio,
@@ -102,17 +120,38 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const lichessPlatform = detectRatingPlatform(lichess_url)
+    const chesscomPlatform = detectRatingPlatform(chesscom_url)
+    if (!lichessPlatform && !chesscomPlatform) {
+      return NextResponse.json(
+        { error: "Для установления рейтинга нужна ссылка на Lichess или Chess.com" },
+        { status: 400 }
+      )
+    }
+
     // Create user
     const newUser = await createUser({
       telegram_id: telegramUser.id,
       username: telegramUser.username,
       first_name,
       last_name,
-      rating: rating && rating >= 100 && rating <= 3000 ? rating : 800,
+      rating: DEFAULT_RATING,
       chesscom_url: chesscom_url || null,
       lichess_url: lichess_url || null,
       bio: bio || null,
     })
+
+    if (newUser) {
+      const profileUrl = String(lichessPlatform ? lichess_url : chesscom_url).trim()
+      await createRatingRequest({
+        user_id: newUser.id,
+        user_telegram_id: telegramUser.id,
+        user_name: getDisplayName(newUser),
+        platform: lichessPlatform || chesscomPlatform || "lichess",
+        profile_url: profileUrl,
+        status: "pending",
+      })
+    }
 
     return NextResponse.json({ user: newUser }, { status: 201 })
   } catch (error) {
@@ -152,7 +191,6 @@ export async function PUT(request: NextRequest) {
     const {
       first_name,
       last_name,
-      rating,
       chesscom_url,
       lichess_url,
       bio,
@@ -166,11 +204,21 @@ export async function PUT(request: NextRequest) {
       )
     }
 
+    const lichessPlatform = detectRatingPlatform(lichess_url)
+    const chesscomPlatform = detectRatingPlatform(chesscom_url)
+    if (!lichessPlatform && !chesscomPlatform) {
+      return NextResponse.json(
+        { error: "Для установления рейтинга нужна ссылка на Lichess или Chess.com" },
+        { status: 400 }
+      )
+    }
+
+    const existingUser = await getUserByTelegramId(telegramUser.id)
+
     // Update user profile
     const profileData: UserProfileData = {
       first_name,
       last_name,
-      rating: rating && rating >= 100 && rating <= 3000 ? rating : undefined,
       chesscom_url: chesscom_url || null,
       lichess_url: lichess_url || null,
       bio: bio || null,
@@ -184,6 +232,24 @@ export async function PUT(request: NextRequest) {
 
     // Get updated user
     const updatedUser = await getUserByTelegramId(telegramUser.id)
+
+    if (updatedUser) {
+      const profileUrl = String(lichessPlatform ? lichess_url : chesscom_url).trim()
+      const previousUrls = new Set([
+        String(existingUser?.lichess_url || "").trim(),
+        String(existingUser?.chesscom_url || "").trim(),
+      ].filter(Boolean))
+      if (!previousUrls.has(String(profileUrl).trim())) {
+        await createRatingRequest({
+          user_id: updatedUser.id,
+          user_telegram_id: telegramUser.id,
+          user_name: getDisplayName(updatedUser),
+          platform: lichessPlatform || chesscomPlatform || "lichess",
+          profile_url: profileUrl,
+          status: "pending",
+        })
+      }
+    }
 
     return NextResponse.json({ user: updatedUser })
   } catch (error) {

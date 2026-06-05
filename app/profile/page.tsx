@@ -24,7 +24,7 @@ function SuccessBanner() {
 
   return (
     <div className="mb-6 bg-green-600/80 border border-green-400 text-white rounded-lg p-4 text-center font-bold">
-      Chess Ratings Verified Successfully
+      Профиль сохранен. Заявка на установление рейтинга отправлена администратору.
     </div>
   )
 }
@@ -196,6 +196,9 @@ export default function ProfilePage() {
 
             {/* Glicko2 Rating Display */}
             <div className="pt-4 border-t border-white/20">
+              <div className="mb-4 rounded-lg border border-amber-300/30 bg-amber-400/15 p-3 text-sm text-amber-50">
+                Если рейтинг еще не подтвержден администратором, используется стартовое значение 1500.
+              </div>
               <RatingDisplay
                 userId={profile.id}
                 showHistory={true}

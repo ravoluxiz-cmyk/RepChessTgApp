@@ -79,7 +79,53 @@ export interface TournamentRegistration {
   user_telegram_id: number
   user_name: string
   venue_title: string
+  attendance_status?: 'registered' | 'attended' | 'no_show'
+  result_place?: number | null
+  result_points?: number | null
+  admin_note?: string | null
   created_at?: string
+}
+
+export interface RatingRequest {
+  id?: number
+  user_id?: number | null
+  user_telegram_id: number
+  user_name: string
+  platform: 'lichess' | 'chesscom'
+  profile_url: string
+  status?: 'pending' | 'approved' | 'rejected'
+  requested_rating?: number | null
+  approved_rating?: number | null
+  admin_note?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface PartnershipRequest {
+  id?: number
+  name: string
+  company: string
+  contact: string
+  format: string
+  people_count?: number | null
+  comment?: string | null
+  status?: 'new' | 'in_progress' | 'done' | 'rejected'
+  created_at?: string
+  updated_at?: string
+}
+
+export interface AdminStats {
+  registrations: number
+  attended: number
+  noShows: number
+  newPlayers: number
+  lessonRequests: number
+  merchOrders: number
+  partnershipRequests: number
+  pendingRatingRequests: number
+  popularTournaments: Array<{ tournament_id: number; title: string; registrations: number; attended: number }>
+  attendanceByTournament: Array<{ tournament_id: number; title: string; attended: number }>
+  popularPartnershipFormats: Array<{ format: string; count: number }>
 }
 
 export interface Round {
@@ -147,7 +193,7 @@ export async function createUser(user: User): Promise<User | null> {
       username: user.username || null,
       first_name: user.first_name,
       last_name: user.last_name,
-      rating: user.rating || 800,
+      rating: user.rating || 1500,
       chesscom_url: user.chesscom_url || null,
       lichess_url: user.lichess_url || null,
       bio: user.bio || null,
@@ -173,7 +219,6 @@ export async function updateUserProfile(
     .update({
       first_name: profileData.first_name,
       last_name: profileData.last_name,
-      rating: profileData.rating || 800,
       chesscom_url: profileData.chesscom_url || null,
       lichess_url: profileData.lichess_url || null,
       bio: profileData.bio || null
@@ -567,6 +612,310 @@ export async function getTournamentRegistration(
   }
 
   return data as TournamentRegistration
+}
+
+export async function listTournamentRegistrations(tournamentId: number): Promise<TournamentRegistration[]> {
+  const { data, error } = await supabaseAdmin
+    .from('tournament_registrations')
+    .select('*')
+    .eq('tournament_id', tournamentId)
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('Error listing tournament registrations:', error)
+    return []
+  }
+
+  return (data || []) as TournamentRegistration[]
+}
+
+export async function updateTournamentRegistrationAttendance(
+  registrationId: number,
+  fields: Pick<TournamentRegistration, 'attendance_status' | 'result_place' | 'result_points' | 'admin_note'>
+): Promise<TournamentRegistration | null> {
+  const { data, error } = await supabaseAdmin
+    .from('tournament_registrations')
+    .update({
+      attendance_status: fields.attendance_status || 'registered',
+      result_place: fields.result_place ?? null,
+      result_points: fields.result_points ?? null,
+      admin_note: fields.admin_note ?? null,
+    })
+    .eq('id', registrationId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating tournament registration attendance:', error)
+    return null
+  }
+
+  return data as TournamentRegistration
+}
+
+export async function createRatingRequest(request: RatingRequest): Promise<RatingRequest | null> {
+  const { data: existing, error: existingError } = await supabaseAdmin
+    .from('rating_requests')
+    .select('*')
+    .eq('user_telegram_id', request.user_telegram_id)
+    .eq('profile_url', request.profile_url)
+    .eq('status', 'pending')
+    .single()
+
+  if (existing) return existing as RatingRequest
+  if (existingError && existingError.code !== 'PGRST116') {
+    console.error('Error checking rating request:', existingError)
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('rating_requests')
+    .insert({
+      user_id: request.user_id ?? null,
+      user_telegram_id: request.user_telegram_id,
+      user_name: request.user_name,
+      platform: request.platform,
+      profile_url: request.profile_url,
+      status: request.status || 'pending',
+      requested_rating: request.requested_rating ?? null,
+      admin_note: request.admin_note ?? null,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating rating request:', error)
+    return null
+  }
+
+  return data as RatingRequest
+}
+
+export async function listRatingRequests(status?: string): Promise<RatingRequest[]> {
+  let query = supabaseAdmin
+    .from('rating_requests')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (status && status !== 'all') {
+    query = query.eq('status', status)
+  }
+
+  const { data, error } = await query
+  if (error) {
+    console.error('Error listing rating requests:', error)
+    return []
+  }
+
+  return (data || []) as RatingRequest[]
+}
+
+export async function resolveRatingRequest(
+  requestId: number,
+  status: 'approved' | 'rejected',
+  approvedRating?: number | null,
+  adminNote?: string | null
+): Promise<RatingRequest | null> {
+  const { data: request, error: requestError } = await supabaseAdmin
+    .from('rating_requests')
+    .select('*')
+    .eq('id', requestId)
+    .single()
+
+  if (requestError || !request) {
+    console.error('Error getting rating request:', requestError)
+    return null
+  }
+
+  if (status === 'approved' && approvedRating) {
+    await supabaseAdmin
+      .from('users')
+      .update({ rating: approvedRating })
+      .eq('telegram_id', Number(request.user_telegram_id))
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('rating_requests')
+    .update({
+      status,
+      approved_rating: status === 'approved' ? approvedRating ?? null : null,
+      admin_note: adminNote ?? null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', requestId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error resolving rating request:', error)
+    return null
+  }
+
+  return data as RatingRequest
+}
+
+export async function createPartnershipRequest(request: PartnershipRequest): Promise<PartnershipRequest | null> {
+  const { data, error } = await supabaseAdmin
+    .from('partnership_requests')
+    .insert({
+      name: request.name,
+      company: request.company,
+      contact: request.contact,
+      format: request.format,
+      people_count: request.people_count ?? null,
+      comment: request.comment ?? null,
+      status: request.status || 'new',
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating partnership request:', error)
+    return null
+  }
+
+  return data as PartnershipRequest
+}
+
+export async function listPartnershipRequests(status?: string): Promise<PartnershipRequest[]> {
+  let query = supabaseAdmin
+    .from('partnership_requests')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (status && status !== 'all') {
+    query = query.eq('status', status)
+  }
+
+  const { data, error } = await query
+  if (error) {
+    console.error('Error listing partnership requests:', error)
+    return []
+  }
+
+  return (data || []) as PartnershipRequest[]
+}
+
+export async function updatePartnershipRequestStatus(
+  requestId: number,
+  status: NonNullable<PartnershipRequest['status']>
+): Promise<PartnershipRequest | null> {
+  const { data, error } = await supabaseAdmin
+    .from('partnership_requests')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', requestId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating partnership request:', error)
+    return null
+  }
+
+  return data as PartnershipRequest
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function safeCount(table: string, filter?: (query: any) => any): Promise<number> {
+  try {
+    let query = supabaseAdmin
+      .from(table)
+      .select('id', { count: 'exact', head: true })
+    if (filter) query = filter(query)
+    const { count, error } = await query
+    if (error) {
+      console.error(`Error counting ${table}:`, error)
+      return 0
+    }
+    return count || 0
+  } catch (error) {
+    console.error(`Exception counting ${table}:`, error)
+    return 0
+  }
+}
+
+export async function getAdminStats(): Promise<AdminStats> {
+  const [
+    registrations,
+    attended,
+    noShows,
+    newPlayers,
+    lessonRequests,
+    merchOrders,
+    partnershipRequests,
+    pendingRatingRequests,
+    tournaments,
+    registrationRows,
+    partnershipRows,
+  ] = await Promise.all([
+    safeCount('tournament_registrations'),
+    safeCount('tournament_registrations', (query) => query.eq('attendance_status', 'attended')),
+    safeCount('tournament_registrations', (query) => query.eq('attendance_status', 'no_show')),
+    safeCount('users'),
+    safeCount('lesson_requests'),
+    safeCount('merch_orders'),
+    safeCount('partnership_requests'),
+    safeCount('rating_requests', (query) => query.eq('status', 'pending')),
+    listTournaments(),
+    supabaseAdmin.from('tournament_registrations').select('tournament_id, attendance_status'),
+    supabaseAdmin.from('partnership_requests').select('format'),
+  ])
+
+  const tournamentTitles = new Map(tournaments.map((tournament) => [Number(tournament.id), tournament.title]))
+  const byTournament = new Map<number, { registrations: number; attended: number }>()
+
+  if (!registrationRows.error) {
+    for (const row of registrationRows.data || []) {
+      const tournamentId = Number(row.tournament_id)
+      const current = byTournament.get(tournamentId) || { registrations: 0, attended: 0 }
+      current.registrations += 1
+      if (row.attendance_status === 'attended') current.attended += 1
+      byTournament.set(tournamentId, current)
+    }
+  }
+
+  const popularTournaments = Array.from(byTournament.entries())
+    .map(([tournament_id, item]) => ({
+      tournament_id,
+      title: tournamentTitles.get(tournament_id) || `Турнир #${tournament_id}`,
+      registrations: item.registrations,
+      attended: item.attended,
+    }))
+    .sort((a, b) => b.registrations - a.registrations)
+    .slice(0, 8)
+
+  const attendanceByTournament = popularTournaments
+    .map((item) => ({
+      tournament_id: item.tournament_id,
+      title: item.title,
+      attended: item.attended,
+    }))
+    .sort((a, b) => b.attended - a.attended)
+
+  const formatCounts = new Map<string, number>()
+  if (!partnershipRows.error) {
+    for (const row of partnershipRows.data || []) {
+      const format = String(row.format || 'Другое')
+      formatCounts.set(format, (formatCounts.get(format) || 0) + 1)
+    }
+  }
+
+  const popularPartnershipFormats = Array.from(formatCounts.entries())
+    .map(([format, count]) => ({ format, count }))
+    .sort((a, b) => b.count - a.count)
+
+  return {
+    registrations,
+    attended,
+    noShows,
+    newPlayers,
+    lessonRequests,
+    merchOrders,
+    partnershipRequests,
+    pendingRatingRequests,
+    popularTournaments,
+    attendanceByTournament,
+    popularPartnershipFormats,
+  }
 }
 
 // ===== TOURNAMENT PARTICIPANTS =====
