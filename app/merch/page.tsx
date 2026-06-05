@@ -149,9 +149,33 @@ export default function MerchPage() {
             </div>
           </header>
 
-          <div>
-            <h1 className="brand-title text-4xl text-white sm:text-6xl">REP CHESS KRD MERCH</h1>
-            <div className="brand-accent-line mt-3 w-52" />
+          <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
+            <div className="brand-bg-icons pointer-events-none absolute -right-16 -top-24 h-72 w-72 opacity-[0.08]" />
+            <div className="grid gap-5 md:grid-cols-[1fr_260px] md:items-end">
+              <div>
+                <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Drop / Lookbook</div>
+                <h1 className="brand-title text-4xl text-white sm:text-6xl">REP CHESS KRD MERCH</h1>
+                <p className="mt-4 max-w-2xl text-white/62">
+                  Футболки, дропы и вещи клуба. Выберите позицию, размер и отправьте заявку в пару касаний.
+                </p>
+                <div className="brand-accent-line mt-5 w-52" />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-center md:grid-cols-1 md:text-left">
+                <div className="rounded-2xl bg-white px-3 py-3 text-[#151515]">
+                  <div className="brand-font text-2xl">{products.length}</div>
+                  <div className="text-xs font-black uppercase opacity-60">позиций</div>
+                </div>
+                <div className="rounded-2xl bg-[#ff1515] px-3 py-3 text-white">
+                  <div className="brand-font text-2xl">2.5+</div>
+                  <div className="text-xs font-black uppercase opacity-80">тыс ₽</div>
+                </div>
+                <div className="rounded-2xl bg-[#fff200] px-3 py-3 text-[#151515]">
+                  <div className="brand-font text-2xl">S-XL</div>
+                  <div className="text-xs font-black uppercase opacity-70">размеры</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <section className="grid gap-5 lg:grid-cols-[1fr_360px]">

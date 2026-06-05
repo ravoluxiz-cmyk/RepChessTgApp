@@ -81,11 +81,31 @@ export default function AdminMainMenuPage() {
 
         {/* Title */}
         <div className="px-3 sm:px-4">
-          <div className="max-w-5xl mx-auto">
-            <h1 className="brand-title text-3xl text-white sm:text-5xl lg:text-6xl">
-              Выберите действие
-            </h1>
-            <p className="mt-2 text-white/60">Быстрые действия для управления турнирами</p>
+          <div className="mx-auto max-w-5xl">
+            <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
+              <div className="brand-bg-icons pointer-events-none absolute -right-20 -top-24 h-72 w-72 opacity-[0.07]" />
+              <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Admin Command Center</div>
+              <h1 className="brand-title text-3xl text-white sm:text-5xl lg:text-6xl">
+                Управление клубом
+              </h1>
+              <p className="mt-3 max-w-2xl text-white/62">
+                Турниры, заявки, рейтинги и статистика в одном рабочем экране.
+              </p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl bg-white px-4 py-3 text-[#151515]">
+                  <div className="brand-font text-xl">Events</div>
+                  <div className="text-xs font-black uppercase opacity-60">турниры и архив</div>
+                </div>
+                <div className="rounded-2xl bg-[#1357ff] px-4 py-3 text-white">
+                  <div className="brand-font text-xl">CRM</div>
+                  <div className="text-xs font-black uppercase opacity-75">B2B и уроки</div>
+                </div>
+                <div className="rounded-2xl bg-[#fff200] px-4 py-3 text-[#151515]">
+                  <div className="brand-font text-xl">Data</div>
+                  <div className="text-xs font-black uppercase opacity-70">рейтинг и отчеты</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -113,7 +133,7 @@ export default function AdminMainMenuPage() {
                 className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
-                  <PlusCircle className="w-6 h-6 text-emerald-400" />
+                  <PlusCircle className="w-6 h-6 text-[#20d66b]" />
                   <span className="text-lg sm:text-xl font-bold">Создать новый турнир</span>
                 </div>
                 <div className="text-white/70">Открыть форму создания турнира</div>
@@ -126,7 +146,7 @@ export default function AdminMainMenuPage() {
                 title="Единый список турниров с переключателем «Все/Мои»"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
-                  <List className="w-6 h-6 text-violet-400" />
+                  <List className="w-6 h-6 text-[#fff200]" />
                   <span className="text-lg sm:text-xl font-bold">Турниры</span>
                 </div>
                 <div className="text-white/70">Откройте список и переключайтесь между «Все» и «Мои»</div>
@@ -138,7 +158,7 @@ export default function AdminMainMenuPage() {
                 className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
-                  <Archive className="w-6 h-6 text-amber-400" />
+                  <Archive className="w-6 h-6 text-[#ff1515]" />
                   <span className="text-lg sm:text-xl font-bold">Архив завершённых турниров</span>
                 </div>
                 <div className="text-white/70">Просмотр архивных турниров</div>
@@ -149,7 +169,7 @@ export default function AdminMainMenuPage() {
                 className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
-                  <BadgeCheck className="w-6 h-6 text-cyan-400" />
+                  <BadgeCheck className="w-6 h-6 text-[#1357ff]" />
                   <span className="text-lg sm:text-xl font-bold">Заявки рейтинга</span>
                 </div>
                 <div className="text-white/70">Проверка Lichess / Chess.com и ручное установление рейтинга</div>
@@ -160,7 +180,7 @@ export default function AdminMainMenuPage() {
                 className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
-                  <Building2 className="w-6 h-6 text-emerald-400" />
+                  <Building2 className="w-6 h-6 text-[#20d66b]" />
                   <span className="text-lg sm:text-xl font-bold">B2B-заявки</span>
                 </div>
                 <div className="text-white/70">Компании, площадки и партнерские мероприятия</div>
@@ -171,7 +191,7 @@ export default function AdminMainMenuPage() {
                 className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
-                  <BarChart3 className="w-6 h-6 text-amber-400" />
+                  <BarChart3 className="w-6 h-6 text-[#fff200]" />
                   <span className="text-lg sm:text-xl font-bold">Статистика</span>
                 </div>
                 <div className="text-white/70">Регистрации, посещаемость, заявки и спрос</div>

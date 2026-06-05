@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import ChessBackground from "@/components/ChessBackground"
-import { User, Edit, Link as LinkIcon, ArrowLeft } from "lucide-react"
+import { User, Edit, Link as LinkIcon, ArrowLeft, BadgeCheck, Trophy } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import RatingDisplay from "@/components/rating/RatingDisplay"
 import { getProfileAuthHeaders } from "@/lib/web-user"
@@ -12,6 +12,16 @@ import { getProfileAuthHeaders } from "@/lib/web-user"
 // Pure helper — hoisted out of component (rendering-hoist-jsx)
 function isProfileIncomplete(profile: { chesscom_url?: string | null; lichess_url?: string | null; bio?: string | null }): boolean {
   return !profile.chesscom_url && !profile.lichess_url && !profile.bio
+}
+
+function formatJoinedAt(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return "недавно"
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    month: "long",
+    year: "numeric",
+  }).format(date)
 }
 
 // Success banner component that uses searchParams
@@ -140,25 +150,28 @@ export default function ProfilePage() {
     )
   }
 
+  const displayName = `${profile.first_name} ${profile.last_name}`.trim()
+  const joinedAt = formatJoinedAt(profile.created_at)
+
   return (
     <ChessBackground>
       <div className="min-h-screen py-8 px-4">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <button
               onClick={() => router.push("/")}
-              className="bg-white text-black p-3 rounded-lg hover:bg-gray-200 transition-colors"
+              className="rounded-full bg-white p-3 text-black transition-colors hover:bg-gray-200"
               aria-label="Назад в меню"
             >
               <ArrowLeft className="w-6 h-6" />
             </button>
             <h1 className="brand-title text-4xl text-white">
-              Профиль
+              Карточка игрока
             </h1>
             <button
               onClick={() => router.push("/profile/edit")}
-              className="bg-white text-black p-3 rounded-lg hover:bg-gray-200 transition-colors"
+              className="rounded-full bg-white p-3 text-black transition-colors hover:bg-gray-200"
               aria-label="Редактировать профиль"
             >
               <Edit className="w-6 h-6" />
@@ -171,74 +184,100 @@ export default function ProfilePage() {
           </Suspense>
 
           {/* Profile Card */}
-          <div className="brand-panel-dark rounded-[18px] p-6 space-y-6">
+          <div className="brand-panel-dark overflow-hidden rounded-[24px]">
             {/* User Info */}
-            <div className="flex items-center gap-4">
-              <div className="bg-white/20 p-4 rounded-full">
-                <User className="w-12 h-12 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  {profile.first_name} {profile.last_name}
-                </h2>
-                {profile.username && (
-                  <p className="text-white/70">@{profile.username}</p>
-                )}
-              </div>
-            </div>
+            <div className="relative p-6 sm:p-7">
+              <div className="brand-bg-icons pointer-events-none absolute -right-20 -top-20 h-72 w-72 opacity-[0.07]" />
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="rounded-[28px] bg-white p-4 text-[#151515] shadow-[0_18px_52px_rgba(0,0,0,0.22)]">
+                    <User className="w-12 h-12" />
+                  </div>
+                  <div>
+                    <div className="brand-chip mb-2 w-fit px-3 py-1 text-xs font-black uppercase">
+                      Rep Player
+                    </div>
+                    <h2 className="brand-title text-3xl text-white sm:text-5xl">
+                      {displayName || "Игрок"}
+                    </h2>
+                    <div className="mt-2 flex flex-wrap gap-2 text-sm font-semibold text-white/65">
+                      {profile.username && <span>@{profile.username}</span>}
+                      <span>С нами с {joinedAt}</span>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Bio */}
-            {profile.bio && (
-              <div className="pt-4 border-t border-white/20">
-                <p className="text-white text-base leading-relaxed">{profile.bio}</p>
-              </div>
-            )}
-
-            {/* Glicko2 Rating Display */}
-            <div className="pt-4 border-t border-white/20">
-              <div className="mb-4 rounded-lg border border-amber-300/30 bg-amber-400/15 p-3 text-sm text-amber-50">
-                Если рейтинг еще не подтвержден администратором, используется стартовое значение 1500.
-              </div>
-              <RatingDisplay
-                userId={profile.id}
-                showHistory={true}
-                showRank={true}
-              />
-            </div>
-
-            {/* Social Links */}
-            {(profile.chesscom_url || profile.lichess_url) && (
-              <div className="pt-4 border-t border-white/20">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <LinkIcon className="w-5 h-5" />
-                  Ссылки
-                </h3>
-                <div className="space-y-3">
-                  {profile.chesscom_url && (
-                    <a
-                      href={profile.chesscom_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-white hover:text-white/80 transition-colors"
-                    >
-                      <span className="font-semibold">Chess.com:</span>
-                      <span className="underline break-all">{profile.chesscom_url}</span>
-                    </a>
-                  )}
-                  {profile.lichess_url && (
-                    <a
-                      href={profile.lichess_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-white hover:text-white/80 transition-colors"
-                    >
-                      <span className="font-semibold">Lichess:</span>
-                      <span className="underline break-all">{profile.lichess_url}</span>
-                    </a>
-                  )}
+                <div className="grid grid-cols-2 gap-2 sm:min-w-64">
+                  <div className="rounded-2xl bg-white px-4 py-3 text-[#151515]">
+                    <div className="flex items-center gap-2 text-xs font-black uppercase opacity-60">
+                      <Trophy className="h-4 w-4" />
+                      Рейтинг
+                    </div>
+                    <div className="brand-font mt-1 text-3xl">{profile.rating || 1500}</div>
+                  </div>
+                  <div className="rounded-2xl bg-[#20d66b] px-4 py-3 text-[#151515]">
+                    <div className="flex items-center gap-2 text-xs font-black uppercase opacity-70">
+                      <BadgeCheck className="h-4 w-4" />
+                      Статус
+                    </div>
+                    <div className="mt-2 text-sm font-black uppercase">Профиль</div>
+                  </div>
                 </div>
               </div>
-            )}
+
+              {profile.bio && (
+                <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.06] p-4">
+                  <p className="text-base leading-relaxed text-white/78">{profile.bio}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-6 border-t border-white/10 p-6 sm:p-7">
+              <div className="rounded-2xl border border-amber-300/30 bg-amber-400/15 p-3 text-sm font-semibold text-amber-50">
+                Если рейтинг еще не подтвержден администратором, используется стартовое значение 1500.
+              </div>
+
+              <div>
+                <RatingDisplay
+                  userId={profile.id}
+                  showHistory={true}
+                  showRank={true}
+                />
+              </div>
+
+              {(profile.chesscom_url || profile.lichess_url) && (
+                <div>
+                  <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
+                    <LinkIcon className="w-5 h-5" />
+                    Игровые профили
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {profile.chesscom_url && (
+                      <a
+                        href={profile.chesscom_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 text-white transition hover:bg-white/[0.12]"
+                      >
+                        <span className="brand-font text-sm">Chess.com</span>
+                        <span className="mt-2 block break-all text-sm text-white/62">{profile.chesscom_url}</span>
+                      </a>
+                    )}
+                    {profile.lichess_url && (
+                      <a
+                        href={profile.lichess_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 text-white transition hover:bg-white/[0.12]"
+                      >
+                        <span className="brand-font text-sm">Lichess</span>
+                        <span className="mt-2 block break-all text-sm text-white/62">{profile.lichess_url}</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

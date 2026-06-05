@@ -66,9 +66,23 @@ export default function LessonsPage() {
             </div>
           </header>
 
+          <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
+            <div className="brand-bg-illustration pointer-events-none absolute -right-24 -bottom-20 h-72 w-96 opacity-[0.08]" />
+            <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Training request</div>
+            <h1 className="brand-title text-4xl text-white sm:text-6xl">Запись на урок</h1>
+            <p className="mt-4 max-w-2xl text-white/62">
+              Быстро соберите заявку: уровень, формат, удобное время и цель занятий.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="rounded-full bg-white px-3 py-2 text-sm font-black text-[#151515]">Индивидуально</span>
+              <span className="rounded-full bg-[#fff200] px-3 py-2 text-sm font-black text-[#151515]">Группа</span>
+              <span className="rounded-full bg-[#1357ff] px-3 py-2 text-sm font-black text-white">Подготовка</span>
+            </div>
+          </section>
+
           <main className="grid gap-4 lg:grid-cols-[1fr_360px]">
             <section className="brand-panel rounded-[18px] p-5 text-[#151515]">
-              <h1 className="brand-title mb-6 text-3xl sm:text-5xl">Запись на урок</h1>
+              <h2 className="brand-title mb-6 text-3xl sm:text-5xl">Параметры</h2>
 
               <div className="space-y-6">
                 <div>

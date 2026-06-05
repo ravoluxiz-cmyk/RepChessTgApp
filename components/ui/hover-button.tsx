@@ -35,7 +35,7 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
           "cursor-pointer overflow-hidden",
           "before:content-[''] before:absolute before:inset-0",
           "before:rounded-[inherit] before:pointer-events-none",
-          "before:z-[1]",
+          "before:z-0",
           "before:bg-[radial-gradient(circle_at_18%_20%,rgba(255,21,21,0.18),transparent_26%),radial-gradient(circle_at_86%_78%,rgba(19,87,255,0.16),transparent_28%)]",
           "before:opacity-70",
           "shadow-[0_18px_48px_rgba(0,0,0,0.28)]",

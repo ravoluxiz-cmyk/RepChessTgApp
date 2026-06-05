@@ -78,6 +78,22 @@ function formatSchedule(value?: string | null) {
   }).format(date)
 }
 
+function formatDateSticker(value?: string | null) {
+  if (!value) {
+    return { day: "??", month: "Дата" }
+  }
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return { day: "??", month: "Дата" }
+  }
+
+  return {
+    day: new Intl.DateTimeFormat("ru-RU", { day: "2-digit" }).format(date),
+    month: new Intl.DateTimeFormat("ru-RU", { month: "short" }).format(date).replace(".", ""),
+  }
+}
+
 export function TournamentCard({ tournament, index }: TournamentCardProps) {
   const { initData, isReady } = useTelegramWebApp()
   const [registering, setRegistering] = useState(false)
@@ -153,6 +169,8 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       },
     },
   }
+  const dateSticker = formatDateSticker(tournament.start_at || tournament.created_at)
+  const scheduleLabel = tournament.start_at ? formatSchedule(tournament.start_at) : formatCreatedAt(tournament.created_at)
 
   return (
     <motion.div
@@ -163,6 +181,10 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
     >
       <div className="grid md:grid-cols-[minmax(220px,320px)_1fr]">
         <div className="relative min-h-56 border-b border-[#151515]/10 bg-[#151515] md:min-h-full md:border-b-0 md:border-r">
+          <div className="absolute left-4 top-4 z-10 rounded-2xl bg-white px-3 py-2 text-center text-[#151515] shadow-[0_14px_40px_rgba(0,0,0,0.28)]">
+            <div className="brand-font text-2xl leading-none">{dateSticker.day}</div>
+            <div className="mt-1 text-xs font-black uppercase">{dateSticker.month}</div>
+          </div>
           {tournament.poster_url ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
@@ -172,11 +194,24 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full min-h-56 flex-col items-center justify-center gap-3 p-6 text-white/55">
+            <div className="relative flex h-full min-h-56 flex-col items-center justify-center gap-3 overflow-hidden p-6 text-white/55">
+              <div className="brand-bg-illustration absolute inset-6 opacity-[0.12]" />
               <CalendarDays className="h-12 w-12 text-white/70" />
               <span className="brand-font text-sm uppercase">Афиша скоро</span>
             </div>
           )}
+          <div className="absolute inset-x-0 bottom-0 z-10 flex flex-wrap gap-2 bg-gradient-to-t from-black/80 to-transparent p-4 pt-16">
+            {Number(tournament.allow_join) === 1 && (
+              <span className="rounded-full bg-[#20d66b] px-3 py-1 text-xs font-black uppercase text-[#151515]">
+                Запись
+              </span>
+            )}
+            {typeof tournament.registration_count === "number" && (
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-[#151515]">
+                {tournament.registration_count} заявок
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="p-5 sm:p-6">
@@ -224,7 +259,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
             <div className="flex items-center gap-3 text-[#151515]/75 sm:col-span-2">
               <CalendarDays className="w-5 h-5 text-[#151515]" />
               <span className="text-base">
-                {tournament.start_at ? formatSchedule(tournament.start_at) : formatCreatedAt(tournament.created_at)}
+                {scheduleLabel}
               </span>
             </div>
 
