@@ -72,19 +72,16 @@ export default function Home() {
 
       <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 text-center">
         <div className="flex min-h-screen flex-col items-center justify-center gap-7 py-8 sm:gap-9">
-          <div className="w-full">
-            <div className="mx-auto mb-5 flex w-fit items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-bold uppercase text-white/65">
-              <span className="h-2 w-2 rounded-full bg-red-500" />
-              <span className="h-2 w-2 rounded-full bg-blue-500" />
-              <span className="h-2 w-2 rounded-full bg-yellow-300" />
-              <span className="h-2 w-2 rounded-full bg-green-400" />
+          <div className="w-full pt-12 sm:pt-16">
+            <div className="brand-chip mx-auto mb-5 flex w-fit items-center gap-2 rounded-none px-3 py-2 text-xs font-bold uppercase">
+              <span className="h-2 w-2 bg-[#151515]" />
               Краснодарский шахматный клуб
             </div>
-            <h1 className="brand-wordmark mx-auto max-w-[980px] text-[4.5rem] text-white sm:text-[7rem] md:text-[9.5rem] lg:text-[12rem]">
+            <h1 className="brand-wordmark mx-auto max-w-[980px] text-[4.5rem] text-[#f7f7f2] sm:text-[7rem] md:text-[9.5rem] lg:text-[12rem]">
               <span>REP</span>
               <button
                 type="button"
-                className="inline-block cursor-pointer select-none text-white transition-colors hover:text-blue-400"
+                className="brand-underlink inline-block cursor-pointer select-none text-[#f7f7f2] transition-colors hover:text-white/70"
                 onClick={handleAdminGate}
                 aria-label="Открыть админку"
               >
@@ -92,7 +89,7 @@ export default function Home() {
               </button>
               <span>KRD</span>
             </h1>
-            <div className="brand-accent-line mx-auto mt-5 h-1 w-full max-w-[760px]" />
+            <div className="brand-accent-line mx-auto mt-5 w-full max-w-[760px]" />
           </div>
 
           <div className="grid w-full max-w-3xl grid-cols-1 gap-3 px-2 sm:grid-cols-2">
@@ -100,7 +97,7 @@ export default function Home() {
               className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/merch')}
             >
-              <ShoppingBag className="w-7 h-7 text-white flex-shrink-0" />
+              <ShoppingBag className="w-7 h-7 flex-shrink-0" />
               <span className="text-lg sm:text-xl">
                 Купить мерч
               </span>
@@ -110,7 +107,7 @@ export default function Home() {
               className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/tournaments')}
             >
-              <Calendar className="w-7 h-7 text-white flex-shrink-0" />
+              <Calendar className="w-7 h-7 flex-shrink-0" />
               <span className="text-lg sm:text-xl">
                 Расписание турниров
               </span>
@@ -120,7 +117,7 @@ export default function Home() {
               className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/lessons')}
             >
-              <GraduationCap className="w-7 h-7 text-white flex-shrink-0" />
+              <GraduationCap className="w-7 h-7 flex-shrink-0" />
               <span className="text-lg sm:text-xl">
                 Запись на урок
               </span>
@@ -130,7 +127,7 @@ export default function Home() {
               className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/partners')}
             >
-              <Building2 className="w-7 h-7 text-white flex-shrink-0" />
+              <Building2 className="w-7 h-7 flex-shrink-0" />
               <span className="text-lg sm:text-xl">
                 Для компаний
               </span>
@@ -140,7 +137,7 @@ export default function Home() {
               className="flex min-h-16 items-center justify-center gap-3 sm:col-span-2"
               onClick={() => router.push('/profile')}
             >
-              <User className="w-7 h-7 text-white flex-shrink-0" />
+              <User className="w-7 h-7 flex-shrink-0" />
               <span className="text-lg sm:text-xl">
                 Мой профиль
               </span>

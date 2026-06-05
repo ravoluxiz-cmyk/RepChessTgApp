@@ -18,7 +18,7 @@ const fadeUpVariants = {
 };
 function ChessboardPattern() {
   return (
-    <div className="absolute inset-0 opacity-[0.07]">
+    <div className="absolute inset-0 opacity-[0.045]">
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern
@@ -29,10 +29,10 @@ function ChessboardPattern() {
             height="96"
             patternUnits="userSpaceOnUse"
           >
-            <rect x="0" y="0" width="48" height="48" fill="#ffffff" />
+            <rect x="0" y="0" width="48" height="48" fill="#f7f7f2" />
             <rect x="48" y="0" width="48" height="48" fill="transparent" />
             <rect x="0" y="48" width="48" height="48" fill="transparent" />
-            <rect x="48" y="48" width="48" height="48" fill="#ffffff" />
+            <rect x="48" y="48" width="48" height="48" fill="#f7f7f2" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#chessboard)" />
@@ -55,12 +55,12 @@ export default function ChessBackground({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#050505]">
-      <div className="absolute inset-x-0 top-0 h-1 brand-accent-line" />
-      <div className="absolute left-0 top-1 h-[42vh] w-1/3 bg-red-500/[0.08] blur-[120px]" />
-      <div className="absolute right-0 top-1/4 h-[46vh] w-1/3 bg-blue-500/[0.08] blur-[130px]" />
-      <div className="absolute bottom-0 left-1/4 h-[34vh] w-1/2 bg-green-400/[0.055] blur-[130px]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(255,255,255,0.16),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_26%,rgba(0,0,0,0.7))]" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#151515] text-[#f7f7f2]">
+      <div className="brand-photo-strip absolute inset-x-0 top-0 h-16 opacity-95 sm:h-20" />
+      <div className="brand-pixel-corner right-5 top-24 rotate-3" />
+      <div className="brand-pixel-corner bottom-8 left-4 -rotate-6 opacity-[0.08]" />
+      <div className="brand-doodle right-[8%] top-[52%] h-28 w-56 -rotate-6 sm:h-40 sm:w-72" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(21,21,21,0)_0,rgba(21,21,21,0)_72px,#151515_72px)]" />
 
       <ChessboardPattern />
 
@@ -74,10 +74,10 @@ export default function ChessBackground({
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
-                className="brand-chip inline-flex items-center gap-2 rounded-lg px-4 py-2 mb-8 md:mb-12 backdrop-blur-sm"
+              className="brand-chip mb-8 inline-flex items-center gap-2 rounded-none px-4 py-2 md:mb-12"
             >
-              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-amber-400" />
-              <span className="text-sm text-white/70 tracking-wide font-medium">
+              <div className="h-2 w-2 bg-[#151515]" />
+              <span className="text-sm font-bold uppercase tracking-wide">
                 {badge}
               </span>
             </motion.div>
@@ -89,11 +89,11 @@ export default function ChessBackground({
               animate="visible"
             >
               <h1 className="brand-title text-5xl sm:text-6xl md:text-8xl mb-6 md:mb-8">
-                <span className="text-white">
+                <span className="text-[#f7f7f2]">
                   {title1}
                 </span>
                 <br />
-                <span className="text-white/80">
+                <span className="text-[#f7f7f2]">
                   {title2}
                 </span>
               </h1>
@@ -105,7 +105,7 @@ export default function ChessBackground({
               initial="hidden"
               animate="visible"
             >
-              <p className="text-base sm:text-lg md:text-xl text-white/50 mb-10 leading-relaxed font-light tracking-wide max-w-2xl mx-auto px-4">
+              <p className="mx-auto mb-10 max-w-2xl px-4 text-base font-medium leading-relaxed text-white/65 sm:text-lg md:text-xl">
                 {description}
               </p>
             </motion.div>
@@ -128,7 +128,7 @@ export default function ChessBackground({
         )}
       </div>
 
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.7),transparent_18%,transparent_82%,rgba(0,0,0,0.7))]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3 brand-accent-line opacity-70" />
     </div>
   );
 }

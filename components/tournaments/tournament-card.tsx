@@ -159,10 +159,10 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       variants={fadeUpVariant}
       initial="hidden"
       animate="visible"
-      className="brand-panel relative overflow-hidden rounded-lg transition-all duration-300 hover:border-white/30"
+      className="brand-panel relative overflow-hidden rounded-none transition-transform duration-300 hover:-translate-y-1"
     >
       <div className="grid md:grid-cols-[minmax(220px,320px)_1fr]">
-        <div className="relative min-h-56 bg-black/70 md:min-h-full">
+        <div className="relative min-h-56 border-b-2 border-[#151515] bg-[#151515] md:min-h-full md:border-b-0 md:border-r-2">
           {tournament.poster_url ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
@@ -172,9 +172,9 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full min-h-56 flex-col items-center justify-center gap-3 p-6 text-white/45">
-              <CalendarDays className="h-12 w-12 text-white/55" />
-              <span className="brand-font text-sm uppercase text-white/55">Афиша скоро</span>
+            <div className="flex h-full min-h-56 flex-col items-center justify-center gap-3 p-6 text-white/55">
+              <CalendarDays className="h-12 w-12 text-white/70" />
+              <span className="brand-font text-sm uppercase">Афиша скоро</span>
             </div>
           )}
         </div>
@@ -182,15 +182,15 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
         <div className="p-5 sm:p-6">
           {/* Header */}
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <h3 className="brand-title min-w-0 text-2xl text-white sm:text-3xl">{tournament.title}</h3>
+            <h3 className="brand-title min-w-0 text-2xl text-[#151515] sm:text-3xl">{tournament.title}</h3>
             <div className="flex flex-wrap gap-2">
               {Number(tournament.allow_join) === 1 && (
-                <span className="shrink-0 rounded-lg border border-green-400/35 bg-green-500/15 px-2.5 py-1 text-xs font-bold uppercase text-green-100">
+                <span className="shrink-0 border-2 border-[#151515] bg-[#20d66b] px-2.5 py-1 text-xs font-black uppercase text-[#151515]">
                   Запись открыта
                 </span>
               )}
               {tournament.source === "google_calendar" && (
-                <span className="shrink-0 rounded-lg border border-cyan-400/30 bg-cyan-500/15 px-2.5 py-1 text-xs font-semibold text-cyan-100">
+                <span className="shrink-0 border-2 border-[#151515] bg-white px-2.5 py-1 text-xs font-black uppercase text-[#151515]">
                   Google Calendar
                 </span>
               )}
@@ -199,52 +199,52 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
 
           {/* Info Grid */}
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="flex items-center gap-3 text-white/70">
-              <Trophy className="w-5 h-5 text-emerald-400" />
+            <div className="flex items-center gap-3 text-[#151515]/75">
+              <Trophy className="w-5 h-5 text-[#151515]" />
               <span className="text-base">{formatLabels[tournament.format] || tournament.format}</span>
             </div>
 
-            <div className="flex items-center gap-3 text-white/70">
-              <ListChecks className="w-5 h-5 text-amber-400" />
+            <div className="flex items-center gap-3 text-[#151515]/75">
+              <ListChecks className="w-5 h-5 text-[#151515]" />
               <span className="text-base">{tournament.rounds} раундов</span>
             </div>
 
-            <div className="flex items-center gap-3 text-white/70">
-              <Scale className="w-5 h-5 text-blue-400" />
+            <div className="flex items-center gap-3 text-[#151515]/75">
+              <Scale className="w-5 h-5 text-[#151515]" />
               <span className="text-base">
                 {tournament.points_win}/{tournament.points_draw}/{tournament.points_loss}, bye {tournament.bye_points}
               </span>
             </div>
 
-            <div className="flex items-center gap-3 text-white/70">
-              <Users className="w-5 h-5 text-purple-400" />
+            <div className="flex items-center gap-3 text-[#151515]/75">
+              <Users className="w-5 h-5 text-[#151515]" />
               <span className="text-base">{teamModeLabels[tournament.team_mode] || tournament.team_mode}</span>
             </div>
 
-            <div className="flex items-center gap-3 text-white/70 sm:col-span-2">
-              <CalendarDays className="w-5 h-5 text-cyan-400" />
+            <div className="flex items-center gap-3 text-[#151515]/75 sm:col-span-2">
+              <CalendarDays className="w-5 h-5 text-[#151515]" />
               <span className="text-base">
                 {tournament.start_at ? formatSchedule(tournament.start_at) : formatCreatedAt(tournament.created_at)}
               </span>
             </div>
 
             {tournament.location && (
-              <div className="flex items-center gap-3 text-white/70">
-                <MapPin className="w-5 h-5 text-rose-300" />
+              <div className="flex items-center gap-3 text-[#151515]/75">
+                <MapPin className="w-5 h-5 text-[#151515]" />
                 <span className="text-base">{tournament.location}</span>
               </div>
             )}
 
             {tournament.address && (
-              <div className="flex items-center gap-3 text-white/70">
-                <MapPin className="w-5 h-5 text-orange-300" />
+              <div className="flex items-center gap-3 text-[#151515]/75">
+                <MapPin className="w-5 h-5 text-[#151515]" />
                 <span className="text-base">{tournament.address}</span>
               </div>
             )}
           </div>
 
           {/* Description */}
-          <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-white/60">
+          <p className="mt-4 line-clamp-3 text-sm font-medium leading-relaxed text-[#151515]/65">
             {tournament.description || `Тай-брейки: ${tournament.tiebreakers || "по регламенту турнира"}`}
           </p>
 
@@ -254,7 +254,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 type="button"
                 onClick={handleRegister}
                 disabled={registering || registered}
-                className="brand-button inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm disabled:cursor-default disabled:opacity-70"
+                className="brand-button inline-flex items-center gap-2 rounded-none px-3 py-2 text-sm disabled:cursor-default disabled:opacity-70"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {registered ? "Вы зарегистрированы" : registering ? "Регистрация..." : "Зарегистрироваться"}
@@ -266,7 +266,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 href={tournament.yandex_maps_url}
                 target="_blank"
                 rel="noreferrer"
-                className="brand-button-dark inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm"
+                className="brand-button-dark inline-flex items-center gap-2 rounded-none px-3 py-2 text-sm"
               >
                 <MapPin className="h-4 w-4" />
                 Яндекс Карты
@@ -278,7 +278,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 href={tournament.event_url}
                 target="_blank"
                 rel="noreferrer"
-                className="brand-button-dark inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm"
+                className="brand-button-dark inline-flex items-center gap-2 rounded-none px-3 py-2 text-sm"
               >
                 <ExternalLink className="h-4 w-4" />
                 Открыть событие
@@ -287,21 +287,20 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
           </div>
 
           {registrationError && (
-            <div className="mt-3 rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-sm text-red-100">
+            <div className="mt-3 border-2 border-[#151515] bg-[#ff3131] px-3 py-2 text-sm font-bold text-white">
               {registrationError}
             </div>
           )}
 
           {registrationNote && (
-            <div className="mt-3 rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-50">
+            <div className="mt-3 border-2 border-[#151515] bg-white px-3 py-2 text-sm font-bold text-[#151515]">
               {registrationNote}
             </div>
           )}
         </div>
       </div>
 
-      {/* Gradient border effect */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-[linear-gradient(90deg,#ff3131,#2563ff,#ffd600,#20d66b)] opacity-80" />
+      <div className="brand-accent-line pointer-events-none absolute inset-x-0 bottom-0" />
     </motion.div>
   )
 }

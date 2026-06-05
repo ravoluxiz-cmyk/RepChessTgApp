@@ -48,7 +48,7 @@ export default function PartnersPage() {
     }
   }
 
-  const inputClass = "w-full rounded-lg border border-white/10 bg-black/30 px-3 py-3 text-white outline-none focus:border-emerald-300"
+  const inputClass = "w-full border-2 border-[#151515] bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
 
   return (
     <ChessBackground>
@@ -60,14 +60,14 @@ export default function PartnersPage() {
           </button>
 
           <div className="mb-6 flex items-center gap-3">
-            <Building2 className="h-8 w-8 text-emerald-300" />
+            <Building2 className="h-8 w-8 text-white" />
             <h1 className="brand-title text-3xl sm:text-5xl">Провести мероприятие с Rep Chess KRD</h1>
           </div>
 
           {message && <div className="mb-4 rounded-lg border border-emerald-400/30 bg-emerald-500/15 p-4 text-emerald-100">{message}</div>}
           {error && <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/15 p-4 text-red-100">{error}</div>}
 
-          <form onSubmit={submit} className="brand-panel space-y-4 rounded-lg p-5">
+          <form onSubmit={submit} className="brand-panel space-y-4 rounded-none p-5 text-[#151515]">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className="mb-2 block font-semibold">Имя</span>
@@ -102,7 +102,7 @@ export default function PartnersPage() {
               <textarea rows={5} value={form.comment} onChange={(e) => setForm((prev) => ({ ...prev, comment: e.target.value }))} className={`${inputClass} resize-none`} />
             </label>
 
-            <button disabled={saving} className="brand-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 disabled:opacity-60">
+            <button disabled={saving} className="brand-button inline-flex w-full items-center justify-center gap-2 rounded-none px-4 py-3 disabled:opacity-60">
               <Send className="h-5 w-5" />
               {saving ? "Отправка..." : "Отправить заявку"}
             </button>

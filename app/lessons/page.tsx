@@ -54,25 +54,25 @@ export default function LessonsPage() {
           <header className="flex items-center justify-between gap-3">
             <button
               onClick={() => router.push("/")}
-              className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-white transition-colors hover:bg-white/20"
+              className="brand-underlink inline-flex items-center gap-2 px-3 py-2 text-white transition-colors hover:text-white/70"
               aria-label="Назад"
             >
               <ArrowLeft className="h-5 w-5" />
               <span className="font-semibold">Главная</span>
             </button>
-            <div className="brand-chip inline-flex items-center gap-2 rounded-lg px-3 py-2">
-              <Trophy className="h-5 w-5 text-amber-300" />
+            <div className="brand-chip inline-flex items-center gap-2 rounded-none px-3 py-2">
+              <Trophy className="h-5 w-5" />
               <span className="brand-font text-sm">Уроки</span>
             </div>
           </header>
 
           <main className="grid gap-4 lg:grid-cols-[1fr_360px]">
-            <section className="brand-panel rounded-lg p-5 text-white">
+            <section className="brand-panel rounded-none p-5 text-[#151515]">
               <h1 className="brand-title mb-6 text-3xl sm:text-5xl">Запись на урок</h1>
 
               <div className="space-y-6">
                 <div>
-                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-white/60">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#151515]/60">
                     <Target className="h-4 w-4" />
                     Уровень
                   </div>
@@ -81,8 +81,8 @@ export default function LessonsPage() {
                       <button
                         key={item}
                         onClick={() => setLevel(item)}
-                        className={`rounded-lg border px-3 py-3 text-left ${
-                          level === item ? "border-emerald-300 bg-emerald-400/20" : "border-white/10 bg-white/5"
+                        className={`border-2 px-3 py-3 text-left font-semibold ${
+                          level === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515] bg-white text-[#151515]"
                         }`}
                       >
                         {item}
@@ -92,14 +92,14 @@ export default function LessonsPage() {
                 </div>
 
                 <div>
-                  <div className="mb-2 text-sm font-semibold text-white/60">Формат</div>
+                  <div className="mb-2 text-sm font-semibold text-[#151515]/60">Формат</div>
                   <div className="grid gap-2 sm:grid-cols-3">
                     {formats.map((item) => (
                       <button
                         key={item}
                         onClick={() => setFormat(item)}
-                        className={`rounded-lg border px-3 py-3 text-left ${
-                          format === item ? "border-amber-300 bg-amber-400/20" : "border-white/10 bg-white/5"
+                        className={`border-2 px-3 py-3 text-left font-semibold ${
+                          format === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515] bg-white text-[#151515]"
                         }`}
                       >
                         {item}
@@ -109,7 +109,7 @@ export default function LessonsPage() {
                 </div>
 
                 <div>
-                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-white/60">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#151515]/60">
                     <Clock className="h-4 w-4" />
                     Время
                   </div>
@@ -118,8 +118,8 @@ export default function LessonsPage() {
                       <button
                         key={item}
                         onClick={() => setTimeSlot(item)}
-                        className={`rounded-lg border px-3 py-3 text-left ${
-                          timeSlot === item ? "border-cyan-300 bg-cyan-400/20" : "border-white/10 bg-white/5"
+                        className={`border-2 px-3 py-3 text-left font-semibold ${
+                          timeSlot === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515] bg-white text-[#151515]"
                         }`}
                       >
                         {item}
@@ -129,35 +129,35 @@ export default function LessonsPage() {
                 </div>
 
                 <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-white/60">Цель</span>
+                  <span className="mb-2 block text-sm font-semibold text-[#151515]/60">Цель</span>
                   <textarea
                     value={goal}
                     onChange={(event) => setGoal(event.target.value)}
                     rows={4}
-                    className="w-full resize-none rounded-lg border border-white/10 bg-black/30 px-3 py-3 text-white outline-none focus:border-emerald-300"
+                    className="w-full resize-none border-2 border-[#151515] bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
                   />
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-white/60">Telegram или телефон</span>
+                  <span className="mb-2 block text-sm font-semibold text-[#151515]/60">Telegram или телефон</span>
                   <input
                     value={contact}
                     onChange={(event) => setContact(event.target.value)}
-                    className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-3 text-white outline-none focus:border-emerald-300"
+                    className="w-full border-2 border-[#151515] bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
                     placeholder="@username"
                   />
                 </label>
               </div>
             </section>
 
-            <aside className="brand-panel rounded-lg p-5 text-white">
+            <aside className="brand-panel rounded-none p-5 text-[#151515]">
               <h2 className="brand-title mb-4 text-2xl">Заявка</h2>
-              <div className="rounded-lg bg-black/30 p-4 text-sm text-white/80">
+              <div className="border-2 border-[#151515] bg-white p-4 text-sm font-semibold text-[#151515]/80">
                 <pre className="whitespace-pre-wrap font-sans">{requestText}</pre>
               </div>
               <button
                 onClick={shareRequest}
-                className="brand-button mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3"
+                className="brand-button mt-4 inline-flex w-full items-center justify-center gap-2 rounded-none px-4 py-3"
               >
                 {copied ? <Check className="h-5 w-5" /> : canShare ? <Send className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                 {copied ? "Заявка скопирована" : "Отправить заявку"}

@@ -171,7 +171,7 @@ export default function ProfilePage() {
           </Suspense>
 
           {/* Profile Card */}
-          <div className="brand-panel rounded-lg p-6 space-y-6">
+          <div className="brand-panel-dark rounded-lg p-6 space-y-6">
             {/* User Info */}
             <div className="flex items-center gap-4">
               <div className="bg-white/20 p-4 rounded-full">

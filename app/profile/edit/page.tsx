@@ -187,7 +187,7 @@ export default function ProfileEditPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Personal Info */}
-            <div className="brand-panel rounded-lg p-6 space-y-4">
+            <div className="brand-panel-dark rounded-lg p-6 space-y-4">
               <h2 className="text-xl font-bold text-white mb-4">
                 Личная информация
               </h2>
@@ -250,7 +250,7 @@ export default function ProfileEditPage() {
             </div>
 
             {/* Unified Rating */}
-            <div className="brand-panel rounded-lg p-6 space-y-2">
+            <div className="brand-panel-dark rounded-lg p-6 space-y-2">
               <h2 className="text-xl font-bold text-white mb-4">Рейтинг</h2>
               <div className="rounded-lg border border-amber-300/30 bg-amber-400/15 p-4 text-amber-50">
                 Рейтинг устанавливается вручную администратором по ссылке на Lichess или Chess.com. До проверки используется стартовый рейтинг 1500, пожалуйста, дождитесь обработки заявки.
@@ -258,7 +258,7 @@ export default function ProfileEditPage() {
             </div>
 
             {/* Social Links */}
-            <div className="brand-panel rounded-lg p-6 space-y-4">
+            <div className="brand-panel-dark rounded-lg p-6 space-y-4">
               <h2 className="text-xl font-bold text-white mb-4">
                 Ссылки на профили
               </h2>

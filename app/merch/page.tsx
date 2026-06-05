@@ -137,21 +137,21 @@ export default function MerchPage() {
           <header className="flex items-center justify-between gap-3">
             <button
               onClick={() => router.push("/")}
-              className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-white transition-colors hover:bg-white/20"
+              className="brand-underlink inline-flex items-center gap-2 px-3 py-2 text-white transition-colors hover:text-white/70"
               aria-label="Назад"
             >
               <ArrowLeft className="h-5 w-5" />
               <span className="font-semibold">Главная</span>
             </button>
-            <div className="brand-chip inline-flex items-center gap-2 rounded-lg px-3 py-2">
-              <ShoppingBag className="h-5 w-5 text-emerald-300" />
+            <div className="brand-chip inline-flex items-center gap-2 rounded-none px-3 py-2">
+              <ShoppingBag className="h-5 w-5" />
               <span className="brand-font text-sm">Мерч</span>
             </div>
           </header>
 
           <div>
             <h1 className="brand-title text-4xl text-white sm:text-6xl">REP CHESS KRD MERCH</h1>
-            <div className="brand-accent-line mt-3 h-1 w-52" />
+            <div className="brand-accent-line mt-3 w-52" />
           </div>
 
           <section className="grid gap-5 lg:grid-cols-[1fr_360px]">
@@ -160,13 +160,13 @@ export default function MerchPage() {
                 <button
                   key={item.id}
                   onClick={() => selectProduct(item.id)}
-                  className={`group overflow-hidden rounded-lg text-left text-white transition-colors ${
+                  className={`group overflow-hidden rounded-none text-left text-[#151515] transition-transform hover:-translate-y-1 ${
                     item.id === product.id
-                      ? "brand-panel border-white/40"
-                      : "brand-panel hover:border-white/30"
+                      ? "brand-panel"
+                      : "brand-panel"
                   }`}
                 >
-                  <div className="relative bg-black/30">
+                  <div className="relative border-b-2 border-[#151515] bg-[#151515]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.image}
@@ -174,41 +174,46 @@ export default function MerchPage() {
                       className="aspect-[4/5] w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                       loading={index < 3 ? "eager" : "lazy"}
                     />
-                    <div className="brand-font absolute left-3 top-3 rounded-lg bg-white px-2.5 py-1 text-xs text-black">
+                    <div className="brand-font absolute left-3 top-3 border-2 border-[#151515] bg-white px-2.5 py-1 text-xs text-black">
                       {item.price.toLocaleString("ru-RU")} ₽
                     </div>
+                    {item.id === product.id && (
+                      <div className="brand-font absolute bottom-3 right-3 border-2 border-[#151515] bg-[#ffd600] px-2.5 py-1 text-xs text-black">
+                        Выбрано
+                      </div>
+                    )}
                   </div>
                   <div className="p-4">
                     <div className="brand-font text-sm">{item.name}</div>
-                    <div className="mt-1 text-sm text-white/55">{item.id}</div>
+                    <div className="mt-1 text-sm font-semibold text-[#151515]/55">{item.id}</div>
                   </div>
                 </button>
               ))}
             </div>
 
-            <aside className="brand-panel h-fit rounded-lg p-5 text-white lg:sticky lg:top-6">
+            <aside className="brand-panel h-fit rounded-none p-5 text-[#151515] lg:sticky lg:top-6">
               <h2 className="brand-title mb-4 text-3xl">Заказ</h2>
 
               <div className="space-y-5">
-                <div className="overflow-hidden rounded-lg border border-white/10 bg-black/20">
+                <div className="overflow-hidden border-2 border-[#151515] bg-[#151515]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={product.image} alt={product.name} className="aspect-[4/5] w-full object-cover" />
                 </div>
 
                 <div>
                   <div className="brand-font text-lg">{product.name}</div>
-                  <div className="mt-1 text-white/60">{product.price.toLocaleString("ru-RU")} ₽</div>
+                  <div className="mt-1 font-bold text-[#151515]/60">{product.price.toLocaleString("ru-RU")} ₽</div>
                 </div>
 
                 <div>
-                  <div className="mb-2 text-sm font-semibold text-white/60">Цвет</div>
+                  <div className="mb-2 text-sm font-semibold text-[#151515]/60">Цвет</div>
                   <div className="flex flex-wrap gap-2">
                     {product.colors.map((item) => (
                       <button
                         key={item}
                         onClick={() => setColor(item)}
-                        className={`rounded-lg border px-3 py-2 text-sm ${
-                          color === item ? "border-emerald-300 bg-emerald-400/20" : "border-white/10 bg-white/5"
+                        className={`border-2 px-3 py-2 text-sm font-bold ${
+                          color === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515] bg-white text-[#151515]"
                         }`}
                       >
                         {item}
@@ -218,14 +223,14 @@ export default function MerchPage() {
                 </div>
 
                 <div>
-                  <div className="mb-2 text-sm font-semibold text-white/60">Размер</div>
+                  <div className="mb-2 text-sm font-semibold text-[#151515]/60">Размер</div>
                   <div className="flex flex-wrap gap-2">
                     {sizes.map((item) => (
                       <button
                         key={item}
                         onClick={() => setSize(item)}
-                        className={`min-w-11 rounded-lg border px-3 py-2 text-sm ${
-                          size === item ? "border-amber-300 bg-amber-400/20" : "border-white/10 bg-white/5"
+                        className={`min-w-11 border-2 px-3 py-2 text-sm font-bold ${
+                          size === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515] bg-white text-[#151515]"
                         }`}
                       >
                         {item}
@@ -235,8 +240,8 @@ export default function MerchPage() {
                 </div>
 
                 <div>
-                  <div className="mb-2 text-sm font-semibold text-white/60">Количество</div>
-                  <div className="inline-flex items-center rounded-lg border border-white/10 bg-white/5">
+                  <div className="mb-2 text-sm font-semibold text-[#151515]/60">Количество</div>
+                  <div className="inline-flex items-center border-2 border-[#151515] bg-white">
                     <button onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="p-3" aria-label="Уменьшить">
                       <Minus className="h-4 w-4" />
                     </button>
@@ -248,22 +253,22 @@ export default function MerchPage() {
                 </div>
 
                 <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-white/60">Telegram или телефон</span>
+                  <span className="mb-2 block text-sm font-semibold text-[#151515]/60">Telegram или телефон</span>
                   <input
                     value={contact}
                     onChange={(event) => setContact(event.target.value)}
-                    className="w-full rounded-lg border border-white/15 bg-black/55 px-3 py-3 text-white outline-none focus:border-white"
+                    className="w-full border-2 border-[#151515] bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
                     placeholder="@username"
                   />
                 </label>
 
-                <div className="rounded-lg bg-black/30 p-4 text-sm text-white/80">
+                <div className="border-2 border-[#151515] bg-white p-4 text-sm font-semibold text-[#151515]/80">
                   <pre className="whitespace-pre-wrap font-sans">{orderText}</pre>
                 </div>
 
                 <button
                   onClick={shareOrder}
-                  className="brand-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3"
+                  className="brand-button inline-flex w-full items-center justify-center gap-2 rounded-none px-4 py-3"
                 >
                   {copied ? <Check className="h-5 w-5" /> : canShare ? <Send className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                   {copied ? "Заявка скопирована" : "Отправить заявку"}
