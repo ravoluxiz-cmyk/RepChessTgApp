@@ -110,7 +110,7 @@ export default function AdminMainMenuPage() {
               {/* Create Tournament */}
               <button
                 onClick={() => router.push("/admin/tournaments/new")}
-                className="brand-panel-dark w-full rounded-lg p-5 text-left transition-all hover:border-white/50 sm:p-6"
+                className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
                   <PlusCircle className="w-6 h-6 text-emerald-400" />
@@ -122,7 +122,7 @@ export default function AdminMainMenuPage() {
               {/* Unified Tournaments */}
               <button
                 onClick={() => router.push("/admin/tournaments")}
-                className="brand-panel-dark w-full rounded-lg p-5 text-left transition-all hover:border-white/50 sm:p-6"
+                className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
                 title="Единый список турниров с переключателем «Все/Мои»"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
@@ -135,7 +135,7 @@ export default function AdminMainMenuPage() {
               {/* Archive */}
               <button
                 onClick={() => router.push("/admin/tournaments/archive")}
-                className="brand-panel-dark w-full rounded-lg p-5 text-left transition-all hover:border-white/50 sm:p-6"
+                className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
                   <Archive className="w-6 h-6 text-amber-400" />
@@ -146,7 +146,7 @@ export default function AdminMainMenuPage() {
 
               <button
                 onClick={() => router.push("/admin/rating-requests")}
-                className="brand-panel-dark w-full rounded-lg p-5 text-left transition-all hover:border-white/50 sm:p-6"
+                className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
                   <BadgeCheck className="w-6 h-6 text-cyan-400" />
@@ -157,7 +157,7 @@ export default function AdminMainMenuPage() {
 
               <button
                 onClick={() => router.push("/admin/partnership-requests")}
-                className="brand-panel-dark w-full rounded-lg p-5 text-left transition-all hover:border-white/50 sm:p-6"
+                className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
                   <Building2 className="w-6 h-6 text-emerald-400" />
@@ -168,7 +168,7 @@ export default function AdminMainMenuPage() {
 
               <button
                 onClick={() => router.push("/admin/stats")}
-                className="brand-panel-dark w-full rounded-lg p-5 text-left transition-all hover:border-white/50 sm:p-6"
+                className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
                   <BarChart3 className="w-6 h-6 text-amber-400" />

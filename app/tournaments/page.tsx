@@ -67,7 +67,7 @@ export default function TournamentsPage() {
             </div>
 
             <div className="text-center">
-              <div className="brand-chip mx-auto mb-4 w-fit rounded-lg px-3 py-1 text-xs font-bold uppercase">Rep Chess KRD Events</div>
+              <div className="brand-chip mx-auto mb-4 w-fit px-3 py-1 text-xs font-bold uppercase">Rep Chess KRD Events</div>
               <h1 className="brand-title text-4xl text-white sm:text-6xl md:text-7xl">
                 Расписание турниров
               </h1>

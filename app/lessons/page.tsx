@@ -60,14 +60,14 @@ export default function LessonsPage() {
               <ArrowLeft className="h-5 w-5" />
               <span className="font-semibold">Главная</span>
             </button>
-            <div className="brand-chip inline-flex items-center gap-2 rounded-none px-3 py-2">
+            <div className="brand-chip inline-flex items-center gap-2 px-3 py-2">
               <Trophy className="h-5 w-5" />
               <span className="brand-font text-sm">Уроки</span>
             </div>
           </header>
 
           <main className="grid gap-4 lg:grid-cols-[1fr_360px]">
-            <section className="brand-panel rounded-none p-5 text-[#151515]">
+            <section className="brand-panel rounded-[18px] p-5 text-[#151515]">
               <h1 className="brand-title mb-6 text-3xl sm:text-5xl">Запись на урок</h1>
 
               <div className="space-y-6">
@@ -81,8 +81,8 @@ export default function LessonsPage() {
                       <button
                         key={item}
                         onClick={() => setLevel(item)}
-                        className={`border-2 px-3 py-3 text-left font-semibold ${
-                          level === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515] bg-white text-[#151515]"
+                        className={`rounded-2xl border px-3 py-3 text-left font-semibold ${
+                          level === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515]/15 bg-white text-[#151515]"
                         }`}
                       >
                         {item}
@@ -98,8 +98,8 @@ export default function LessonsPage() {
                       <button
                         key={item}
                         onClick={() => setFormat(item)}
-                        className={`border-2 px-3 py-3 text-left font-semibold ${
-                          format === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515] bg-white text-[#151515]"
+                        className={`rounded-2xl border px-3 py-3 text-left font-semibold ${
+                          format === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515]/15 bg-white text-[#151515]"
                         }`}
                       >
                         {item}
@@ -118,8 +118,8 @@ export default function LessonsPage() {
                       <button
                         key={item}
                         onClick={() => setTimeSlot(item)}
-                        className={`border-2 px-3 py-3 text-left font-semibold ${
-                          timeSlot === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515] bg-white text-[#151515]"
+                        className={`rounded-2xl border px-3 py-3 text-left font-semibold ${
+                          timeSlot === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515]/15 bg-white text-[#151515]"
                         }`}
                       >
                         {item}
@@ -134,7 +134,7 @@ export default function LessonsPage() {
                     value={goal}
                     onChange={(event) => setGoal(event.target.value)}
                     rows={4}
-                    className="w-full resize-none border-2 border-[#151515] bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
+                    className="w-full resize-none rounded-2xl border border-[#151515]/15 bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
                   />
                 </label>
 
@@ -143,21 +143,21 @@ export default function LessonsPage() {
                   <input
                     value={contact}
                     onChange={(event) => setContact(event.target.value)}
-                    className="w-full border-2 border-[#151515] bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
+                    className="w-full rounded-2xl border border-[#151515]/15 bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
                     placeholder="@username"
                   />
                 </label>
               </div>
             </section>
 
-            <aside className="brand-panel rounded-none p-5 text-[#151515]">
+            <aside className="brand-panel rounded-[18px] p-5 text-[#151515]">
               <h2 className="brand-title mb-4 text-2xl">Заявка</h2>
-              <div className="border-2 border-[#151515] bg-white p-4 text-sm font-semibold text-[#151515]/80">
+              <div className="rounded-2xl border border-[#151515]/10 bg-white p-4 text-sm font-semibold text-[#151515]/80">
                 <pre className="whitespace-pre-wrap font-sans">{requestText}</pre>
               </div>
               <button
                 onClick={shareRequest}
-                className="brand-button mt-4 inline-flex w-full items-center justify-center gap-2 rounded-none px-4 py-3"
+                className="brand-button mt-4 inline-flex w-full items-center justify-center gap-2 px-4 py-3"
               >
                 {copied ? <Check className="h-5 w-5" /> : canShare ? <Send className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                 {copied ? "Заявка скопирована" : "Отправить заявку"}

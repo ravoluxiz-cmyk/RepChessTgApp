@@ -72,11 +72,13 @@ export default function Home() {
 
       <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 text-center">
         <div className="flex min-h-screen flex-col items-center justify-center gap-7 py-8 sm:gap-9">
-          <div className="w-full pt-12 sm:pt-16">
-            <div className="brand-chip mx-auto mb-5 flex w-fit items-center gap-2 rounded-none px-3 py-2 text-xs font-bold uppercase">
+          <div className="relative w-full pt-8 sm:pt-12">
+            <div className="brand-chip mx-auto mb-5 flex w-fit items-center gap-2 px-3 py-2 text-xs font-bold uppercase">
               <span className="h-2 w-2 bg-[#151515]" />
               Краснодарский шахматный клуб
             </div>
+            <div className="brand-sticker pointer-events-none absolute left-[7%] top-[18%] hidden h-10 w-24 rotate-[-8deg] bg-[#ff1515] opacity-90 md:block" />
+            <div className="brand-sticker pointer-events-none absolute right-[8%] top-[22%] hidden h-10 w-24 rotate-[7deg] bg-[#fff200] opacity-95 md:block" />
             <h1 className="brand-wordmark mx-auto max-w-[980px] text-[4.5rem] text-[#f7f7f2] sm:text-[7rem] md:text-[9.5rem] lg:text-[12rem]">
               <span>REP</span>
               <button
@@ -89,10 +91,10 @@ export default function Home() {
               </button>
               <span>KRD</span>
             </h1>
-            <div className="brand-accent-line mx-auto mt-5 w-full max-w-[760px]" />
+            <div className="brand-accent-line mx-auto mt-5 w-full max-w-[420px]" />
           </div>
 
-          <div className="grid w-full max-w-3xl grid-cols-1 gap-3 px-2 sm:grid-cols-2">
+          <div className="grid w-full max-w-3xl grid-cols-1 gap-4 px-2 sm:grid-cols-2">
             <HoverButton
               className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/merch')}

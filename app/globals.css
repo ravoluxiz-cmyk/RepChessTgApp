@@ -138,44 +138,51 @@
   }
 
   .brand-panel {
-    border: 2px solid #151515;
-    background: #f7f7f2;
+    border: 1px solid rgb(21 21 21 / 0.14);
+    border-radius: 18px;
+    background: rgb(247 247 242 / 0.96);
     color: #151515;
-    box-shadow: 8px 8px 0 #151515;
+    box-shadow: 0 22px 80px rgb(0 0 0 / 0.28), inset 0 1px 0 rgb(255 255 255 / 0.72);
   }
 
   .brand-panel-dark {
-    border: 2px solid #f7f7f2;
-    background: #151515;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    border-radius: 18px;
+    background: rgb(247 247 242 / 0.08);
     color: #f7f7f2;
-    box-shadow: 8px 8px 0 rgb(247 247 242 / 0.2);
+    box-shadow: 0 24px 80px rgb(0 0 0 / 0.32), inset 0 1px 0 rgb(255 255 255 / 0.12);
+    backdrop-filter: blur(18px);
   }
 
   .brand-chip {
-    border: 2px solid currentColor;
-    background: #f7f7f2;
+    border: 1px solid rgb(21 21 21 / 0.16);
+    border-radius: 999px;
+    background: rgb(247 247 242 / 0.94);
     color: #151515;
+    box-shadow: 0 12px 40px rgb(0 0 0 / 0.16);
   }
 
   .brand-button {
-    border: 2px solid #151515;
+    border: 1px solid rgb(21 21 21 / 0.26);
+    border-radius: 999px;
     background: #151515;
     color: #ffffff;
     font-weight: 900;
     text-transform: uppercase;
-    box-shadow: 4px 4px 0 #f7f7f2;
-    transition: transform 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+    box-shadow: 0 14px 34px rgb(0 0 0 / 0.22);
+    transition: transform 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease;
   }
 
   .brand-button:hover {
-    transform: translate(2px, 2px);
+    transform: translateY(-1px);
     background: #ffffff;
     color: #151515;
-    box-shadow: 2px 2px 0 #151515;
+    border-color: rgb(21 21 21 / 0.4);
   }
 
   .brand-button-dark {
-    border: 2px solid #151515;
+    border: 1px solid rgb(21 21 21 / 0.18);
+    border-radius: 999px;
     background: #ffffff;
     color: #151515;
     font-weight: 800;
@@ -188,10 +195,9 @@
   }
 
   .brand-accent-line {
-    height: 8px;
-    background:
-      linear-gradient(90deg, #151515 0 50%, transparent 50% 100%) 0 0 / 24px 8px repeat-x,
-      #f7f7f2;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ff1515 0 28%, #fff200 28% 53%, #1357ff 53% 79%, #20d66b 79% 100%);
   }
 
   .brand-underlink {
@@ -202,10 +208,8 @@
   }
 
   .brand-photo-strip {
-    background:
-      linear-gradient(90deg, #151515 0 28%, transparent 28% 35%, #151515 35% 66%, transparent 66% 72%, #151515 72% 100%),
-      repeating-linear-gradient(135deg, #151515 0 10px, #f7f7f2 10px 18px);
-    filter: contrast(140%);
+    background: url("/brand/doodles-large.svg") center / cover no-repeat;
+    filter: invert(1);
   }
 
   .brand-pixel-corner {
@@ -213,7 +217,7 @@
     width: clamp(92px, 18vw, 180px);
     aspect-ratio: 1;
     background: url("/brand/pixel-mark.svg") center / contain no-repeat;
-    opacity: 0.13;
+    opacity: 0.08;
     filter: invert(1);
     pointer-events: none;
   }
@@ -221,9 +225,33 @@
   .brand-doodle {
     position: absolute;
     background: url("/brand/doodles-small.svg") center / contain no-repeat;
-    opacity: 0.12;
+    opacity: 0.09;
     filter: invert(1);
     pointer-events: none;
+  }
+
+  .brand-noise {
+    background-image:
+      radial-gradient(circle at 30% 20%, rgb(255 255 255 / 0.13) 0 1px, transparent 1px),
+      radial-gradient(circle at 70% 80%, rgb(255 255 255 / 0.08) 0 1px, transparent 1px);
+    background-size: 28px 28px, 42px 42px;
+    mix-blend-mode: screen;
+  }
+
+  .brand-bg-illustration {
+    background: url("/brand/drawings-bank.svg") center / contain no-repeat;
+    filter: invert(1);
+  }
+
+  .brand-bg-icons {
+    background: url("/brand/doodles-large.svg") center / contain no-repeat;
+    filter: invert(1);
+  }
+
+  .brand-sticker {
+    border-radius: 999px;
+    color: #151515;
+    box-shadow: 0 18px 50px rgb(0 0 0 / 0.28);
   }
 }
 

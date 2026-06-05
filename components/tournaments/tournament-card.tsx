@@ -159,10 +159,10 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       variants={fadeUpVariant}
       initial="hidden"
       animate="visible"
-      className="brand-panel relative overflow-hidden rounded-none transition-transform duration-300 hover:-translate-y-1"
+      className="brand-panel relative overflow-hidden rounded-[18px] transition-transform duration-300 hover:-translate-y-1"
     >
       <div className="grid md:grid-cols-[minmax(220px,320px)_1fr]">
-        <div className="relative min-h-56 border-b-2 border-[#151515] bg-[#151515] md:min-h-full md:border-b-0 md:border-r-2">
+        <div className="relative min-h-56 border-b border-[#151515]/10 bg-[#151515] md:min-h-full md:border-b-0 md:border-r">
           {tournament.poster_url ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
@@ -185,12 +185,12 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
             <h3 className="brand-title min-w-0 text-2xl text-[#151515] sm:text-3xl">{tournament.title}</h3>
             <div className="flex flex-wrap gap-2">
               {Number(tournament.allow_join) === 1 && (
-                <span className="shrink-0 border-2 border-[#151515] bg-[#20d66b] px-2.5 py-1 text-xs font-black uppercase text-[#151515]">
+                <span className="shrink-0 rounded-full border border-[#151515]/15 bg-[#20d66b] px-2.5 py-1 text-xs font-black uppercase text-[#151515]">
                   Запись открыта
                 </span>
               )}
               {tournament.source === "google_calendar" && (
-                <span className="shrink-0 border-2 border-[#151515] bg-white px-2.5 py-1 text-xs font-black uppercase text-[#151515]">
+                <span className="shrink-0 rounded-full border border-[#151515]/15 bg-white px-2.5 py-1 text-xs font-black uppercase text-[#151515]">
                   Google Calendar
                 </span>
               )}
@@ -254,7 +254,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 type="button"
                 onClick={handleRegister}
                 disabled={registering || registered}
-                className="brand-button inline-flex items-center gap-2 rounded-none px-3 py-2 text-sm disabled:cursor-default disabled:opacity-70"
+                className="brand-button inline-flex items-center gap-2 px-3 py-2 text-sm disabled:cursor-default disabled:opacity-70"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {registered ? "Вы зарегистрированы" : registering ? "Регистрация..." : "Зарегистрироваться"}
@@ -266,7 +266,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 href={tournament.yandex_maps_url}
                 target="_blank"
                 rel="noreferrer"
-                className="brand-button-dark inline-flex items-center gap-2 rounded-none px-3 py-2 text-sm"
+                className="brand-button-dark inline-flex items-center gap-2 px-3 py-2 text-sm"
               >
                 <MapPin className="h-4 w-4" />
                 Яндекс Карты
@@ -278,7 +278,7 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
                 href={tournament.event_url}
                 target="_blank"
                 rel="noreferrer"
-                className="brand-button-dark inline-flex items-center gap-2 rounded-none px-3 py-2 text-sm"
+                className="brand-button-dark inline-flex items-center gap-2 px-3 py-2 text-sm"
               >
                 <ExternalLink className="h-4 w-4" />
                 Открыть событие
@@ -287,13 +287,13 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
           </div>
 
           {registrationError && (
-            <div className="mt-3 border-2 border-[#151515] bg-[#ff3131] px-3 py-2 text-sm font-bold text-white">
+            <div className="mt-3 rounded-xl border border-[#151515]/15 bg-[#ff3131] px-3 py-2 text-sm font-bold text-white">
               {registrationError}
             </div>
           )}
 
           {registrationNote && (
-            <div className="mt-3 border-2 border-[#151515] bg-white px-3 py-2 text-sm font-bold text-[#151515]">
+            <div className="mt-3 rounded-xl border border-[#151515]/15 bg-white px-3 py-2 text-sm font-bold text-[#151515]">
               {registrationNote}
             </div>
           )}

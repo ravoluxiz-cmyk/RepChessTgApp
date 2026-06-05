@@ -28,19 +28,20 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
       <button
         ref={setCombinedRef}
         className={cn(
-          "relative isolate px-8 py-4 rounded-lg",
+          "relative isolate px-8 py-4 rounded-[22px]",
           "brand-font text-base leading-6 uppercase",
-          "text-white font-black",
-          "bg-[#151515] border-2 border-[#151515]",
+          "text-[#151515] font-black",
+          "bg-[#f7f7f2] border border-white/30",
           "cursor-pointer overflow-hidden",
           "before:content-[''] before:absolute before:inset-0",
           "before:rounded-[inherit] before:pointer-events-none",
           "before:z-[1]",
-          "before:shadow-[6px_6px_0_#f7f7f2]",
-          "before:transition-transform before:duration-200",
-          "transition-transform duration-200",
-          "hover:translate-x-1 hover:translate-y-1 hover:bg-white hover:text-[#151515]",
-          "active:translate-x-1 active:translate-y-1",
+          "before:bg-[radial-gradient(circle_at_18%_20%,rgba(255,21,21,0.18),transparent_26%),radial-gradient(circle_at_86%_78%,rgba(19,87,255,0.16),transparent_28%)]",
+          "before:opacity-70",
+          "shadow-[0_18px_48px_rgba(0,0,0,0.28)]",
+          "transition-all duration-200",
+          "hover:-translate-y-1 hover:bg-white hover:shadow-[0_24px_68px_rgba(0,0,0,0.36)]",
+          "active:translate-y-0",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           className
         )}

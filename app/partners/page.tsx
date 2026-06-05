@@ -48,7 +48,7 @@ export default function PartnersPage() {
     }
   }
 
-  const inputClass = "w-full border-2 border-[#151515] bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
+  const inputClass = "w-full rounded-2xl border border-[#151515]/15 bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
 
   return (
     <ChessBackground>
@@ -67,7 +67,7 @@ export default function PartnersPage() {
           {message && <div className="mb-4 rounded-lg border border-emerald-400/30 bg-emerald-500/15 p-4 text-emerald-100">{message}</div>}
           {error && <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/15 p-4 text-red-100">{error}</div>}
 
-          <form onSubmit={submit} className="brand-panel space-y-4 rounded-none p-5 text-[#151515]">
+          <form onSubmit={submit} className="brand-panel space-y-4 rounded-[18px] p-5 text-[#151515]">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className="mb-2 block font-semibold">Имя</span>
@@ -102,7 +102,7 @@ export default function PartnersPage() {
               <textarea rows={5} value={form.comment} onChange={(e) => setForm((prev) => ({ ...prev, comment: e.target.value }))} className={`${inputClass} resize-none`} />
             </label>
 
-            <button disabled={saving} className="brand-button inline-flex w-full items-center justify-center gap-2 rounded-none px-4 py-3 disabled:opacity-60">
+            <button disabled={saving} className="brand-button inline-flex w-full items-center justify-center gap-2 px-4 py-3 disabled:opacity-60">
               <Send className="h-5 w-5" />
               {saving ? "Отправка..." : "Отправить заявку"}
             </button>

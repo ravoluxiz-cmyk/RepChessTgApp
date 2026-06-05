@@ -16,30 +16,6 @@ const fadeUpVariants = {
     },
   }),
 };
-function ChessboardPattern() {
-  return (
-    <div className="absolute inset-0 opacity-[0.045]">
-      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern
-            id="chessboard"
-            x="0"
-            y="0"
-            width="96"
-            height="96"
-            patternUnits="userSpaceOnUse"
-          >
-            <rect x="0" y="0" width="48" height="48" fill="#f7f7f2" />
-            <rect x="48" y="0" width="48" height="48" fill="transparent" />
-            <rect x="0" y="48" width="48" height="48" fill="transparent" />
-            <rect x="48" y="48" width="48" height="48" fill="#f7f7f2" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#chessboard)" />
-      </svg>
-    </div>
-  );
-}
 
 export default function ChessBackground({
   badge = "Обучающая платформа",
@@ -56,13 +32,13 @@ export default function ChessBackground({
 }) {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#151515] text-[#f7f7f2]">
-      <div className="brand-photo-strip absolute inset-x-0 top-0 h-16 opacity-95 sm:h-20" />
-      <div className="brand-pixel-corner right-5 top-24 rotate-3" />
-      <div className="brand-pixel-corner bottom-8 left-4 -rotate-6 opacity-[0.08]" />
-      <div className="brand-doodle right-[8%] top-[52%] h-28 w-56 -rotate-6 sm:h-40 sm:w-72" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(21,21,21,0)_0,rgba(21,21,21,0)_72px,#151515_72px)]" />
-
-      <ChessboardPattern />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_12%,rgba(255,255,255,0.13),transparent_24%),radial-gradient(circle_at_86%_18%,rgba(19,87,255,0.16),transparent_20%),radial-gradient(circle_at_12%_86%,rgba(255,21,21,0.14),transparent_22%),radial-gradient(circle_at_80%_84%,rgba(255,242,0,0.10),transparent_18%),linear-gradient(180deg,#111111_0%,#171717_48%,#0f0f0f_100%)]" />
+      <div className="brand-noise absolute inset-0 opacity-[0.18]" />
+      <div className="brand-bg-icons pointer-events-none absolute -right-28 top-28 hidden h-[430px] w-[520px] rotate-6 opacity-[0.045] md:block" />
+      <div className="brand-bg-illustration pointer-events-none absolute -left-28 bottom-8 hidden h-[320px] w-[520px] -rotate-3 opacity-[0.07] lg:block" />
+      <div className="pointer-events-none absolute left-4 top-24 h-24 w-48 rounded-full bg-[#ff1515]/15 blur-3xl sm:left-[10%]" />
+      <div className="pointer-events-none absolute right-4 top-[42%] h-28 w-56 rounded-full bg-[#1357ff]/14 blur-3xl sm:right-[12%]" />
+      <div className="pointer-events-none absolute bottom-16 left-[52%] h-24 w-48 rounded-full bg-[#20d66b]/10 blur-3xl" />
 
       <div className="relative z-10 mx-auto w-full max-w-[1480px] px-4 md:px-6">
         {children ? (
@@ -74,7 +50,7 @@ export default function ChessBackground({
               variants={fadeUpVariants}
               initial="hidden"
               animate="visible"
-              className="brand-chip mb-8 inline-flex items-center gap-2 rounded-none px-4 py-2 md:mb-12"
+              className="brand-chip mb-8 inline-flex items-center gap-2 px-4 py-2 md:mb-12"
             >
               <div className="h-2 w-2 bg-[#151515]" />
               <span className="text-sm font-bold uppercase tracking-wide">
@@ -128,7 +104,7 @@ export default function ChessBackground({
         )}
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3 brand-accent-line opacity-70" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/10" />
     </div>
   );
 }
