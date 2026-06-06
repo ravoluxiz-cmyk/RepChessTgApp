@@ -232,7 +232,7 @@ export async function validateRatingEligibility(userId: number): Promise<{
     }
 
     // Check minimum rating (if needed)
-    const minRating = 800
+    const minRating = 100
     if (user.rating < minRating) {
       warnings.push(`Low rating (${user.rating}) may affect pairing quality`)
     }

@@ -1,5 +1,5 @@
 import { Glicko2, type Player } from 'glicko2'
-import { supabase } from '../supabase'
+import { supabaseAdmin } from '../supabase'
 import { getUserById, type User } from '../db'
 
 // Types for rating system
@@ -87,7 +87,7 @@ export class RatingService {
       const initialRating = this.calculateInitialRating(user)
 
       // Create new rating entry
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('player_ratings')
         .insert({
           user_id: userId,
@@ -107,6 +107,18 @@ export class RatingService {
         throw new Error(`Failed to initialize player rating: ${error.message}`)
       }
 
+      const { error: userRatingError } = await supabaseAdmin
+        .from('users')
+        .update({
+          rating: Math.round(initialRating.rating),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId)
+
+      if (userRatingError) {
+        console.error('Error syncing initialized user rating:', userRatingError)
+      }
+
       return data as PlayerRating
     } catch (error) {
       console.error('Error initializing player rating:', error)
@@ -118,27 +130,13 @@ export class RatingService {
    * Calculate initial rating based on existing chess ratings
    */
   private calculateInitialRating(user: User): { rating: number; rd: number; volatility: number } {
-    // Use unified rating field with confidence-based RD values
-    if (user.rating && user.rating > 800) {
-      // User has an established rating (above default)
-      return {
-        rating: user.rating,
-        rd: 150,  // Medium confidence for established players
-        volatility: 0.06
-      }
-    } else if (user.rating && user.rating <= 800) {
-      // User has default or below-default rating
-      return {
-        rating: user.rating,
-        rd: 250,  // Higher uncertainty for new/unrated players
-        volatility: 0.06
-      }
-    }
+    void user
 
-    // Fallback to default values (should not happen with NOT NULL constraint)
+    // Every player now enters the internal club rating from the same baseline.
+    // High RD keeps them in calibration until enough rated games are played.
     return {
-      rating: 800,    // Default unified rating
-      rd: 350,        // High uncertainty
+      rating: 1500,
+      rd: 350,
       volatility: 0.06
     }
   }
@@ -148,7 +146,7 @@ export class RatingService {
    */
   async getPlayerRating(userId: number): Promise<PlayerRating | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('player_ratings')
         .select('*')
         .eq('user_id', userId)
@@ -300,7 +298,7 @@ export class RatingService {
    */
   private async updatePlayerRating(updatedRating: PlayerRating): Promise<PlayerRating | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('player_ratings')
         .update({
           rating: updatedRating.rating,
@@ -319,6 +317,18 @@ export class RatingService {
 
       if (error) {
         throw new Error(`Failed to update player rating: ${error.message}`)
+      }
+
+      const { error: userRatingError } = await supabaseAdmin
+        .from('users')
+        .update({
+          rating: Math.round(updatedRating.rating),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', updatedRating.user_id)
+
+      if (userRatingError) {
+        console.error('Error syncing user rating:', userRatingError)
       }
 
       return data as PlayerRating
@@ -347,7 +357,7 @@ export class RatingService {
     gameResult?: string | null
   }): Promise<RatingHistory> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('rating_history')
         .insert({
           user_id: history.userId,
@@ -383,7 +393,7 @@ export class RatingService {
    */
   async getRatingHistory(userId: number, limit: number = 50): Promise<RatingHistory[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('rating_history')
         .select('*')
         .eq('user_id', userId)
@@ -416,7 +426,7 @@ export class RatingService {
     global_rank: number
   }>> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('rating_leaderboard')
         .select('*')
         .limit(limit)

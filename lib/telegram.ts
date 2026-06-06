@@ -153,7 +153,7 @@ export function getTelegramUserFromHeaders(
 /**
  * Check if Telegram user is an admin based on database role
  * Checks the 'role' field in the users table
- * Falls back to ADMIN_TELEGRAM_ID env variable if user not found in database
+ * Falls back to ADMIN_TELEGRAM_ID env variable for backwards compatibility
  */
 export async function isAdmin(user: TelegramUser | null): Promise<boolean> {
   if (!user) return false
@@ -164,7 +164,15 @@ export async function isAdmin(user: TelegramUser | null): Promise<boolean> {
   // Check database role first
   const dbUser = await getUserByTelegramId(user.id)
   if (dbUser) {
-    return dbUser.role === 'admin' || dbUser.role === 'moderator'
+    const { isAdministrativePlayerStatus, resolvePlayerStatus } = await import("./player-status")
+    const playerStatus = resolvePlayerStatus(dbUser.player_status, dbUser.role)
+    if (
+      dbUser.role === 'admin' ||
+      dbUser.role === 'moderator' ||
+      isAdministrativePlayerStatus(playerStatus)
+    ) {
+      return true
+    }
   }
 
   // Fallback to env variable for backwards compatibility

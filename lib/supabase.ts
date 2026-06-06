@@ -20,6 +20,8 @@ interface MemStore {
   partnership_requests: MemRow[]
   lesson_requests: MemRow[]
   merch_orders: MemRow[]
+  player_ratings: MemRow[]
+  rating_history: MemRow[]
   rounds: MemRow[]
   matches: MemRow[]
   leaderboard: MemRow[]
@@ -39,10 +41,12 @@ function getGlobalStore(): MemStore {
       partnership_requests: [],
       lesson_requests: [],
       merch_orders: [],
+      player_ratings: [],
+      rating_history: [],
       rounds: [],
       matches: [],
       leaderboard: [],
-      counters: { users: 0, tournaments: 0, tournament_participants: 0, tournament_registrations: 0, rating_requests: 0, partnership_requests: 0, lesson_requests: 0, merch_orders: 0, rounds: 0, matches: 0, leaderboard: 0 }
+      counters: { users: 0, tournaments: 0, tournament_participants: 0, tournament_registrations: 0, rating_requests: 0, partnership_requests: 0, lesson_requests: 0, merch_orders: 0, player_ratings: 0, rating_history: 0, rounds: 0, matches: 0, leaderboard: 0 }
     } as MemStore
   }
   return g.__MEM_SUPABASE_STORE__ as MemStore
@@ -98,6 +102,13 @@ class QueryBuilder {
   eq(column: string, value: any) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.filters.push((row) => (row as any)[column] === value)
+    return this
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  neq(column: string, value: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.filters.push((row) => (row as any)[column] !== value)
     return this
   }
 
@@ -339,6 +350,7 @@ export interface Database {
           lichess_url: string | null
           bio: string | null
           role: string
+          player_status: string | null
           created_at: string
           updated_at: string
         }
@@ -353,6 +365,7 @@ export interface Database {
           lichess_url?: string | null
           bio?: string | null
           role?: string
+          player_status?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -367,6 +380,7 @@ export interface Database {
           lichess_url?: string | null
           bio?: string | null
           role?: string
+          player_status?: string | null
           created_at?: string
           updated_at?: string
         }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut, BarChart3, BadgeCheck, Building2 } from "lucide-react"
+import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut, BarChart3, Building2, Users } from "lucide-react"
 
 export default function AdminMainMenuPage() {
   const router = useRouter()
@@ -165,14 +165,14 @@ export default function AdminMainMenuPage() {
               </button>
 
               <button
-                onClick={() => router.push("/admin/rating-requests")}
+                onClick={() => router.push("/admin/users")}
                 className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
               >
                 <div className="flex items-center gap-3 text-white mb-2">
-                  <BadgeCheck className="w-6 h-6 text-[#1357ff]" />
-                  <span className="text-lg sm:text-xl font-bold">Заявки рейтинга</span>
+                  <Users className="w-6 h-6 text-[#1357ff]" />
+                  <span className="text-lg sm:text-xl font-bold">Игроки и статусы</span>
                 </div>
-                <div className="text-white/70">Проверка Lichess / Chess.com и ручное установление рейтинга</div>
+                <div className="text-white/70">Назначение статусов и контроль Glicko-калибровки</div>
               </button>
 
               <button

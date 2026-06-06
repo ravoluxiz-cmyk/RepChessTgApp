@@ -185,6 +185,8 @@ export default function RatingDisplay({
     return timeControlCategories.find(cat => rating >= cat.min && rating < cat.max) || timeControlCategories[0]
   }
 
+  const isCalibrating = (rating: PlayerRating) => rating.games_played < 10 || rating.rd >= 250
+
   const getConfidenceLevel = (rd: number) => {
     if (rd < 50) return { level: 'Очень высокая', color: 'text-green-400' }
     if (rd < 100) return { level: 'Высокая', color: 'text-green-300' }
@@ -276,6 +278,7 @@ export default function RatingDisplay({
         {filteredRatings.map((rating, index) => {
           const category = getRatingCategory(rating.rating, rating.time_control)
           const confidence = getConfidenceLevel(rating.rd)
+          const calibrating = isCalibrating(rating)
           
           return (
             <motion.div
@@ -301,10 +304,10 @@ export default function RatingDisplay({
                       #{rating.rank}
                     </div>
                   )}
-                  <div className={`text-xs px-2 py-1 rounded-full ${category.color} ${
+                  <div className={`text-xs px-2 py-1 rounded-full ${calibrating ? 'text-amber-300' : category.color} ${
                     theme === 'dark' ? 'bg-white/10' : 'bg-gray-100'
                   }`}>
-                    {category.name}
+                    {calibrating ? 'Калибровка' : category.name}
                   </div>
                 </div>
               </div>
@@ -325,7 +328,7 @@ export default function RatingDisplay({
                   <div className={`text-xs ${
                     theme === 'dark' ? 'text-white/40' : 'text-gray-500'
                   }`}>
-                    ±{Math.round(rating.rd)} (точность)
+                    ±{Math.round(rating.rd)} RD
                   </div>
                 </div>
 

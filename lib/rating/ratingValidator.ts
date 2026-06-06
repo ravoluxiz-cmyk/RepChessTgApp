@@ -4,7 +4,7 @@ import type { User } from '../db'
 import type { RatingValidationResult, RatingHistory } from './types'
 
 export class RatingValidator {
-  private readonly MIN_RATING_FOR_TOURNAMENT = 800
+  private readonly MIN_RATING_FOR_TOURNAMENT = 100
   private readonly MAX_RATING_DIFFERENCE = 400
   private readonly MAX_RATING_CHANGE = 200
   private readonly MIN_TIME_BETWEEN_UPDATES = 60 // seconds
@@ -26,11 +26,6 @@ export class RatingValidator {
 
       const errors: string[] = []
       const warnings: string[] = []
-
-      // Check if user has required rating
-      if (!this.hasRequiredRating(user)) {
-        errors.push('Необходимо указать хотя бы один рейтинг (FIDE, Chess.com или Lichess)')
-      }
 
       // Check minimum rating
       const effectiveRating = this.getEffectiveRating(user)
@@ -141,10 +136,10 @@ export class RatingValidator {
       const missingFields: string[] = []
       const suggestions: string[] = []
 
-      // Check for chess ratings
+      // Check internal club rating baseline
       if (!user.rating || user.rating < 100) {
         missingFields.push('rating')
-        suggestions.push('Рейтинг должен быть не менее 100')
+        suggestions.push('Клубный рейтинг создается автоматически от 1500')
       }
 
       // Check for profile completeness
@@ -177,17 +172,10 @@ export class RatingValidator {
   }
 
   /**
-   * Check if user has required rating
-   */
-  private hasRequiredRating(user: User): boolean {
-    return !!(user.rating && user.rating >= 100)
-  }
-
-  /**
-   * Get effective rating (priority: FIDE > Chess.com > Lichess)
+   * Get effective internal club rating
    */
   private getEffectiveRating(user: User): number {
-    return user.rating || 0
+    return user.rating || 1500
   }
 
   /**

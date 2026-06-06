@@ -8,10 +8,11 @@ import { User, Edit, Link as LinkIcon, ArrowLeft, BadgeCheck, Trophy } from "luc
 import { useSearchParams } from "next/navigation"
 import RatingDisplay from "@/components/rating/RatingDisplay"
 import { getProfileAuthHeaders } from "@/lib/web-user"
+import { resolvePlayerStatus } from "@/lib/player-status"
 
-// Pure helper — hoisted out of component (rendering-hoist-jsx)
-function isProfileIncomplete(profile: { chesscom_url?: string | null; lichess_url?: string | null; bio?: string | null }): boolean {
-  return !profile.chesscom_url && !profile.lichess_url && !profile.bio
+// Pure helper - hoisted out of component (rendering-hoist-jsx)
+function isProfileIncomplete(profile: { first_name?: string | null; last_name?: string | null }): boolean {
+  return !profile.first_name || !profile.last_name
 }
 
 function formatJoinedAt(value: string) {
@@ -34,7 +35,7 @@ function SuccessBanner() {
 
   return (
     <div className="mb-6 bg-green-600/80 border border-green-400 text-white rounded-lg p-4 text-center font-bold">
-      Профиль сохранен. Заявка на установление рейтинга отправлена администратору.
+      Профиль сохранен.
     </div>
   )
 }
@@ -49,6 +50,8 @@ interface UserProfile {
   chesscom_url?: string
   lichess_url?: string
   bio?: string
+  role?: string | null
+  player_status?: string | null
   created_at: string
   updated_at: string
 }
@@ -152,6 +155,7 @@ export default function ProfilePage() {
 
   const displayName = `${profile.first_name} ${profile.last_name}`.trim()
   const joinedAt = formatJoinedAt(profile.created_at)
+  const playerStatus = resolvePlayerStatus(profile.player_status, profile.role)
 
   return (
     <ChessBackground>
@@ -220,7 +224,7 @@ export default function ProfilePage() {
                       <BadgeCheck className="h-4 w-4" />
                       Статус
                     </div>
-                    <div className="mt-2 text-sm font-black uppercase">Профиль</div>
+                    <div className="mt-2 text-sm font-black uppercase">{playerStatus}</div>
                   </div>
                 </div>
               </div>
@@ -234,7 +238,7 @@ export default function ProfilePage() {
 
             <div className="space-y-6 border-t border-white/10 p-6 sm:p-7">
               <div className="rounded-2xl border border-amber-300/30 bg-amber-400/15 p-3 text-sm font-semibold text-amber-50">
-                Если рейтинг еще не подтвержден администратором, используется стартовое значение 1500.
+                Стартовый клубный рейтинг: 1500. Высокий RD означает калибровку: после рейтинговых партий система Glicko-2 уточнит силу игрока.
               </div>
 
               <div>

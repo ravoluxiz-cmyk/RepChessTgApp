@@ -534,7 +534,7 @@ export default function TournamentParticipantsPage() {
                           className="w-full text-left px-3 py-2 hover:bg-white/10 text-white"
                         >
                           <div className="font-medium">{u.first_name ?? ""} {u.last_name ?? ""}</div>
-                          <div className="text-sm text-white/70">@{u.username || u.telegram_id} • Рейтинг: {u.rating || 800}</div>
+                          <div className="text-sm text-white/70">@{u.username || u.telegram_id} • Рейтинг: {u.rating || 1500}</div>
                         </button>
                       ))}
                     </div>

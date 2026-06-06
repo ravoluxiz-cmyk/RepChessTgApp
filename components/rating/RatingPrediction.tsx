@@ -52,7 +52,7 @@ function normalizePlayerRating(payload: RatingApiPayload, fallbackUserId: number
 
   return {
     userId: String(rating?.user_id ?? rating?.userId ?? fallbackUserId),
-    rating: Number(rating?.rating ?? 800),
+    rating: Number(rating?.rating ?? 1500),
     rd: Number(rating?.rd ?? 350),
     volatility: Number(rating?.volatility ?? 0.06)
   };

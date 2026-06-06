@@ -1,4 +1,6 @@
 import { supabase, supabaseAdmin } from './supabase'
+import type { PlayerStatus } from './player-status'
+import { normalizePlayerStatus, resolvePlayerStatus } from './player-status'
 
 // Types matching our database schema
 export interface User {
@@ -12,6 +14,7 @@ export interface User {
   lichess_url?: string | null
   bio?: string | null
   role?: string
+  player_status?: PlayerStatus | string | null
   created_at?: string
   updated_at?: string
 }
@@ -122,7 +125,7 @@ export interface AdminStats {
   lessonRequests: number
   merchOrders: number
   partnershipRequests: number
-  pendingRatingRequests: number
+  calibratingPlayers: number
   popularTournaments: Array<{ tournament_id: number; title: string; registrations: number; attended: number }>
   attendanceByTournament: Array<{ tournament_id: number; title: string; attended: number }>
   popularPartnershipFormats: Array<{ format: string; count: number }>
@@ -268,6 +271,52 @@ export async function getAllUsers(): Promise<User[]> {
   return (data || []) as User[]
 }
 
+export async function updateUserPlayerStatus(
+  userId: number,
+  playerStatus: PlayerStatus
+): Promise<User | null> {
+  const normalizedStatus = normalizePlayerStatus(playerStatus)
+  const { data, error } = await supabaseAdmin
+    .from('users')
+    .update({
+      player_status: normalizedStatus,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', userId)
+    .select('*')
+    .single()
+
+  if (!error) {
+    return data as User
+  }
+
+  const message = String(error.message || '')
+  if (!message.includes('player_status')) {
+    console.error('Error updating user player status:', error)
+    return null
+  }
+
+  const fallback = await supabaseAdmin
+    .from('users')
+    .update({
+      role: normalizedStatus,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', userId)
+    .select('*')
+    .single()
+
+  if (fallback.error) {
+    console.error('Error updating fallback user status:', fallback.error)
+    return null
+  }
+
+  return {
+    ...(fallback.data as User),
+    player_status: resolvePlayerStatus(null, (fallback.data as User).role),
+  }
+}
+
 export async function searchUsersByUsernameFragment(fragment: string, limit = 8): Promise<User[]> {
   const q = (fragment || '').trim()
   if (!q) return []
@@ -302,13 +351,12 @@ export async function seedTestUsers(count = 20): Promise<{ inserted: number }> {
         username: `test${i}`,
         first_name: `Тест${i}`,
         last_name: `Пользователь${i}`,
-        fide_rating: null,
-        chesscom_rating: null,
-        lichess_rating: null,
+        rating: 1500,
         chesscom_url: null,
         lichess_url: null,
         bio: `Сидер ${i}`,
-        role: role
+        role: role,
+        player_status: 'Player'
       })
       .select()
     if (error) {
@@ -842,7 +890,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     lessonRequests,
     merchOrders,
     partnershipRequests,
-    pendingRatingRequests,
+    ratingRows,
     tournaments,
     registrationRows,
     partnershipRows,
@@ -854,13 +902,19 @@ export async function getAdminStats(): Promise<AdminStats> {
     safeCount('lesson_requests'),
     safeCount('merch_orders'),
     safeCount('partnership_requests'),
-    safeCount('rating_requests', (query) => query.eq('status', 'pending')),
+    supabaseAdmin.from('player_ratings').select('rd,games_count'),
     listTournaments(),
     supabaseAdmin.from('tournament_registrations').select('tournament_id, attendance_status'),
     supabaseAdmin.from('partnership_requests').select('format'),
   ])
 
   const tournamentTitles = new Map(tournaments.map((tournament) => [Number(tournament.id), tournament.title]))
+  const calibratingPlayers = ratingRows.error
+    ? 0
+    : ((ratingRows.data || []) as Array<{ rd?: number | null; games_count?: number | null }>).filter((row) => {
+      return Number(row.games_count || 0) < 10 || Number(row.rd || 350) >= 250
+    }).length
+
   const byTournament = new Map<number, { registrations: number; attended: number }>()
 
   if (!registrationRows.error) {
@@ -911,7 +965,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     lessonRequests,
     merchOrders,
     partnershipRequests,
-    pendingRatingRequests,
+    calibratingPlayers,
     popularTournaments,
     attendanceByTournament,
     popularPartnershipFormats,

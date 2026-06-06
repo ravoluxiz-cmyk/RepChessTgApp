@@ -14,7 +14,7 @@ type Stats = {
   lessonRequests: number
   merchOrders: number
   partnershipRequests: number
-  pendingRatingRequests: number
+  calibratingPlayers: number
   popularTournaments: Array<{ tournament_id: number; title: string; registrations: number; attended: number }>
   attendanceByTournament: Array<{ tournament_id: number; title: string; attended: number }>
   popularPartnershipFormats: Array<{ format: string; count: number }>
@@ -86,7 +86,7 @@ export default function AdminStatsPage() {
                 <StatCard label="Заявки на уроки" value={stats.lessonRequests} />
                 <StatCard label="Заказы мерча" value={stats.merchOrders} />
                 <StatCard label="B2B-заявки" value={stats.partnershipRequests} />
-                <StatCard label="Рейтинг ждет проверки" value={stats.pendingRatingRequests} />
+                <StatCard label="Игроки в калибровке" value={stats.calibratingPlayers} />
               </div>
 
               <section className="rounded-lg border border-white/10 bg-white/5 p-5">

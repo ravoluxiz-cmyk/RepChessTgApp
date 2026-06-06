@@ -142,7 +142,7 @@ export class RatingPairingService {
   ): TournamentParticipant[] {
     return participants.filter(participant => {
       const rating = ratings.get(participant.user_id)
-      return rating !== undefined && rating >= 800 // Minimum rating requirement
+      return rating !== undefined && rating >= 100 // Technical sanity check
     })
   }
 

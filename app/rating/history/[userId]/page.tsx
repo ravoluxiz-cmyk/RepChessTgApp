@@ -66,14 +66,14 @@ function normalizePlayerInfo(userId: string, payload: RatingApiPayload): PlayerR
     user_id: Number(rating?.user_id ?? userId),
     first_name: `Игрок #${rating?.user_id ?? userId}`,
     last_name: "",
-    current_rating: Number(rating?.rating ?? 800),
+    current_rating: Number(rating?.rating ?? 1500),
     current_rd: Number(rating?.rd ?? 350),
     current_volatility: Number(rating?.volatility ?? 0.06),
     total_games: games,
     win_rate: games > 0 ? wins / games : 0,
     recent_form: "",
-    highest_rating: Number(rating?.rating ?? 800),
-    lowest_rating: Number(rating?.rating ?? 800),
+    highest_rating: Number(rating?.rating ?? 1500),
+    lowest_rating: Number(rating?.rating ?? 1500),
     rating_trend: "stable",
   }
 }
@@ -87,7 +87,7 @@ function normalizeHistory(payload: unknown): RatingHistoryPoint[] {
 
   return rawHistory.map((point, index) => ({
     date: point.created_at || new Date().toISOString(),
-    rating: Number(point.new_rating ?? point.old_rating ?? 800),
+    rating: Number(point.new_rating ?? point.old_rating ?? 1500),
     rd: Number(point.new_rd ?? 350),
     games_played: rawHistory.length - index,
     change: Number(point.rating_change ?? 0),

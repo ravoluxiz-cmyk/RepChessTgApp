@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ratingService } from '@/lib/rating/ratingService'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/telegram'
 
 // GET /api/rating/player/[userId] - Get player rating
 export async function GET(
@@ -48,6 +49,11 @@ export async function PUT(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const adminUser = await requireAdmin(request.headers)
+    if (!adminUser) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const { userId: userIdParam } = await params
     const userId = parseInt(userIdParam)
     const body = await request.json()
@@ -59,9 +65,6 @@ export async function PUT(
         { status: 400 }
       )
     }
-
-    // TODO: Add admin authentication check
-    // For now, we'll skip auth for development
 
     if (typeof rating !== 'number' || typeof rd !== 'number' || typeof volatility !== 'number') {
       return NextResponse.json(
@@ -80,7 +83,7 @@ export async function PUT(
     }
 
     // Update rating
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('player_ratings')
       .update({
         rating,
@@ -96,8 +99,13 @@ export async function PUT(
       throw new Error(`Failed to update rating: ${error.message}`)
     }
 
+    await supabaseAdmin
+      .from('users')
+      .update({ rating: Math.round(rating), updated_at: new Date().toISOString() })
+      .eq('id', userId)
+
     // Create history entry for manual adjustment
-    await supabase.from('rating_history').insert({
+    await supabaseAdmin.from('rating_history').insert({
       user_id: userId,
       old_rating: currentRating.rating,
       new_rating: rating,

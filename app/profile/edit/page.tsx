@@ -56,10 +56,8 @@ export default function ProfileEditPage() {
             bio: data.user.bio || "",
           })
 
-          // Check if profile is incomplete (only has Telegram data)
-          const isIncomplete = !data.user.chesscom_url &&
-                               !data.user.lichess_url &&
-                               !data.user.bio
+          // Check if profile is incomplete (missing required name fields)
+          const isIncomplete = !data.user.first_name || !data.user.last_name
           setIsNewProfile(isIncomplete)
         }
       } catch (err) {
@@ -101,12 +99,6 @@ export default function ProfileEditPage() {
       // Validate required fields
       if (!formData.first_name || !formData.last_name) {
         setError("Имя и фамилия обязательны для заполнения")
-        setSaving(false)
-        return
-      }
-
-      if (!formData.chesscom_url && !formData.lichess_url) {
-        setError("Прикрепите ссылку на Lichess или Chess.com, чтобы администратор установил рейтинг")
         setSaving(false)
         return
       }
@@ -253,7 +245,7 @@ export default function ProfileEditPage() {
             <div className="brand-panel-dark rounded-[18px] p-6 space-y-2">
               <h2 className="text-xl font-bold text-white mb-4">Рейтинг</h2>
               <div className="rounded-lg border border-amber-300/30 bg-amber-400/15 p-4 text-amber-50">
-                Рейтинг устанавливается вручную администратором по ссылке на Lichess или Chess.com. До проверки используется стартовый рейтинг 1500, пожалуйста, дождитесь обработки заявки.
+                Все игроки начинают с клубного рейтинга 1500 и высоким RD. После рейтинговых партий Glicko-2 постепенно снижает неопределенность и пересчитывает рейтинг.
               </div>
             </div>
 
@@ -262,6 +254,9 @@ export default function ProfileEditPage() {
               <h2 className="text-xl font-bold text-white mb-4">
                 Ссылки на профили
               </h2>
+              <p className="text-sm text-white/60">
+                Необязательно. Можно оставить для связи с вашими внешними шахматными аккаунтами.
+              </p>
 
               <div>
                 <label
