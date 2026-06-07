@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground";
 import { HoverButton } from "@/components/ui/hover-button";
-import { Building2, ShoppingBag, Calendar, GraduationCap, User } from "lucide-react";
+import { Building2, ShoppingBag, Calendar, GraduationCap, Newspaper, User } from "lucide-react";
 import { useEffect, useCallback } from "react"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 
@@ -136,7 +136,17 @@ export default function Home() {
             </HoverButton>
 
             <HoverButton
-              className="flex min-h-16 items-center justify-center gap-3 sm:col-span-2"
+              className="flex min-h-16 items-center justify-center gap-3"
+              onClick={() => router.push('/club')}
+            >
+              <Newspaper className="w-7 h-7 flex-shrink-0" />
+              <span className="text-lg sm:text-xl">
+                Клуб
+              </span>
+            </HoverButton>
+
+            <HoverButton
+              className="flex min-h-16 items-center justify-center gap-3"
               onClick={() => router.push('/profile')}
             >
               <User className="w-7 h-7 flex-shrink-0" />

@@ -20,6 +20,7 @@ interface MemStore {
   partnership_requests: MemRow[]
   lesson_requests: MemRow[]
   merch_orders: MemRow[]
+  club_content: MemRow[]
   player_ratings: MemRow[]
   rating_history: MemRow[]
   rounds: MemRow[]
@@ -41,12 +42,13 @@ function getGlobalStore(): MemStore {
       partnership_requests: [],
       lesson_requests: [],
       merch_orders: [],
+      club_content: [],
       player_ratings: [],
       rating_history: [],
       rounds: [],
       matches: [],
       leaderboard: [],
-      counters: { users: 0, tournaments: 0, tournament_participants: 0, tournament_registrations: 0, rating_requests: 0, partnership_requests: 0, lesson_requests: 0, merch_orders: 0, player_ratings: 0, rating_history: 0, rounds: 0, matches: 0, leaderboard: 0 }
+      counters: { users: 0, tournaments: 0, tournament_participants: 0, tournament_registrations: 0, rating_requests: 0, partnership_requests: 0, lesson_requests: 0, merch_orders: 0, club_content: 0, player_ratings: 0, rating_history: 0, rounds: 0, matches: 0, leaderboard: 0 }
     } as MemStore
   }
   return g.__MEM_SUPABASE_STORE__ as MemStore
@@ -550,6 +552,56 @@ export interface Database {
           score_black?: number
           source?: string | null
           notes?: string | null
+        }
+      }
+      club_content: {
+        Row: {
+          id: number
+          type: string
+          title: string
+          subtitle: string | null
+          body: string | null
+          image_url: string | null
+          external_url: string | null
+          author_name: string | null
+          is_published: boolean
+          is_featured: boolean
+          sort_order: number
+          published_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          type: string
+          title: string
+          subtitle?: string | null
+          body?: string | null
+          image_url?: string | null
+          external_url?: string | null
+          author_name?: string | null
+          is_published?: boolean
+          is_featured?: boolean
+          sort_order?: number
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          type?: string
+          title?: string
+          subtitle?: string | null
+          body?: string | null
+          image_url?: string | null
+          external_url?: string | null
+          author_name?: string | null
+          is_published?: boolean
+          is_featured?: boolean
+          sort_order?: number
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
         }
       }
       leaderboard: {

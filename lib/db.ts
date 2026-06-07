@@ -1,6 +1,8 @@
 import { supabase, supabaseAdmin } from './supabase'
 import type { PlayerStatus } from './player-status'
 import { normalizePlayerStatus, resolvePlayerStatus } from './player-status'
+import type { ClubContent, ClubContentType } from './club-content'
+import { DEFAULT_CLUB_CONTENT, normalizeClubContentType } from './club-content'
 
 // Types matching our database schema
 export interface User {
@@ -116,6 +118,8 @@ export interface PartnershipRequest {
   created_at?: string
   updated_at?: string
 }
+
+export type { ClubContent, ClubContentType }
 
 export interface AdminStats {
   registrations: number
@@ -860,6 +864,128 @@ export async function updatePartnershipRequestStatus(
   }
 
   return data as PartnershipRequest
+}
+
+function fallbackClubContent(type?: string): ClubContent[] {
+  const normalizedType = type && type !== 'all' ? normalizeClubContentType(type) : null
+  return DEFAULT_CLUB_CONTENT
+    .filter((item) => !normalizedType || item.type === normalizedType)
+    .filter((item) => item.is_published !== false)
+    .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0))
+}
+
+export async function listClubContent(options: {
+  type?: string
+  publishedOnly?: boolean
+} = {}): Promise<ClubContent[]> {
+  const { type, publishedOnly = false } = options
+  let query = supabaseAdmin
+    .from('club_content')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+
+  if (type && type !== 'all') {
+    query = query.eq('type', normalizeClubContentType(type))
+  }
+
+  if (publishedOnly) {
+    query = query.eq('is_published', true)
+  }
+
+  const { data, error } = await query
+  if (error) {
+    console.error('Error listing club content:', error)
+    return publishedOnly ? fallbackClubContent(type) : fallbackClubContent(type)
+  }
+
+  const rows = (data || []) as ClubContent[]
+  if (publishedOnly && rows.length === 0) {
+    return fallbackClubContent(type)
+  }
+
+  return rows.map((item) => ({
+    ...item,
+    type: normalizeClubContentType(item.type),
+  }))
+}
+
+export async function createClubContent(content: ClubContent): Promise<ClubContent | null> {
+  const now = new Date().toISOString()
+  const isPublished = content.is_published !== false
+
+  const { data, error } = await supabaseAdmin
+    .from('club_content')
+    .insert({
+      type: normalizeClubContentType(content.type),
+      title: content.title,
+      subtitle: content.subtitle || null,
+      body: content.body || null,
+      image_url: content.image_url || null,
+      external_url: content.external_url || null,
+      author_name: content.author_name || null,
+      is_published: isPublished,
+      is_featured: !!content.is_featured,
+      sort_order: Number(content.sort_order || 100),
+      published_at: isPublished ? content.published_at || now : content.published_at || null,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating club content:', error)
+    return null
+  }
+
+  return data as ClubContent
+}
+
+export async function updateClubContent(contentId: number, fields: Partial<ClubContent>): Promise<ClubContent | null> {
+  const payload: Record<string, unknown> = {
+    updated_at: new Date().toISOString(),
+  }
+
+  if (fields.type !== undefined) payload.type = normalizeClubContentType(fields.type)
+  if (fields.title !== undefined) payload.title = fields.title
+  if (fields.subtitle !== undefined) payload.subtitle = fields.subtitle || null
+  if (fields.body !== undefined) payload.body = fields.body || null
+  if (fields.image_url !== undefined) payload.image_url = fields.image_url || null
+  if (fields.external_url !== undefined) payload.external_url = fields.external_url || null
+  if (fields.author_name !== undefined) payload.author_name = fields.author_name || null
+  if (fields.is_published !== undefined) {
+    payload.is_published = !!fields.is_published
+    if (fields.is_published) payload.published_at = fields.published_at || new Date().toISOString()
+  }
+  if (fields.is_featured !== undefined) payload.is_featured = !!fields.is_featured
+  if (fields.sort_order !== undefined) payload.sort_order = Number(fields.sort_order || 100)
+
+  const { data, error } = await supabaseAdmin
+    .from('club_content')
+    .update(payload)
+    .eq('id', contentId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating club content:', error)
+    return null
+  }
+
+  return data as ClubContent
+}
+
+export async function deleteClubContent(contentId: number): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('club_content')
+    .delete()
+    .eq('id', contentId)
+
+  if (error) {
+    console.error('Error deleting club content:', error)
+    return false
+  }
+
+  return true
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

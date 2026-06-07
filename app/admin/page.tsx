@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut, BarChart3, Building2, Users } from "lucide-react"
+import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut, BarChart3, Building2, Newspaper, Users } from "lucide-react"
 
 export default function AdminMainMenuPage() {
   const router = useRouter()
@@ -184,6 +184,17 @@ export default function AdminMainMenuPage() {
                   <span className="text-lg sm:text-xl font-bold">B2B-заявки</span>
                 </div>
                 <div className="text-white/70">Компании, площадки и партнерские мероприятия</div>
+              </button>
+
+              <button
+                onClick={() => router.push("/admin/club-content")}
+                className="brand-panel-dark w-full rounded-[18px] p-5 text-left transition-all hover:border-white/50 sm:p-6"
+              >
+                <div className="flex items-center gap-3 text-white mb-2">
+                  <Newspaper className="w-6 h-6 text-[#ff1515]" />
+                  <span className="text-lg sm:text-xl font-bold">Контент клуба</span>
+                </div>
+                <div className="text-white/70">Новости, лекции, правила, отзывы и доска почета</div>
               </button>
 
               <button
