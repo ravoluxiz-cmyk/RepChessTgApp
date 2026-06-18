@@ -121,6 +121,20 @@ export interface PartnershipRequest {
 
 export type { ClubContent, ClubContentType }
 
+export interface SupportRequest {
+  id?: number
+  user_name: string
+  user_contact?: string | null
+  telegram_id?: number | null
+  username?: string | null
+  question: string
+  bot_answer?: string | null
+  status?: 'new' | 'in_progress' | 'done'
+  source?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
 export interface AdminStats {
   registrations: number
   attended: number
@@ -986,6 +1000,68 @@ export async function deleteClubContent(contentId: number): Promise<boolean> {
   }
 
   return true
+}
+
+export async function createSupportRequest(request: SupportRequest): Promise<SupportRequest | null> {
+  const { data, error } = await supabaseAdmin
+    .from('support_requests')
+    .insert({
+      user_name: request.user_name || 'Гость',
+      user_contact: request.user_contact || null,
+      telegram_id: request.telegram_id ?? null,
+      username: request.username || null,
+      question: request.question,
+      bot_answer: request.bot_answer || null,
+      status: request.status || 'new',
+      source: request.source || 'chat_bot',
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating support request:', error)
+    return null
+  }
+
+  return data as SupportRequest
+}
+
+export async function listSupportRequests(status?: string): Promise<SupportRequest[]> {
+  let query = supabaseAdmin
+    .from('support_requests')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (status && status !== 'all') {
+    query = query.eq('status', status)
+  }
+
+  const { data, error } = await query
+  if (error) {
+    console.error('Error listing support requests:', error)
+    return []
+  }
+
+  return (data || []) as SupportRequest[]
+}
+
+export async function updateSupportRequestStatus(
+  requestId: number,
+  status: NonNullable<SupportRequest['status']>
+): Promise<SupportRequest | null> {
+  const { data, error } = await supabaseAdmin
+    .from('support_requests')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', requestId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating support request:', error)
+    return null
+  }
+
+  return data as SupportRequest
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
