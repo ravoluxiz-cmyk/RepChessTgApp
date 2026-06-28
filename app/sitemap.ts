@@ -7,10 +7,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     { path: "/", priority: 1 },
     { path: "/tournaments", priority: 0.9 },
+    { path: "/beginners", priority: 0.86 },
     { path: "/club", priority: 0.85 },
     { path: "/lessons", priority: 0.8 },
     { path: "/merch", priority: 0.75 },
     { path: "/partners", priority: 0.7 },
+    { path: "/corporate", priority: 0.65 },
     { path: "/rating/leaderboard", priority: 0.55 },
   ]
 

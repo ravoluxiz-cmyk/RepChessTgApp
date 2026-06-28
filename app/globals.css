@@ -47,6 +47,17 @@
 /* Light theme variables */
 :root {
   --radius: 0.625rem;
+  --brand-bg: #151515;
+  --brand-text: #f7f7f2;
+  --brand-accent: #ff1515;
+  --brand-blue: #1357ff;
+  --brand-yellow: #fff200;
+  --brand-green: #20d66b;
+  --brand-muted: rgb(247 247 242 / 0.62);
+  --brand-card: rgb(247 247 242 / 0.08);
+  --brand-border: rgb(255 255 255 / 0.14);
+  --brand-success: #20d66b;
+  --brand-warning: #fff200;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -141,15 +152,15 @@
     border: 1px solid rgb(21 21 21 / 0.14);
     border-radius: 18px;
     background: rgb(247 247 242 / 0.96);
-    color: #151515;
+    color: var(--brand-bg);
     box-shadow: 0 22px 80px rgb(0 0 0 / 0.28), inset 0 1px 0 rgb(255 255 255 / 0.72);
   }
 
   .brand-panel-dark {
-    border: 1px solid rgb(255 255 255 / 0.14);
+    border: 1px solid var(--brand-border);
     border-radius: 18px;
-    background: rgb(247 247 242 / 0.08);
-    color: #f7f7f2;
+    background: var(--brand-card);
+    color: var(--brand-text);
     box-shadow: 0 24px 80px rgb(0 0 0 / 0.32), inset 0 1px 0 rgb(255 255 255 / 0.12);
     backdrop-filter: blur(18px);
   }
@@ -253,6 +264,29 @@
     color: #151515;
     box-shadow: 0 18px 50px rgb(0 0 0 / 0.28);
   }
+
+  .brand-pawn-shell {
+    perspective: 920px;
+  }
+
+  .brand-pawn {
+    transform-style: preserve-3d;
+    animation: pawn-float 8s ease-in-out infinite, pawn-turn 22s linear infinite;
+  }
+
+  .brand-pawn-shell:hover .brand-pawn {
+    transform: rotateX(5deg) rotateY(-6deg) translateY(-4px);
+  }
+
+  .brand-pawn-part {
+    background:
+      radial-gradient(circle at 30% 18%, rgb(255 255 255 / 0.22), transparent 26%),
+      linear-gradient(145deg, #3a3a3a, #111111 58%, #050505);
+    border: 1px solid rgb(255 255 255 / 0.14);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      0 24px 80px rgb(0 0 0 / 0.36);
+  }
 }
 
 /* Custom animations */
@@ -287,5 +321,34 @@
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@keyframes pawn-turn {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 360deg;
+  }
+}
+
+@keyframes pawn-float {
+  0%, 100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-pawn,
+  .animate-shimmer {
+    animation: none !important;
+  }
+
+  * {
+    scroll-behavior: auto !important;
   }
 }

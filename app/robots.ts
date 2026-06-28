@@ -8,10 +8,12 @@ export default function robots(): MetadataRoute.Robots {
         allow: [
           "/",
           "/tournaments",
+          "/beginners",
           "/club",
           "/merch",
           "/lessons",
           "/partners",
+          "/corporate",
           "/rating/leaderboard",
         ],
         disallow: [
