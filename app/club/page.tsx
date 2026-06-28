@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import type { ClubContent, ClubContentType } from "@/lib/club-content"
 import { CLUB_CONTENT_TYPE_DESCRIPTIONS, CLUB_CONTENT_TYPE_LABELS, CLUB_CONTENT_TYPES } from "@/lib/club-content"
-import { ArrowLeft, ExternalLink, Megaphone, Quote, ScrollText, Sparkles, Trophy } from "lucide-react"
+import { ArrowLeft, Camera, ExternalLink, Megaphone, Quote, ScrollText, Sparkles, Trophy } from "lucide-react"
 
 const TYPE_ICONS: Record<ClubContentType, typeof Trophy> = {
   honor: Trophy,
@@ -13,6 +13,7 @@ const TYPE_ICONS: Record<ClubContentType, typeof Trophy> = {
   lecture: Sparkles,
   rules: ScrollText,
   review: Quote,
+  gallery: Camera,
 }
 
 const TYPE_ACCENTS: Record<ClubContentType, string> = {
@@ -21,6 +22,7 @@ const TYPE_ACCENTS: Record<ClubContentType, string> = {
   lecture: "bg-white text-[#151515]",
   rules: "bg-[#20d66b] text-[#151515]",
   review: "bg-[#ff1515] text-white",
+  gallery: "bg-white/15 text-white",
 }
 
 export default function ClubPage() {
@@ -155,7 +157,7 @@ export default function ClubPage() {
             </div>
           )}
 
-          <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
             {CLUB_CONTENT_TYPES.map((type) => {
               const Icon = TYPE_ICONS[type]
               return (

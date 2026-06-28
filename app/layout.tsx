@@ -14,6 +14,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION || undefined;
+const yandexVerification = process.env.YANDEX_VERIFICATION || undefined;
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://repchesskrd.ru"),
   title: {
@@ -56,6 +59,10 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  verification: {
+    google: googleSiteVerification,
+    yandex: yandexVerification,
+  },
 };
 
 const organizationJsonLd = {
@@ -70,6 +77,7 @@ const organizationJsonLd = {
   },
   sameAs: [
     "https://repchess.ru",
+    "https://t.me/RepChessKRD",
   ],
   description: "Шахматный клуб в Краснодаре: турниры, уроки, лекции, клубные встречи и корпоративные шахматные мероприятия.",
 };

@@ -1,4 +1,4 @@
-export const CLUB_CONTENT_TYPES = ["honor", "news", "lecture", "rules", "review"] as const
+export const CLUB_CONTENT_TYPES = ["honor", "news", "lecture", "rules", "review", "gallery"] as const
 
 export type ClubContentType = typeof CLUB_CONTENT_TYPES[number]
 
@@ -8,6 +8,7 @@ export const CLUB_CONTENT_TYPE_LABELS: Record<ClubContentType, string> = {
   lecture: "Лекции",
   rules: "Правила",
   review: "Отзывы",
+  gallery: "Галерея",
 }
 
 export const CLUB_CONTENT_TYPE_DESCRIPTIONS: Record<ClubContentType, string> = {
@@ -16,6 +17,7 @@ export const CLUB_CONTENT_TYPE_DESCRIPTIONS: Record<ClubContentType, string> = {
   lecture: "Материалы, конспекты и записи клубных лекций.",
   rules: "Как мы играем в недушные шахматы.",
   review: "Что участники говорят о турнирах и комьюнити.",
+  gallery: "Фото с турниров, лекций и клубных вечеров.",
 }
 
 export interface ClubContent {
@@ -80,5 +82,16 @@ export const DEFAULT_CLUB_CONTENT: ClubContent[] = [
     is_published: true,
     is_featured: false,
     sort_order: 40,
+  },
+  {
+    id: -5,
+    type: "gallery",
+    title: "Атмосфера Rep Chess KRD",
+    subtitle: "Фото с турниров, где шахматы не выглядят как экзамен.",
+    body: "Добавляйте сюда фотографии через админку: лучшие кадры будут попадать на главную страницу.",
+    image_url: "/merch/repchess-merch-01.jpg",
+    is_published: true,
+    is_featured: true,
+    sort_order: 50,
   },
 ]

@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
+import { ImageUploadField } from "@/components/admin/image-upload-field"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import type { ClubContent, ClubContentType } from "@/lib/club-content"
 import { CLUB_CONTENT_TYPE_LABELS, CLUB_CONTENT_TYPES } from "@/lib/club-content"
@@ -195,10 +196,17 @@ export default function AdminClubContentPage() {
               </label>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                <label className="block">
-                  <span className="mb-2 block font-semibold">Картинка / афиша URL</span>
-                  <input value={form.image_url} onChange={(e) => setForm((prev) => ({ ...prev, image_url: e.target.value }))} className={inputClass} />
-                </label>
+                <ImageUploadField
+                  value={form.image_url}
+                  onChange={(value) => setForm((prev) => ({ ...prev, image_url: value }))}
+                  endpoint="/api/admin/club-content/upload"
+                  authHeader={initData ? `Bearer ${initData}` : undefined}
+                  inputClassName={inputClass}
+                  labelClassName="mb-2 block font-semibold"
+                  label="Картинка / фото галереи"
+                  previewAlt="Картинка клубной карточки"
+                  previewClassName="aspect-[4/3] w-full object-cover"
+                />
                 <label className="block">
                   <span className="mb-2 block font-semibold">Внешняя ссылка</span>
                   <input value={form.external_url} onChange={(e) => setForm((prev) => ({ ...prev, external_url: e.target.value }))} className={inputClass} />
