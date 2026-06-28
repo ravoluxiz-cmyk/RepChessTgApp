@@ -8,7 +8,12 @@ import { BrandPawn } from "./brand-pawn"
 
 const TELEGRAM_URL = "https://t.me/RepChessKRD"
 
-const HERO_BADGES = ["BLITZ 5+3", "BEGINNER FRIENDLY", "KRD COMMUNITY", "LECTURES / EVENTS / MERCH"]
+const HERO_BADGES = [
+  { title: "Турниры", color: "#fff200" },
+  { title: "Новички", color: "#20d66b" },
+  { title: "Комьюнити", color: "#1357ff" },
+  { title: "Лекции / мерч", color: "#ff1515" },
+]
 
 export function HomeHero() {
   const router = useRouter()
@@ -97,9 +102,10 @@ export function HomeHero() {
         </p>
 
         <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
-          {HERO_BADGES.map((badge, index) => (
-            <span key={badge} className={`rounded-full px-3 py-2 text-[0.66rem] font-black uppercase sm:text-xs ${index === 0 ? "bg-[#fff200] text-[#151515]" : "border border-white/12 bg-white/10 text-white/74"}`}>
-              {badge}
+          {HERO_BADGES.map((badge) => (
+            <span key={badge.title} className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-3 py-2 text-[0.66rem] font-black uppercase text-white/78 sm:text-xs">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: badge.color }} />
+              {badge.title}
             </span>
           ))}
         </div>

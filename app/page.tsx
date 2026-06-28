@@ -92,9 +92,9 @@ const SCENARIOS = [
 ]
 
 const CLUB_NUMBERS = [
-  { value: "550+", label: "активных игроков в Краснодаре" },
-  { value: "30+", label: "человек на клубных турнирах" },
-  { value: "10", label: "городов Rep Chess" },
+  { value: "700+", label: "активных игроков в Краснодаре" },
+  { value: "20+", label: "человек на клубных турнирах" },
+  { value: "14", label: "городов Rep Chess" },
   { value: "40 000+", label: "игроков в экосистеме Rep Chess" },
 ]
 
