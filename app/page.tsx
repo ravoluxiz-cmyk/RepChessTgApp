@@ -206,7 +206,7 @@ export default async function Home() {
               <div className="brand-bg-icons pointer-events-none absolute -right-20 -top-24 h-72 w-72 opacity-[0.08]" />
               <div className="brand-chip mb-5 w-fit px-3 py-1 text-xs font-black uppercase">Кто мы</div>
               <h2 className="brand-title max-w-3xl text-3xl text-white sm:text-5xl md:text-6xl">
-                Шахматы без пыли и лишнего пафоса
+                Шахматы без пыли
               </h2>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/68 sm:text-lg">
                 Rep Chess KRD собирает людей вокруг турниров, уроков, лекций и живого комьюнити. Мы делаем шахматы понятными, социальными и красивыми: можно прийти первый раз, сыграть блиц, познакомиться с людьми и остаться в клубе.
@@ -470,7 +470,7 @@ export default async function Home() {
               <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Главная площадка</div>
               <h2 className="brand-title text-3xl sm:text-5xl">Все начинается в Telegram</h2>
               <p className="mt-4 text-base leading-relaxed text-[#151515]/68 sm:text-lg">
-                Там появляются быстрые анонсы, обсуждения, фото, регистрация на клубные активности и вся живая коммуникация. Сайт нужен как удобная витрина и система записи, но пульс клуба находится в канале.
+                Там появляются быстрые анонсы, обсуждения, фото, регистрация на клубные активности и вся живая коммуникация.
               </p>
               <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="brand-button mt-6 inline-flex w-full items-center justify-center gap-2 px-5 py-3 sm:w-auto">
                 Подписаться на Rep Chess KRD

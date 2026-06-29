@@ -8,10 +8,10 @@ import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 const TELEGRAM_URL = "https://t.me/RepChessKRD"
 
 const HERO_BADGES = [
-  { title: "Анонсы турниров", color: "#fff200" },
-  { title: "Запись на события", color: "#20d66b" },
-  { title: "Новости клуба", color: "#1357ff" },
-  { title: "Мерч и лекции", color: "#ff1515" },
+  { title: "Турниры", color: "#fff200" },
+  { title: "Новички", color: "#20d66b" },
+  { title: "Комьюнити", color: "#1357ff" },
+  { title: "Мерч", color: "#ff1515" },
 ]
 
 const QUICK_LINKS = [
@@ -83,7 +83,7 @@ export function HomeHero() {
       <div className="relative w-full pt-4 text-center lg:text-left">
         <div className="brand-chip mx-auto mb-4 flex w-fit items-center gap-2 px-3 py-2 text-[0.68rem] font-bold uppercase sm:text-xs lg:mx-0">
           <span className="h-2 w-2 rounded-full bg-[#151515]" />
-          Главный продукт — Telegram-канал
+          Краснодарское шахматное комьюнити
         </div>
         <div className="brand-sticker pointer-events-none absolute left-[4%] top-[22%] hidden h-8 w-24 rotate-[-8deg] bg-[#ff1515] opacity-90 md:block" />
         <h1 className="brand-wordmark mx-auto max-w-[980px] text-[clamp(3.1rem,14vw,8.5rem)] text-[#f7f7f2] lg:mx-0 lg:max-w-[780px]">
@@ -99,10 +99,10 @@ export function HomeHero() {
           <span className="lg:text-left">KRD</span>
         </h1>
         <h2 className="brand-title mx-auto mt-5 max-w-4xl text-2xl leading-none text-white sm:text-4xl lg:mx-0">
-          Шахматы Краснодара живут в Telegram
+          Шахматы, которые не пахнут пылью
         </h2>
         <p className="mx-auto mt-5 max-w-2xl px-2 text-sm font-semibold leading-relaxed text-white/70 sm:text-base lg:mx-0 lg:px-0">
-          Подписывайся на @RepChessKRD: там первыми появляются турниры по шахматам в Краснодаре, запись, фотоотчеты, новости клуба, лекции и дропы мерча.
+          Турниры, лекции, новичковые вечера, клубные дропы и городское комьюнити в Краснодаре.
         </p>
 
         <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
@@ -119,10 +119,10 @@ export function HomeHero() {
             href={TELEGRAM_URL}
             target="_blank"
             rel="noreferrer"
-            className="brand-button inline-flex min-h-14 items-center justify-center gap-2 px-5 py-3 text-sm"
+            className="inline-flex min-h-16 items-center justify-center gap-3 rounded-full border border-white/25 bg-[#f7f7f2] px-6 py-4 text-base font-black uppercase text-[#151515] shadow-[0_18px_55px_rgba(255,255,255,0.14)] transition hover:-translate-y-0.5 hover:bg-white"
           >
-            <Send className="h-5 w-5" />
-            Перейти в Telegram-канал
+            <Send className="h-6 w-6" />
+            @RepChessKRD
           </a>
           <button
             type="button"
@@ -151,7 +151,7 @@ export function HomeHero() {
         </div>
 
         <div className="mt-6 text-xs font-bold uppercase text-white/42">
-          Сайт — витрина клуба. Telegram — место, где реально движется вся жизнь Rep Chess KRD.
+          Приходи за 10 минут до старта. Формат объясним на месте.
         </div>
       </div>
     </section>
