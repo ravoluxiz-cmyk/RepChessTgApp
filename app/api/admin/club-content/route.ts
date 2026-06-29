@@ -34,8 +34,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Укажите заголовок" }, { status: 400 })
   }
 
+  const type = normalizeClubContentType(body?.type)
   const content = await createClubContent({
-    type: normalizeClubContentType(body?.type),
+    type,
     title,
     subtitle: String(body?.subtitle || "").trim() || null,
     body: String(body?.body || "").trim() || null,
@@ -50,6 +51,9 @@ export async function POST(request: NextRequest) {
   })
 
   if (!content) {
+    if (type === "gallery") {
+      return NextResponse.json({ error: "Галерея еще не включена в Supabase. Выполните SQL-файл supabase_migration_club_content_images.sql." }, { status: 500 })
+    }
     return NextResponse.json({ error: "Не удалось создать карточку" }, { status: 500 })
   }
 
@@ -68,8 +72,9 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Некорректная карточка" }, { status: 400 })
   }
 
+  const type = normalizeClubContentType(body?.type)
   const content = await updateClubContent(id, {
-    type: normalizeClubContentType(body?.type),
+    type,
     title: String(body?.title || "").trim(),
     subtitle: String(body?.subtitle || "").trim() || null,
     body: String(body?.body || "").trim() || null,
@@ -84,6 +89,9 @@ export async function PATCH(request: NextRequest) {
   })
 
   if (!content) {
+    if (type === "gallery") {
+      return NextResponse.json({ error: "Галерея еще не включена в Supabase. Выполните SQL-файл supabase_migration_club_content_images.sql." }, { status: 500 })
+    }
     return NextResponse.json({ error: "Не удалось обновить карточку" }, { status: 500 })
   }
 

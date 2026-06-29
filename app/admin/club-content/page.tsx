@@ -1,13 +1,12 @@
 "use client"
 
-import { FormEvent, useEffect, useMemo, useState } from "react"
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
-import { ImageUploadField } from "@/components/admin/image-upload-field"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import type { ClubContent, ClubContentType } from "@/lib/club-content"
 import { CLUB_CONTENT_TYPE_LABELS, CLUB_CONTENT_TYPES, getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content"
-import { ArrowLeft, Edit3, Plus, Save, Trash2 } from "lucide-react"
+import { ArrowLeft, Check, Edit3, ImagePlus, Loader2, Plus, Save, Star, Trash2, Upload, X } from "lucide-react"
 
 type FormState = {
   id?: number
@@ -40,14 +39,29 @@ const EMPTY_FORM: FormState = {
   sort_order: "100",
 }
 
+const IMAGE_POSITIONS = [
+  { value: "left top", label: "ЛВ" },
+  { value: "center top", label: "В" },
+  { value: "right top", label: "ПВ" },
+  { value: "left center", label: "Л" },
+  { value: "center center", label: "Ц" },
+  { value: "right center", label: "П" },
+  { value: "left bottom", label: "ЛН" },
+  { value: "center bottom", label: "Н" },
+  { value: "right bottom", label: "ПН" },
+]
+
 export default function AdminClubContentPage() {
   const router = useRouter()
   const { initData, isReady } = useTelegramWebApp()
+  const uploadInputRef = useRef<HTMLInputElement>(null)
   const [content, setContent] = useState<ClubContent[]>([])
   const [filter, setFilter] = useState<ClubContentType | "all">("all")
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
+  const [manualImageUrl, setManualImageUrl] = useState("")
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploadingImages, setUploadingImages] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -95,6 +109,7 @@ export default function AdminClubContentPage() {
   function edit(item: ClubContent) {
     setMessage(null)
     setError(null)
+    setManualImageUrl("")
     setForm({
       id: item.id && item.id > 0 ? item.id : undefined,
       type: item.type,
@@ -117,15 +132,14 @@ export default function AdminClubContentPage() {
     const nextType = type || (filter === "all" ? form.type : filter)
     setMessage(null)
     setError(null)
+    setManualImageUrl("")
     setForm({ ...EMPTY_FORM, type: nextType })
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  function updateImage(index: number, value: string) {
+  function setImages(images: string[]) {
+    const compactImages = images.map((item) => item.trim()).filter(Boolean).slice(0, 8)
     setForm((prev) => {
-      const nextImages = [...prev.image_urls]
-      nextImages[index] = value
-      const compactImages = nextImages.map((item) => item.trim()).filter(Boolean).slice(0, 8)
       return {
         ...prev,
         image_url: compactImages[0] || "",
@@ -134,22 +148,72 @@ export default function AdminClubContentPage() {
     })
   }
 
-  function addImageSlot() {
-    setForm((prev) => {
-      if (prev.image_urls.length >= 8) return prev
-      return { ...prev, image_urls: [...prev.image_urls, ""] }
-    })
+  function addManualImage() {
+    const url = manualImageUrl.trim()
+    if (!url) return
+    if (form.image_urls.length >= 8) {
+      setError("Можно добавить максимум 8 фотографий")
+      return
+    }
+    setImages([...form.image_urls, url])
+    setManualImageUrl("")
+    setError(null)
+  }
+
+  async function uploadPhotoFiles(event: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files || [])
+    if (event.target) event.target.value = ""
+    if (files.length === 0) return
+
+    const remainingSlots = 8 - form.image_urls.length
+    if (remainingSlots <= 0) {
+      setError("В карточке уже 8 фотографий")
+      return
+    }
+
+    setUploadingImages(true)
+    setError(null)
+
+    try {
+      const urls: string[] = []
+      for (const file of files.slice(0, remainingSlots)) {
+        const formData = new FormData()
+        formData.append("file", file)
+
+        const response = await fetch("/api/admin/club-content/upload", {
+          method: "POST",
+          headers: initData ? { Authorization: `Bearer ${initData}` } : undefined,
+          body: formData,
+        })
+        const data = await response.json().catch(() => ({}))
+
+        if (!response.ok) {
+          throw new Error(data.error || "Не удалось загрузить фото")
+        }
+
+        if (data.url) urls.push(String(data.url))
+      }
+
+      setImages([...form.image_urls, ...urls])
+      if (files.length > remainingSlots) {
+        setMessage(`Загрузил ${remainingSlots} фото. Лимит карточки - 8 фото.`)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Не удалось загрузить фото")
+    } finally {
+      setUploadingImages(false)
+    }
+  }
+
+  function setCoverImage(index: number) {
+    if (index <= 0) return
+    const nextImages = [...form.image_urls]
+    const [cover] = nextImages.splice(index, 1)
+    setImages([cover, ...nextImages])
   }
 
   function removeImage(index: number) {
-    setForm((prev) => {
-      const compactImages = prev.image_urls.filter((_, imageIndex) => imageIndex !== index).filter(Boolean).slice(0, 8)
-      return {
-        ...prev,
-        image_url: compactImages[0] || "",
-        image_urls: compactImages,
-      }
-    })
+    setImages(form.image_urls.filter((_, imageIndex) => imageIndex !== index))
   }
 
   async function submit(event: FormEvent) {
@@ -204,7 +268,7 @@ export default function AdminClubContentPage() {
   return (
     <ChessBackground>
       <main className="min-h-screen px-4 py-8 text-white">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <button onClick={() => router.push("/admin")} className="mb-6 inline-flex items-center gap-2 text-white/70 hover:text-white">
             <ArrowLeft className="h-5 w-5" />
             Админ-меню
@@ -222,7 +286,7 @@ export default function AdminClubContentPage() {
           {message && <div className="mb-4 rounded-lg border border-emerald-400/30 bg-emerald-500/15 p-4 text-emerald-100">{message}</div>}
           {error && <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/15 p-4 text-red-100">{error}</div>}
 
-          <div className="grid gap-5 lg:grid-cols-[420px_1fr]">
+          <div className="grid gap-5 xl:grid-cols-[560px_1fr]">
             <form onSubmit={submit} className="brand-panel space-y-4 rounded-[22px] p-5 text-[#151515]">
               <div className="flex items-center justify-between gap-3">
                 <div className="brand-font text-2xl">{form.id ? "Редактировать" : "Новая карточка в ленту"}</div>
@@ -259,64 +323,149 @@ export default function AdminClubContentPage() {
               </label>
 
               <div className="space-y-4 rounded-2xl border border-[#151515]/10 bg-[#151515]/5 p-3">
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-bold">Фотографии карточки</div>
-                    <div className="mt-1 text-xs font-semibold text-[#151515]/55">До 8 фото. Первое фото будет обложкой на главной.</div>
+                    <div className="font-bold">Фотографии</div>
+                    <div className="mt-1 text-xs font-semibold text-[#151515]/55">
+                      До 8 фото. Первая фотография становится обложкой.
+                    </div>
                   </div>
+                  <div className="rounded-full bg-[#151515] px-3 py-1 text-xs font-black text-white">
+                    {form.image_urls.length}/8
+                  </div>
+                </div>
+
+                <input
+                  ref={uploadInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  multiple
+                  onChange={uploadPhotoFiles}
+                  className="hidden"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => uploadInputRef.current?.click()}
+                  disabled={uploadingImages || form.image_urls.length >= 8}
+                  className="flex w-full items-center justify-center gap-3 rounded-[18px] border-2 border-dashed border-[#151515]/20 bg-white px-4 py-6 text-sm font-black uppercase text-[#151515] transition hover:bg-[#f4f4f0] disabled:opacity-50"
+                >
+                  {uploadingImages ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
+                  {uploadingImages ? "Загружаю..." : "Загрузить фото пачкой"}
+                </button>
+
+                <div className="flex gap-2">
+                  <input
+                    value={manualImageUrl}
+                    onChange={(event) => setManualImageUrl(event.target.value)}
+                    className={inputClass}
+                    placeholder="Или вставить ссылку на фото"
+                    type="url"
+                  />
                   <button
                     type="button"
-                    onClick={addImageSlot}
-                    disabled={form.image_urls.length >= 8}
-                    className="shrink-0 rounded-full bg-[#151515] px-3 py-2 text-xs font-black uppercase text-white disabled:opacity-40"
+                    onClick={addManualImage}
+                    disabled={!manualImageUrl.trim() || form.image_urls.length >= 8}
+                    className="shrink-0 rounded-2xl bg-[#151515] px-4 py-3 text-sm font-black uppercase text-white disabled:opacity-40"
                   >
-                    + фото
+                    <Plus className="h-5 w-5" />
                   </button>
                 </div>
 
-                {(form.image_urls.length ? form.image_urls : [""]).map((image, index) => (
-                  <div key={index} className="rounded-2xl border border-[#151515]/10 bg-white/60 p-3">
-                    <div className="mb-2 flex items-center justify-between gap-2">
-                      <span className="text-sm font-black uppercase text-[#151515]/60">Фото {index + 1}</span>
-                      {form.image_urls.length > 1 && (
-                        <button type="button" onClick={() => removeImage(index)} className="text-xs font-black uppercase text-red-600">
-                          Удалить
+                {form.image_urls.length === 0 ? (
+                  <div className="rounded-[18px] border border-[#151515]/10 bg-white/60 p-5 text-center text-sm font-semibold text-[#151515]/55">
+                    <ImagePlus className="mx-auto mb-2 h-8 w-8" />
+                    Фото пока нет. Нажми “Загрузить фото пачкой” и выбери кадры.
+                  </div>
+                ) : (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {form.image_urls.map((image, index) => (
+                      <div key={`${image}-${index}`} className="overflow-hidden rounded-[18px] border border-[#151515]/10 bg-white">
+                        <div className="relative aspect-[4/3] bg-[#151515]/10">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={image}
+                            alt=""
+                            className="h-full w-full object-cover"
+                            style={{ objectPosition: form.image_position }}
+                          />
+                          {index === 0 && (
+                            <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#fff200] px-2 py-1 text-[10px] font-black uppercase text-[#151515]">
+                              <Star className="h-3 w-3 fill-[#151515]" />
+                              Обложка
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2 p-2">
+                          <button
+                            type="button"
+                            onClick={() => setCoverImage(index)}
+                            disabled={index === 0}
+                            className="inline-flex flex-1 items-center justify-center gap-1 rounded-xl bg-[#151515]/8 px-2 py-2 text-xs font-black uppercase text-[#151515] disabled:opacity-40"
+                          >
+                            <Check className="h-4 w-4" />
+                            Обложка
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="inline-flex items-center justify-center rounded-xl bg-red-500/10 px-3 py-2 text-red-600"
+                            title="Убрать фото"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="rounded-[18px] border border-[#151515]/10 bg-white/70 p-3">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="font-bold">Фокус кадра</div>
+                      <div className="mt-1 text-xs font-semibold text-[#151515]/55">Выбери, какую часть фото держать в видимой области.</div>
+                    </div>
+                    <span className="rounded-full bg-[#151515]/8 px-3 py-1 text-xs font-black uppercase text-[#151515]/60">
+                      {form.image_position}
+                    </span>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-[120px_1fr] sm:items-center">
+                    <div className="grid grid-cols-3 gap-1">
+                      {IMAGE_POSITIONS.map((position) => (
+                        <button
+                          key={position.value}
+                          type="button"
+                          onClick={() => setForm((prev) => ({ ...prev, image_position: position.value }))}
+                          className={`aspect-square rounded-xl border text-xs font-black transition ${
+                            form.image_position === position.value
+                              ? "border-[#151515] bg-[#151515] text-white"
+                              : "border-[#151515]/15 bg-white text-[#151515]/60 hover:bg-[#f4f4f0]"
+                          }`}
+                        >
+                          {position.label}
                         </button>
+                      ))}
+                    </div>
+
+                    <div className="overflow-hidden rounded-2xl border border-[#151515]/10 bg-[#151515]/10">
+                      {form.image_urls[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={form.image_urls[0]}
+                          alt=""
+                          className="aspect-[16/10] w-full object-cover"
+                          style={{ objectPosition: form.image_position }}
+                        />
+                      ) : (
+                        <div className="flex aspect-[16/10] items-center justify-center text-sm font-bold text-[#151515]/45">
+                          Превью появится после загрузки фото
+                        </div>
                       )}
                     </div>
-                    <ImageUploadField
-                      value={image}
-                      onChange={(value) => updateImage(index, value)}
-                      endpoint="/api/admin/club-content/upload"
-                      authHeader={initData ? `Bearer ${initData}` : undefined}
-                      inputClassName={inputClass}
-                      labelClassName="sr-only"
-                      label={`Фото ${index + 1}`}
-                      previewAlt="Картинка клубной карточки"
-                      previewClassName="aspect-[4/3] w-full object-cover"
-                      previewStyle={{ objectPosition: form.image_position }}
-                    />
                   </div>
-                ))}
-
-                <label className="block">
-                  <span className="mb-2 block font-semibold">Область фотографии</span>
-                  <select
-                    value={form.image_position}
-                    onChange={(event) => setForm((prev) => ({ ...prev, image_position: event.target.value }))}
-                    className={inputClass}
-                  >
-                    <option value="center center">Центр</option>
-                    <option value="center top">Верх</option>
-                    <option value="center bottom">Низ</option>
-                    <option value="left center">Слева</option>
-                    <option value="right center">Справа</option>
-                    <option value="left top">Слева сверху</option>
-                    <option value="right top">Справа сверху</option>
-                    <option value="left bottom">Слева снизу</option>
-                    <option value="right bottom">Справа снизу</option>
-                  </select>
-                </label>
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">

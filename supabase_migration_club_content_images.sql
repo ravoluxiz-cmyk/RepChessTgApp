@@ -2,6 +2,11 @@ alter table public.club_content
   add column if not exists image_urls jsonb not null default '[]'::jsonb,
   add column if not exists image_position text not null default 'center center';
 
+alter table public.club_content
+  drop constraint if exists club_content_type_check,
+  add constraint club_content_type_check
+    check (type in ('honor', 'news', 'lecture', 'rules', 'review', 'gallery'));
+
 update public.club_content
 set image_urls = jsonb_build_array(image_url)
 where image_url is not null
