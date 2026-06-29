@@ -52,12 +52,24 @@ export default function AdminClubContentPage() {
     ...(initData ? { Authorization: `Bearer ${initData}` } : {}),
   }), [initData])
 
+  const visibleContent = useMemo(() => {
+    if (filter === "all") return content
+    return content.filter((item) => item.type === filter)
+  }, [content, filter])
+
+  const typeCounts = useMemo(() => {
+    const counts = new Map<ClubContentType, number>()
+    CLUB_CONTENT_TYPES.forEach((type) => counts.set(type, 0))
+    content.forEach((item) => counts.set(item.type, (counts.get(item.type) || 0) + 1))
+    return counts
+  }, [content])
+
   async function load() {
     if (!isReady) return
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`/api/admin/club-content?type=${filter}`, {
+      const response = await fetch("/api/admin/club-content?type=all", {
         headers: initData ? { Authorization: `Bearer ${initData}` } : undefined,
         cache: "no-store",
       })
@@ -74,7 +86,7 @@ export default function AdminClubContentPage() {
   useEffect(() => {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, initData, isReady])
+  }, [initData, isReady])
 
   function edit(item: ClubContent) {
     setMessage(null)
@@ -95,6 +107,14 @@ export default function AdminClubContentPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  function startNew(type?: ClubContentType) {
+    const nextType = type || (filter === "all" ? form.type : filter)
+    setMessage(null)
+    setError(null)
+    setForm({ ...EMPTY_FORM, type: nextType })
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     setSaving(true)
@@ -112,8 +132,8 @@ export default function AdminClubContentPage() {
       })
       const data = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(data.error || "Не удалось сохранить карточку")
-      setMessage(form.id ? "Карточка обновлена" : "Карточка создана")
-      setForm(EMPTY_FORM)
+      setMessage(form.id ? "Карточка обновлена" : `Карточка создана в ленте «${CLUB_CONTENT_TYPE_LABELS[form.type]}»`)
+      setForm({ ...EMPTY_FORM, type: form.type, sort_order: String(Number(form.sort_order || 100) + 10) })
       await load()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Не удалось сохранить карточку")
@@ -155,7 +175,7 @@ export default function AdminClubContentPage() {
             <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Club CMS</div>
             <h1 className="brand-title text-4xl text-white sm:text-6xl">Контент клуба</h1>
             <p className="mt-3 max-w-2xl text-white/62">
-              Новости, лекции, правила, отзывы и доска почета управляются одной карточной системой.
+              Каждый раздел работает как лента: можно добавлять несколько участников, новостей, лекций, отзывов и фото.
             </p>
           </section>
 
@@ -165,12 +185,15 @@ export default function AdminClubContentPage() {
           <div className="grid gap-5 lg:grid-cols-[420px_1fr]">
             <form onSubmit={submit} className="brand-panel space-y-4 rounded-[22px] p-5 text-[#151515]">
               <div className="flex items-center justify-between gap-3">
-                <div className="brand-font text-2xl">{form.id ? "Редактировать" : "Новая карточка"}</div>
+                <div className="brand-font text-2xl">{form.id ? "Редактировать" : "Новая карточка в ленту"}</div>
                 {form.id && (
-                  <button type="button" onClick={() => setForm(EMPTY_FORM)} className="rounded-full bg-[#151515] px-3 py-2 text-xs font-black uppercase text-white">
+                  <button type="button" onClick={() => startNew(form.type)} className="rounded-full bg-[#151515] px-3 py-2 text-xs font-black uppercase text-white">
                     Сброс
                   </button>
                 )}
+              </div>
+              <div className="rounded-2xl border border-[#151515]/10 bg-[#151515]/5 p-3 text-sm font-semibold leading-relaxed text-[#151515]/70">
+                Добавление не перезаписывает раздел. “Закрепить” поднимает карточку выше, но остальные записи остаются в ленте.
               </div>
 
               <label className="block">
@@ -242,22 +265,36 @@ export default function AdminClubContentPage() {
             </form>
 
             <section>
+              <div className="mb-4 flex flex-col gap-3 rounded-[22px] border border-white/10 bg-white/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="text-sm font-black uppercase text-white/50">Сейчас показано</div>
+                  <div className="mt-1 text-2xl font-black text-white">{visibleContent.length} карточек</div>
+                </div>
+                <button
+                  onClick={() => startNew(filter === "all" ? undefined : filter)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-4 py-3 text-sm font-black uppercase text-[#151515]"
+                >
+                  <Plus className="h-4 w-4" />
+                  Новая карточка
+                </button>
+              </div>
+
               <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
                 <button onClick={() => setFilter("all")} className={`shrink-0 rounded-full px-4 py-2 text-sm font-black uppercase ${filter === "all" ? "bg-white text-[#151515]" : "bg-white/10 text-white/75"}`}>
-                  Все
+                  Все <span className="ml-1 opacity-60">{content.length}</span>
                 </button>
                 {CLUB_CONTENT_TYPES.map((type) => (
                   <button key={type} onClick={() => setFilter(type)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-black uppercase ${filter === type ? "bg-[#fff200] text-[#151515]" : "bg-white/10 text-white/75"}`}>
-                    {CLUB_CONTENT_TYPE_LABELS[type]}
+                    {CLUB_CONTENT_TYPE_LABELS[type]} <span className="ml-1 opacity-60">{typeCounts.get(type) || 0}</span>
                   </button>
                 ))}
               </div>
 
               {loading && <div className="text-white/70">Загрузка...</div>}
-              {!loading && content.length === 0 && <div className="rounded-[22px] border border-white/10 bg-white/5 p-6 text-white/70">Карточек пока нет</div>}
+              {!loading && visibleContent.length === 0 && <div className="rounded-[22px] border border-white/10 bg-white/5 p-6 text-white/70">В этой ленте пока нет карточек</div>}
 
               <div className="grid gap-3">
-                {content.map((item) => (
+                {visibleContent.map((item) => (
                   <article key={`${item.id}-${item.title}`} className="rounded-[22px] border border-white/10 bg-white/[0.06] p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>

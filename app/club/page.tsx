@@ -56,7 +56,21 @@ export default function ClubPage() {
     return content.filter((item) => item.type === activeType)
   }, [activeType, content])
 
+  const typeCounts = useMemo(() => {
+    const counts = new Map<ClubContentType, number>()
+    CLUB_CONTENT_TYPES.forEach((type) => counts.set(type, 0))
+    content.forEach((item) => counts.set(item.type, (counts.get(item.type) || 0) + 1))
+    return counts
+  }, [content])
+
   const featured = content.find((item) => item.is_featured) || content[0]
+  const activeTitle = activeType === "all"
+    ? "Вся клубная лента"
+    : activeType === "honor"
+      ? "Лента участников"
+      : activeType === "gallery"
+        ? "Фото с турниров"
+        : CLUB_CONTENT_TYPE_LABELS[activeType]
 
   return (
     <ChessBackground>
@@ -95,7 +109,7 @@ export default function ClubPage() {
               onClick={() => setActiveType("all")}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-black uppercase transition ${activeType === "all" ? "bg-white text-[#151515]" : "bg-white/10 text-white/75 hover:bg-white/15"}`}
             >
-              Все
+              Все <span className="opacity-55">{content.length}</span>
             </button>
             {CLUB_CONTENT_TYPES.map((type) => {
               const Icon = TYPE_ICONS[type]
@@ -107,7 +121,7 @@ export default function ClubPage() {
                   className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-black uppercase transition ${active ? TYPE_ACCENTS[type] : "bg-white/10 text-white/75 hover:bg-white/15"}`}
                 >
                   <Icon className="h-4 w-4" />
-                  {CLUB_CONTENT_TYPE_LABELS[type]}
+                  {CLUB_CONTENT_TYPE_LABELS[type]} <span className="opacity-55">{typeCounts.get(type) || 0}</span>
                 </button>
               )
             })}
@@ -117,38 +131,49 @@ export default function ClubPage() {
           {loading && <div className="text-white/70">Загрузка...</div>}
 
           {!loading && (
-            <div className="grid gap-4 md:grid-cols-2">
-              {visibleContent.map((item) => {
-                const Icon = TYPE_ICONS[item.type]
-                return (
-                  <article key={`${item.type}-${item.id}-${item.title}`} className="brand-panel-dark overflow-hidden rounded-[22px]">
-                    {item.image_url && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={item.image_url} alt="" className="h-56 w-full object-cover" />
-                    )}
-                    <div className="p-5">
-                      <div className="mb-4 flex flex-wrap items-center gap-2">
-                        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black uppercase ${TYPE_ACCENTS[item.type]}`}>
-                          <Icon className="h-4 w-4" />
-                          {CLUB_CONTENT_TYPE_LABELS[item.type]}
-                        </span>
-                        {item.is_featured && <span className="rounded-full bg-white/10 px-3 py-2 text-xs font-black uppercase text-white/70">Важно</span>}
-                      </div>
-                      <h2 className="brand-font text-2xl leading-none text-white">{item.title}</h2>
-                      {item.subtitle && <p className="mt-3 font-semibold text-white/72">{item.subtitle}</p>}
-                      {item.body && <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-white/64">{item.body}</p>}
-                      {item.author_name && <div className="mt-4 text-sm font-bold text-white/60">- {item.author_name}</div>}
-                      {item.external_url && (
-                        <a href={item.external_url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black text-[#151515]">
-                          Открыть ссылку
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
+            <>
+              <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                <div>
+                  <h2 className="brand-font text-3xl leading-none text-white">{activeTitle}</h2>
+                  <p className="mt-2 text-sm font-semibold text-white/52">
+                    {visibleContent.length} {visibleContent.length === 1 ? "карточка" : "карточек"} в этом разделе
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {visibleContent.map((item) => {
+                  const Icon = TYPE_ICONS[item.type]
+                  return (
+                    <article key={`${item.type}-${item.id}-${item.title}`} className="brand-panel-dark overflow-hidden rounded-[22px]">
+                      {item.image_url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={item.image_url} alt="" className="h-56 w-full object-cover" />
                       )}
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
+                      <div className="p-5">
+                        <div className="mb-4 flex flex-wrap items-center gap-2">
+                          <span className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black uppercase ${TYPE_ACCENTS[item.type]}`}>
+                            <Icon className="h-4 w-4" />
+                            {CLUB_CONTENT_TYPE_LABELS[item.type]}
+                          </span>
+                          {item.is_featured && <span className="rounded-full bg-white/10 px-3 py-2 text-xs font-black uppercase text-white/70">Важно</span>}
+                        </div>
+                        <h2 className="brand-font text-2xl leading-none text-white">{item.title}</h2>
+                        {item.subtitle && <p className="mt-3 font-semibold text-white/72">{item.subtitle}</p>}
+                        {item.body && <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-white/64">{item.body}</p>}
+                        {item.author_name && <div className="mt-4 text-sm font-bold text-white/60">- {item.author_name}</div>}
+                        {item.external_url && (
+                          <a href={item.external_url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black text-[#151515]">
+                            Открыть ссылку
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        )}
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+            </>
           )}
 
           {!loading && visibleContent.length === 0 && (

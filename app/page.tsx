@@ -3,7 +3,7 @@ import { HomeHero } from "@/components/home/home-hero";
 import { MobileDock } from "@/components/home/mobile-dock";
 import { CLUB_CONTENT_TYPE_LABELS } from "@/lib/club-content";
 import { listClubContent, listTournaments, type Tournament } from "@/lib/db";
-import { ArrowRight, Brain, Building2, CalendarDays, Camera, Crown, Flame, GraduationCap, Handshake, MapPin, MessageCircle, Search, Send, ShoppingBag, Sparkles, Trophy, Users, Zap } from "lucide-react";
+import { ArrowRight, Brain, Building2, CalendarDays, Camera, Flame, GraduationCap, Handshake, MapPin, MessageCircle, Search, Send, ShoppingBag, Sparkles, Trophy, Users, Zap } from "lucide-react";
 
 const TELEGRAM_URL = "https://t.me/RepChessKRD"
 
@@ -442,9 +442,12 @@ export default async function Home() {
             <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
                 <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Доска почёта</div>
-                <h2 className="brand-title text-3xl sm:text-5xl">Герои вечера</h2>
+                <h2 className="brand-title text-3xl sm:text-5xl">Лента участников</h2>
               </div>
-              <Crown className="hidden h-10 w-10 text-[#151515]/35 sm:block" />
+              <a href="/club" className="inline-flex items-center gap-2 rounded-full bg-[#151515] px-4 py-3 text-sm font-black uppercase text-white">
+                Вся доска почета
+                <ArrowRight className="h-4 w-4" />
+              </a>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {(honorItems.length ? honorItems.map((item) => ({
