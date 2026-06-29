@@ -51,9 +51,6 @@ export async function POST(request: NextRequest) {
   })
 
   if (!content) {
-    if (type === "gallery") {
-      return NextResponse.json({ error: "Галерея еще не включена в Supabase. Выполните SQL-файл supabase_migration_club_content_images.sql." }, { status: 500 })
-    }
     return NextResponse.json({ error: "Не удалось создать карточку" }, { status: 500 })
   }
 
@@ -89,9 +86,6 @@ export async function PATCH(request: NextRequest) {
   })
 
   if (!content) {
-    if (type === "gallery") {
-      return NextResponse.json({ error: "Галерея еще не включена в Supabase. Выполните SQL-файл supabase_migration_club_content_images.sql." }, { status: 500 })
-    }
     return NextResponse.json({ error: "Не удалось обновить карточку" }, { status: 500 })
   }
 
