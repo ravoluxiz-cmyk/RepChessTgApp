@@ -20,24 +20,33 @@ const yandexVerification = process.env.YANDEX_VERIFICATION || undefined;
 export const metadata: Metadata = {
   metadataBase: new URL("https://repchesskrd.ru"),
   title: {
-    default: "Rep Chess KRD - шахматный клуб в Краснодаре",
+    default: "Rep Chess KRD - шахматы в Краснодаре, турниры и Telegram-канал",
     template: "%s | Rep Chess KRD",
   },
-  description: "Rep Chess KRD - шахматный клуб в Краснодаре: турниры, уроки, лекции, мерч, корпоративные шахматные мероприятия и клубное комьюнити.",
+  description: "Rep Chess KRD - шахматное комьюнити Краснодара: Telegram-канал, турниры по шахматам, уроки для начинающих, лекции, мерч и корпоративные шахматные мероприятия.",
   keywords: [
+    "шахматы Краснодар",
+    "шахматы в Краснодаре",
+    "играть в шахматы Краснодар",
     "шахматный клуб Краснодар",
     "шахматные турниры Краснодар",
-    "шахматы Краснодар",
+    "турниры по шахматам Краснодар",
     "уроки шахмат Краснодар",
+    "шахматы для начинающих Краснодар",
+    "обучение шахматам Краснодар",
+    "шахматное комьюнити Краснодар",
+    "шахматный мерч",
+    "шахматные корпоративы Краснодар",
+    "мероприятия по шахматам Краснодар",
     "Rep Chess KRD",
-    "шахматные мероприятия",
+    "Реп Чесс Краснодар",
   ],
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Rep Chess KRD - шахматный клуб в Краснодаре",
-    description: "Турниры, уроки, лекции, мерч и шахматные мероприятия Rep Chess KRD.",
+    title: "Rep Chess KRD - шахматы в Краснодаре",
+    description: "Telegram-канал, турниры, уроки, лекции, мерч и шахматные мероприятия Rep Chess KRD.",
     url: "https://repchesskrd.ru",
     siteName: "Rep Chess KRD",
     locale: "ru_RU",
@@ -45,8 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rep Chess KRD - шахматный клуб в Краснодаре",
-    description: "Турниры, уроки, лекции, мерч и шахматные мероприятия Rep Chess KRD.",
+    title: "Rep Chess KRD - шахматы в Краснодаре",
+    description: "Telegram-канал, турниры, уроки, лекции, мерч и шахматные мероприятия Rep Chess KRD.",
   },
   robots: {
     index: true,
@@ -69,17 +78,27 @@ const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "SportsOrganization",
   name: "Rep Chess KRD",
+  alternateName: [
+    "Реп Чесс Краснодар",
+    "Rep Chess Краснодар",
+  ],
   url: "https://repchesskrd.ru",
   sport: "Chess",
   areaServed: {
     "@type": "City",
     name: "Краснодар",
   },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    url: "https://t.me/RepChessKRD",
+    availableLanguage: "Russian",
+  },
   sameAs: [
     "https://repchess.ru",
     "https://t.me/RepChessKRD",
   ],
-  description: "Шахматный клуб в Краснодаре: турниры, уроки, лекции, клубные встречи и корпоративные шахматные мероприятия.",
+  description: "Шахматное комьюнити в Краснодаре: Telegram-канал, турниры, уроки, лекции, клубные встречи, мерч и корпоративные шахматные мероприятия.",
 };
 
 export default function RootLayout({

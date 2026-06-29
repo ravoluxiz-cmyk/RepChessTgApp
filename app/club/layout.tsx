@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Клуб, новости, правила и отзывы",
-  description: "Клуб Rep Chess KRD: новости, лекции, правила недушных шахмат, отзывы участников и доска почета шахматного комьюнити Краснодара.",
+  title: "Шахматный клуб Rep Chess KRD - новости, правила и отзывы",
+  description: "Клуб Rep Chess KRD в Краснодаре: новости шахматного комьюнити, лекции, правила турниров, отзывы участников и доска почета.",
   alternates: {
     canonical: "/club",
   },

@@ -3,7 +3,7 @@ import { HomeHero } from "@/components/home/home-hero";
 import { MobileDock } from "@/components/home/mobile-dock";
 import { CLUB_CONTENT_TYPE_LABELS } from "@/lib/club-content";
 import { listClubContent, listTournaments, type Tournament } from "@/lib/db";
-import { ArrowRight, Brain, Building2, CalendarDays, Camera, Crown, Flame, GraduationCap, Handshake, MapPin, MessageCircle, Send, Sparkles, Trophy, Users, Zap } from "lucide-react";
+import { ArrowRight, Brain, Building2, CalendarDays, Camera, Crown, Flame, GraduationCap, Handshake, MapPin, MessageCircle, Search, Send, ShoppingBag, Sparkles, Trophy, Users, Zap } from "lucide-react";
 
 const TELEGRAM_URL = "https://t.me/RepChessKRD"
 
@@ -89,6 +89,14 @@ const SCENARIOS = [
     icon: MessageCircle,
     accent: "#ff1515",
   },
+  {
+    title: "Хочу мерч",
+    text: "Футболки и клубные вещи Rep Chess KRD: карточки товаров, размеры, цены и быстрая заявка.",
+    cta: "Открыть витрину",
+    href: "/merch",
+    icon: ShoppingBag,
+    accent: "#fff200",
+  },
 ]
 
 const CLUB_NUMBERS = [
@@ -113,6 +121,55 @@ const HONOR_FALLBACK = [
   { title: "Топ посещаемости", name: "Постоянный участник", metric: "за любовь к клубным вечерам" },
 ]
 
+const SEO_TOPICS = [
+  {
+    title: "Шахматы в Краснодаре",
+    text: "Rep Chess KRD — шахматный клуб и городское комьюнити в Краснодаре. Мы собираем людей, которые хотят играть в шахматы офлайн, знакомиться, расти в рейтинге и приходить на живые клубные вечера.",
+  },
+  {
+    title: "Турниры по шахматам",
+    text: "На сайте есть расписание турниров по шахматам в Краснодаре: дата, площадка, формат, описание, афиша и регистрация. Анонсы и быстрые изменения первыми появляются в Telegram-канале Rep Chess KRD.",
+  },
+  {
+    title: "Шахматы для начинающих",
+    text: "Если вы ищете, где играть в шахматы с нуля, приходите на beginner-friendly события. Организатор объяснит формат, пары, часы и правила вечера без лишнего давления.",
+  },
+  {
+    title: "Уроки, лекции и клубный контент",
+    text: "В клубе проходят уроки шахмат, лекции, разборы партий, новости, отзывы участников и доска почета. Это помогает новичкам быстрее войти в шахматную среду, а опытным игрокам держать практику.",
+  },
+  {
+    title: "Мерч и стиль клуба",
+    text: "В разделе мерча собраны футболки и клубные вещи Rep Chess KRD. Это отдельная витрина для тех, кто хочет поддержать шахматное комьюнити и носить вещи клуба.",
+  },
+  {
+    title: "Шахматные мероприятия для компаний",
+    text: "Rep Chess KRD проводит корпоративные турниры, лекции, фестивальные шахматные зоны и партнерские события для компаний, баров, площадок и городских проектов.",
+  },
+]
+
+const homeJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Rep Chess KRD — шахматы в Краснодаре",
+  url: "https://repchesskrd.ru",
+  inLanguage: "ru-RU",
+  description: "Шахматный клуб Rep Chess KRD в Краснодаре: Telegram-канал, турниры, уроки, лекции, мерч и корпоративные шахматные мероприятия.",
+  about: [
+    "шахматы в Краснодаре",
+    "турниры по шахматам",
+    "шахматный клуб",
+    "уроки шахмат",
+    "шахматный мерч",
+  ],
+  mainEntity: {
+    "@type": "SportsOrganization",
+    name: "Rep Chess KRD",
+    url: "https://repchesskrd.ru",
+    sameAs: "https://t.me/RepChessKRD",
+  },
+}
+
 export const revalidate = 60
 
 export default async function Home() {
@@ -136,6 +193,10 @@ export default async function Home() {
 
   return (
     <ChessBackground>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
+      />
       <div className="mx-auto w-full max-w-7xl px-3 sm:px-4">
         <HomeHero />
 
@@ -237,7 +298,7 @@ export default async function Home() {
             )}
           </section>
 
-          <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             {SCENARIOS.map((scenario) => {
               const Icon = scenario.icon
               return (
@@ -253,6 +314,32 @@ export default async function Home() {
                 </a>
               )
             })}
+          </section>
+
+          <section className="brand-panel-dark p-5 sm:p-7" aria-labelledby="seo-chess-krasnodar">
+            <div className="mb-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+              <div>
+                <div className="brand-chip mb-3 inline-flex w-fit items-center gap-2 px-3 py-1 text-xs font-black uppercase">
+                  <Search className="h-4 w-4" />
+                  Шахматы Краснодар
+                </div>
+                <h2 id="seo-chess-krasnodar" className="brand-title text-3xl text-white sm:text-5xl">
+                  Где играть в шахматы в Краснодаре
+                </h2>
+              </div>
+              <p className="text-sm leading-relaxed text-white/62 sm:text-base">
+                Если коротко: в Rep Chess KRD. У нас есть Telegram-канал с анонсами, сайт с расписанием, турниры для разных уровней, уроки, лекции, мерч и форматы для компаний.
+              </p>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {SEO_TOPICS.map((topic) => (
+                <article key={topic.title} className="rounded-[20px] border border-white/10 bg-white/[0.06] p-5">
+                  <h3 className="brand-font text-xl leading-tight text-white">{topic.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-white/58">{topic.text}</p>
+                </article>
+              ))}
+            </div>
           </section>
 
           <section className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">

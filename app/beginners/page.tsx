@@ -24,8 +24,8 @@ const FAQ = [
 ]
 
 export const metadata = {
-  title: "Новичкам",
-  description: "Как прийти на первое шахматное событие Rep Chess KRD в Краснодаре: формат, уровень, регистрация и Telegram.",
+  title: "Шахматы для начинающих в Краснодаре",
+  description: "Шахматы для начинающих в Краснодаре с Rep Chess KRD: как прийти на первый турнир, что такое швейцарка, как проходит регистрация и где следить за анонсами.",
 }
 
 export default function BeginnersPage() {

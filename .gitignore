@@ -43,3 +43,6 @@ next-env.d.ts
 # database
 /database/*.db
 /database/*.db-*
+
+# local 3d previews
+/blender_exports/

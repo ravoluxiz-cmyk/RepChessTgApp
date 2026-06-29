@@ -1,6 +1,6 @@
 "use client"
 
-import { Calendar, Send, Trophy, User } from "lucide-react"
+import { Calendar, Send, ShoppingBag, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 const TELEGRAM_URL = "https://t.me/RepChessKRD"
@@ -14,11 +14,11 @@ export function MobileDock() {
         <Calendar className="h-5 w-5" />
         Турниры
       </button>
-      <button type="button" onClick={() => router.push("/tournaments")} className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl bg-white text-[0.68rem] font-black uppercase text-[#151515]">
-        <Trophy className="h-5 w-5" />
-        Запись
+      <button type="button" onClick={() => router.push("/merch")} className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl text-[0.68rem] font-black uppercase text-white/76 transition hover:bg-white/10 hover:text-white">
+        <ShoppingBag className="h-5 w-5" />
+        Мерч
       </button>
-      <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl text-[0.68rem] font-black uppercase text-white/76 transition hover:bg-white/10 hover:text-white">
+      <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl bg-white text-[0.68rem] font-black uppercase text-[#151515]">
         <Send className="h-5 w-5" />
         TG
       </a>
