@@ -40,7 +40,7 @@ export function normalizeHalfHourDateTimeInput(value?: string | null): string {
   if (!match) return trimmed
 
   const [, datePart, hourRaw, minuteRaw] = match
-  let hour = Number(hourRaw)
+  const hour = Number(hourRaw)
   const minute = Number(minuteRaw)
 
   if (!Number.isFinite(hour) || !Number.isFinite(minute)) return trimmed
