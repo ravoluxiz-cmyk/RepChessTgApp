@@ -70,13 +70,13 @@ export default function ClubPage() {
           <section className="relative mb-6 overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
             <div className="brand-bg-illustration pointer-events-none absolute -right-24 -bottom-20 h-80 w-[420px] opacity-[0.08]" />
             <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">
-              Club Feed
+              Клубная лента
             </div>
             <div className="grid gap-5 lg:grid-cols-[1fr_360px] lg:items-end">
               <div>
                 <h1 className="brand-title text-4xl text-white sm:text-6xl">Клуб Rep Chess KRD</h1>
                 <p className="mt-3 max-w-2xl text-white/62">
-                  Доска почета, лекции, новости, отзывы и правила наших недушных шахмат.
+                  Новости, лекции, отзывы, правила вечеров и доска почета. Все, что хочется сохранить после турнира.
                 </p>
               </div>
 
@@ -153,7 +153,7 @@ export default function ClubPage() {
 
           {!loading && visibleContent.length === 0 && (
             <div className="rounded-[22px] border border-white/10 bg-white/5 p-6 text-white/70">
-              В этом разделе пока нет опубликованных карточек. В админке можно добавить первую.
+              Тут пока пусто. Добавь первую карточку в админке, и она появится здесь.
             </div>
           )}
 

@@ -59,7 +59,7 @@ function getEventStatusClass(status: string) {
 const SCENARIOS = [
   {
     title: "Я новичок",
-    text: "Не знаешь, что такое швейцарка, но хочешь попробовать? Есть мягкие форматы и уроки для старта.",
+    text: "Не знаешь, что такое швейцарка? Нормально. Покажем, куда садиться, когда жать часы и с кем играть.",
     cta: "Старт для новичка",
     href: "/beginners",
     icon: GraduationCap,
@@ -67,7 +67,7 @@ const SCENARIOS = [
   },
   {
     title: "Я уже играю",
-    text: "Блиц, Фишер, клубный рейтинг, сильные пары и живые турниры без лишней духоты.",
+    text: "Блиц, Фишер, рейтинг, новые соперники и партии, после которых хочется сразу обсудить позицию.",
     cta: "К расписанию",
     href: "/tournaments",
     icon: Trophy,
@@ -75,7 +75,7 @@ const SCENARIOS = [
   },
   {
     title: "Хочу корпоратив",
-    text: "Турнир, лекция, квиз или шахматный спот для команды, площадки или фестиваля.",
+    text: "Соберем шахматный вечер для команды, бара, фестиваля или площадки. Можно турнир, лекцию или микс.",
     cta: "Запросить формат",
     href: "/partners",
     icon: Building2,
@@ -83,7 +83,7 @@ const SCENARIOS = [
   },
   {
     title: "Хочу в комьюнити",
-    text: "Новости, фото, лекции, доска почёта, правила и весь вайб клубной жизни.",
+    text: "Там новости, фото, правила, отзывы, доска почета и все, что обычно происходит между турнирами.",
     cta: "Открыть клуб",
     href: "/club",
     icon: MessageCircle,
@@ -91,7 +91,7 @@ const SCENARIOS = [
   },
   {
     title: "Хочу мерч",
-    text: "Футболки и клубные вещи Rep Chess KRD: карточки товаров, размеры, цены и быстрая заявка.",
+    text: "Футболки и клубные вещи Rep Chess KRD. Смотри карточки, выбирай размер, оставляй заявку.",
     cta: "Открыть витрину",
     href: "/merch",
     icon: ShoppingBag,
@@ -103,16 +103,16 @@ const CLUB_NUMBERS = [
   { value: "700+", label: "активных игроков в Краснодаре" },
   { value: "20+", label: "человек на клубных турнирах" },
   { value: "14", label: "городов Rep Chess" },
-  { value: "40 000+", label: "игроков в экосистеме Rep Chess" },
+  { value: "40 000+", label: "игроков Rep Chess по городам" },
 ]
 
 const FORMATS = [
-  { title: "BLITZ 5+3", text: "Быстро, шумно, с часами и шансом случайно обыграть сильного игрока.", icon: Zap },
-  { title: "Новички", text: "Форматы без тревоги: объясним правила вечера и поможем с первой партией.", icon: GraduationCap },
-  { title: "Фишер", text: "960 позиций, меньше зубрёжки, больше живого шахматного мышления.", icon: Sparkles },
-  { title: "Лекции", text: "Разборы, идеи, позиции и разговоры о шахматах человеческим языком.", icon: Brain },
+  { title: "BLITZ 5+3", text: "Быстро, шумно, с часами. Иногда успеваешь подумать, иногда просто веришь руке.", icon: Zap },
+  { title: "Новички", text: "Без экзамена на входе. Объясним формат и поможем сыграть первую партию.", icon: GraduationCap },
+  { title: "Фишер", text: "960 стартовых позиций. Меньше заучки, больше настоящего шахматного хаоса.", icon: Sparkles },
+  { title: "Лекции", text: "Разбираем партии, идеи и позиции нормальным языком, а не как в старой методичке.", icon: Brain },
   { title: "Корпоративы", text: "Шахматный вечер для команды: турнир, квиз, лекция или свободная игра.", icon: Handshake },
-  { title: "Hand & Brain", text: "Командный хаос, где один говорит фигуру, другой пытается спасти позицию.", icon: Users },
+  { title: "Hand & Brain", text: "Один говорит фигуру, второй делает ход. Дружба проверяется за пять минут.", icon: Users },
 ]
 
 const HONOR_FALLBACK = [
@@ -124,27 +124,27 @@ const HONOR_FALLBACK = [
 const SEO_TOPICS = [
   {
     title: "Шахматы в Краснодаре",
-    text: "Rep Chess KRD — шахматный клуб и городское комьюнити в Краснодаре. Мы собираем людей, которые хотят играть в шахматы офлайн, знакомиться, расти в рейтинге и приходить на живые клубные вечера.",
+    text: "Ищешь шахматы в Краснодаре не в формате тихого кружка? У нас играют офлайн, знакомятся, спорят о партиях и возвращаются на следующие вечера.",
   },
   {
     title: "Турниры по шахматам",
-    text: "На сайте есть расписание турниров по шахматам в Краснодаре: дата, площадка, формат, описание, афиша и регистрация. Анонсы и быстрые изменения первыми появляются в Telegram-канале Rep Chess KRD.",
+    text: "В расписании есть дата, площадка, формат, афиша и запись. Самые быстрые анонсы и переносы все равно сначала улетают в Telegram.",
   },
   {
     title: "Шахматы для начинающих",
-    text: "Если вы ищете, где играть в шахматы с нуля, приходите на beginner-friendly события. Организатор объяснит формат, пары, часы и правила вечера без лишнего давления.",
+    text: "Можно прийти без рейтинга и без уверенности в себе. Организатор объяснит пары, часы и что делать после партии.",
   },
   {
     title: "Уроки, лекции и клубный контент",
-    text: "В клубе проходят уроки шахмат, лекции, разборы партий, новости, отзывы участников и доска почета. Это помогает новичкам быстрее войти в шахматную среду, а опытным игрокам держать практику.",
+    text: "Проводим уроки шахмат, лекции и разборы. Плюс собираем новости клуба, отзывы и доску почета, чтобы история вечеров не терялась.",
   },
   {
     title: "Мерч и стиль клуба",
-    text: "В разделе мерча собраны футболки и клубные вещи Rep Chess KRD. Это отдельная витрина для тех, кто хочет поддержать шахматное комьюнити и носить вещи клуба.",
+    text: "В мерче лежат футболки и вещи Rep Chess KRD. Не обязательная форма, просто приятно, когда клуб виден и вне доски.",
   },
   {
     title: "Шахматные мероприятия для компаний",
-    text: "Rep Chess KRD проводит корпоративные турниры, лекции, фестивальные шахматные зоны и партнерские события для компаний, баров, площадок и городских проектов.",
+    text: "Делаем корпоративные турниры, лекции и шахматные зоны для компаний, баров, фестивалей и городских проектов.",
   },
 ]
 
@@ -209,7 +209,7 @@ export default async function Home() {
                 Шахматы без пыли
               </h2>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/68 sm:text-lg">
-                Rep Chess KRD собирает людей вокруг турниров, уроков, лекций и живого комьюнити. Мы делаем шахматы понятными, социальными и красивыми: можно прийти первый раз, сыграть блиц, познакомиться с людьми и остаться в клубе.
+                Мы делаем офлайн-шахматы в Краснодаре: турниры, уроки, лекции и вечера, где можно прийти одному, сыграть блиц и уйти уже с новыми знакомыми.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="brand-button inline-flex items-center justify-center gap-2 px-5 py-3">
@@ -241,7 +241,7 @@ export default async function Home() {
           <section className="brand-panel-dark p-5 sm:p-7">
             <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
-                <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Event drop</div>
+                <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Скоро играем</div>
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Ближайшие события</h2>
               </div>
               <a href="/tournaments" className="inline-flex items-center gap-2 text-sm font-black uppercase text-white/70 transition hover:text-white">
@@ -289,7 +289,7 @@ export default async function Home() {
             ) : (
               <div className="rounded-[22px] border border-white/10 bg-white/[0.06] p-6">
                 <h3 className="brand-font text-2xl text-white">Анонсы выходят в Telegram первыми</h3>
-                <p className="mt-3 max-w-2xl text-white/62">Когда новое событие появится в расписании, оно автоматически станет карточкой на сайте. А пока живые анонсы, переносы и запись идут в канале.</p>
+                <p className="mt-3 max-w-2xl text-white/62">Новое событие появится здесь карточкой. А если хочешь узнать первым, лучше заглянуть в канал.</p>
                 <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black uppercase text-[#151515]">
                   Открыть Telegram
                   <Send className="h-4 w-4" />
@@ -328,7 +328,7 @@ export default async function Home() {
                 </h2>
               </div>
               <p className="text-sm leading-relaxed text-white/62 sm:text-base">
-                Если коротко: в Rep Chess KRD. У нас есть Telegram-канал с анонсами, сайт с расписанием, турниры для разных уровней, уроки, лекции, мерч и форматы для компаний.
+                Если коротко: у нас. Есть расписание, турниры для разных уровней, уроки, лекции, мерч и отдельные форматы для компаний.
               </p>
             </div>
 
@@ -364,7 +364,7 @@ export default async function Home() {
                 ))}
                 {galleryItems.length === 0 && (
                   <div className="col-span-full rounded-[18px] border border-white/10 bg-white/5 p-6 text-white/62">
-                    Фотоотчеты скоро появятся здесь. Сейчас самая свежая атмосфера живет в Telegram.
+                    Фотоотчеты скоро появятся здесь. Самое свежее пока выкладываем в Telegram.
                   </div>
                 )}
               </div>
@@ -375,7 +375,7 @@ export default async function Home() {
               {upcomingTournament ? (
                 <>
                   <h2 className="brand-font text-2xl leading-tight sm:text-3xl">{upcomingTournament.title}</h2>
-                  <p className="mt-4 leading-relaxed text-[#151515]/68">Главная → карточка события → регистрация → подтверждение → Telegram. Мы держим путь записи коротким и понятным.</p>
+                  <p className="mt-4 leading-relaxed text-[#151515]/68">Открой карточку, посмотри место и формат, нажми запись. Без длинных анкет и лишних кругов.</p>
                   <a href="/tournaments" className="brand-button mt-6 inline-flex w-full items-center justify-center gap-2 px-5 py-3">
                     Перейти к записи
                     <ArrowRight className="h-5 w-5" />
@@ -384,7 +384,7 @@ export default async function Home() {
               ) : (
                 <>
                   <h2 className="brand-font text-2xl leading-tight sm:text-3xl">Скоро новый drop</h2>
-                  <p className="mt-4 leading-relaxed text-[#151515]/68">Подписывайся на канал: там появляются анонсы, переносы, победители и внезапные события.</p>
+                  <p className="mt-4 leading-relaxed text-[#151515]/68">Новый анонс обычно сначала появляется в канале. Потом уже красиво ложится на сайт.</p>
                   <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="brand-button mt-6 inline-flex w-full items-center justify-center gap-2 px-5 py-3">
                     Telegram
                     <Send className="h-5 w-5" />
@@ -416,7 +416,7 @@ export default async function Home() {
           <section className="brand-panel-dark p-5 sm:p-7">
             <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
-                <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Club feed</div>
+                <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Клубная лента</div>
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Полезное внутри клуба</h2>
               </div>
               <a href="/club" className="inline-flex items-center gap-2 text-sm font-black uppercase text-white/70 transition hover:text-white">
@@ -467,10 +467,10 @@ export default async function Home() {
           <section className="brand-panel relative overflow-hidden p-5 sm:p-7">
             <div className="brand-sticker pointer-events-none absolute -right-10 top-8 h-12 w-36 rotate-[-12deg] bg-[#ff1515]" />
             <div className="max-w-3xl">
-              <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Главная площадка</div>
+              <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Канал клуба</div>
               <h2 className="brand-title text-3xl sm:text-5xl">Все начинается в Telegram</h2>
               <p className="mt-4 text-base leading-relaxed text-[#151515]/68 sm:text-lg">
-                Там появляются быстрые анонсы, обсуждения, фото, регистрация на клубные активности и вся живая коммуникация.
+                Там быстрее всего появляются анонсы, переносы, фото, обсуждения и записи на ближайшие шахматные вечера.
               </p>
               <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="brand-button mt-6 inline-flex w-full items-center justify-center gap-2 px-5 py-3 sm:w-auto">
                 Подписаться на Rep Chess KRD

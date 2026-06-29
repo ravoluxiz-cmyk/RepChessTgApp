@@ -102,7 +102,7 @@ export function HomeHero() {
           Шахматы, которые не пахнут пылью
         </h2>
         <p className="mx-auto mt-5 max-w-2xl px-2 text-sm font-semibold leading-relaxed text-white/70 sm:text-base lg:mx-0 lg:px-0">
-          Турниры, лекции, новичковые вечера, клубные дропы и городское комьюнити в Краснодаре.
+          Турниры, лекции, новичковые вечера и мерч. Если хочется играть в шахматы в Краснодаре не одному за ноутбуком, тебе сюда.
         </p>
 
         <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">

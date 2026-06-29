@@ -69,7 +69,7 @@ export default function PartnersPage() {
               <div>
                 <h1 className="brand-title text-3xl sm:text-5xl">Провести мероприятие с Rep Chess KRD</h1>
                 <p className="mt-3 max-w-2xl text-white/62">
-                  Турниры, корпоративы, лекции и шахматные pop-up форматы для площадок и команд.
+                  Привезем шахматы на площадку, в офис или на фестиваль. Можно сделать турнир, лекцию, квиз или спокойный вечер с досками.
                 </p>
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function PartnersPage() {
                 ))}
               </div>
               <p className="mt-5 text-sm leading-relaxed text-white/62">
-                Заявка попадает в админку, где ее можно обработать как коммерческий лид.
+                Заявка появится в админке. Мы увидим контакт, формат и примерное количество гостей.
               </p>
             </aside>
           </div>

@@ -71,7 +71,7 @@ export default function LessonsPage() {
             <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Training request</div>
             <h1 className="brand-title text-4xl text-white sm:text-6xl">Запись на урок</h1>
             <p className="mt-4 max-w-2xl text-white/62">
-              Быстро соберите заявку: уровень, формат, удобное время и цель занятий.
+              Оставь заявку на урок шахмат: уровень, удобное время и что хочется подтянуть.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="rounded-full bg-white px-3 py-2 text-sm font-black text-[#151515]">Индивидуально</span>

@@ -11,7 +11,7 @@ const STEPS = [
 const FAQ = [
   {
     title: "Можно без рейтинга?",
-    text: "Да. Стартовый рейтинг и калибровка нужны системе, но на первый вечер можно приходить спокойно.",
+    text: "Да. Если рейтинга еще нет, ничего страшного. Первый вечер точно не про анкету и цифры.",
   },
   {
     title: "Что такое швейцарка?",
@@ -41,7 +41,7 @@ export default function BeginnersPage() {
               <div className="brand-chip mb-5 w-fit px-3 py-1 text-xs font-black uppercase">Beginner friendly</div>
               <h1 className="brand-title text-4xl text-white sm:text-6xl md:text-7xl">Первый турнир без паники</h1>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/66 sm:text-lg">
-                Нормально, если ты не знаешь, что такое швейцарка, как ставить часы или что делать после партии. Приходи, мы объясним формат и поможем зайти в клуб без ощущения экзамена.
+                Нормально, если ты не знаешь, что такое швейцарка, как ставить часы или что делать после партии. Приходи, объясним на месте. Это шахматы для начинающих, а не вступительный экзамен.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <a href="/tournaments" className="brand-button inline-flex min-h-12 items-center justify-center gap-2 px-5 py-3">
@@ -57,7 +57,7 @@ export default function BeginnersPage() {
 
             <div className="grid gap-3">
               {[
-                { icon: GraduationCap, title: "Играю впервые", text: "Подойдут уроки и beginner-friendly события." },
+                { icon: GraduationCap, title: "Играю впервые", text: "Подойдут уроки и события, где новичков ждут." },
                 { icon: ShieldCheck, title: "Знаю правила", text: "Можно смело пробовать клубный турнир." },
                 { icon: Trophy, title: "Играю онлайн", text: "Блиц и Фишер быстро покажут твой стиль." },
               ].map((item) => {

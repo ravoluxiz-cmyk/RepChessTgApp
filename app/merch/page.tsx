@@ -156,7 +156,7 @@ export default function MerchPage() {
                 <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Drop / Lookbook</div>
                 <h1 className="brand-title text-4xl text-white sm:text-6xl">REP CHESS KRD MERCH</h1>
                 <p className="mt-4 max-w-2xl text-white/62">
-                  Футболки, дропы и вещи клуба. Выберите позицию, размер и отправьте заявку в пару касаний.
+                  Футболки и вещи клуба. Выбери карточку, размер и оставь контакт, дальше напишем и уточним детали.
                 </p>
                 <div className="brand-accent-line mt-5 w-52" />
               </div>
