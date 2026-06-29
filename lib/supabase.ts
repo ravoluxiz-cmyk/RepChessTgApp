@@ -564,6 +564,8 @@ export interface Database {
           subtitle: string | null
           body: string | null
           image_url: string | null
+          image_urls: string[]
+          image_position: string
           external_url: string | null
           author_name: string | null
           is_published: boolean
@@ -580,6 +582,8 @@ export interface Database {
           subtitle?: string | null
           body?: string | null
           image_url?: string | null
+          image_urls?: string[]
+          image_position?: string
           external_url?: string | null
           author_name?: string | null
           is_published?: boolean
@@ -596,6 +600,8 @@ export interface Database {
           subtitle?: string | null
           body?: string | null
           image_url?: string | null
+          image_urls?: string[]
+          image_position?: string
           external_url?: string | null
           author_name?: string | null
           is_published?: boolean

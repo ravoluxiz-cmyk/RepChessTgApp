@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/telegram"
 import { createTournament, listTournaments, type Tournament } from "@/lib/db"
+import { fromMoscowDateTimeInput } from "@/lib/date-time"
 
 export const dynamic = "force-dynamic"
 
@@ -57,8 +58,12 @@ export async function POST(request: NextRequest) {
       registration_chat_id: body.registration_chat_id || body.chat_id || null,
       creator_telegram_id: adminUser.id,
       archived: body.archived ?? 0,
-      start_at: body.start_at || null,
-      end_at: body.end_at || null,
+      start_at: typeof body.start_at === "string" && body.start_at.includes("T") && !body.start_at.includes("+") && !body.start_at.endsWith("Z")
+        ? fromMoscowDateTimeInput(body.start_at)
+        : body.start_at || null,
+      end_at: typeof body.end_at === "string" && body.end_at.includes("T") && !body.end_at.includes("+") && !body.end_at.endsWith("Z")
+        ? fromMoscowDateTimeInput(body.end_at)
+        : body.end_at || null,
       location: body.location || null,
       address: body.address || null,
       yandex_maps_url: body.yandex_maps_url || null,

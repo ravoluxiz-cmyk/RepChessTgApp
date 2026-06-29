@@ -27,6 +27,8 @@ export interface ClubContent {
   subtitle?: string | null
   body?: string | null
   image_url?: string | null
+  image_urls?: string[] | null
+  image_position?: string | null
   external_url?: string | null
   author_name?: string | null
   is_published?: boolean
@@ -40,6 +42,43 @@ export interface ClubContent {
 export function normalizeClubContentType(value: unknown): ClubContentType {
   const raw = String(value || "").trim()
   return CLUB_CONTENT_TYPES.includes(raw as ClubContentType) ? raw as ClubContentType : "news"
+}
+
+export function normalizeClubContentImages(value: unknown, fallback?: unknown): string[] {
+  const raw = Array.isArray(value) ? value : []
+  const images = raw
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+    .slice(0, 8)
+
+  const fallbackImage = String(fallback || "").trim()
+  if (images.length === 0 && fallbackImage) return [fallbackImage]
+  return images
+}
+
+export function getClubContentImages(item: Pick<ClubContent, "image_url" | "image_urls">): string[] {
+  return normalizeClubContentImages(item.image_urls, item.image_url)
+}
+
+export function getClubContentCoverImage(item: Pick<ClubContent, "image_url" | "image_urls">): string {
+  return getClubContentImages(item)[0] || ""
+}
+
+export function normalizeClubContentImagePosition(value: unknown): string {
+  const raw = String(value || "").trim().toLowerCase()
+  const allowed = new Set([
+    "left top",
+    "center top",
+    "right top",
+    "left center",
+    "center center",
+    "right center",
+    "left bottom",
+    "center bottom",
+    "right bottom",
+  ])
+
+  return allowed.has(raw) ? raw : "center center"
 }
 
 export const DEFAULT_CLUB_CONTENT: ClubContent[] = [

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
+import { fromMoscowDateTimeInput, normalizeHalfHourDateTimeInput, toMoscowDateTimeInput } from "@/lib/date-time"
 import { ArrowLeft } from "lucide-react"
 import { PosterUploadField } from "@/components/admin/poster-upload-field"
 
@@ -80,8 +81,8 @@ export default function TournamentSettingsPage() {
                     allow_join: t.allow_join ?? 1,
                     archived: t.archived ?? 0,
                     registration_chat_id: t.registration_chat_id || "",
-                    start_at: t.start_at ? String(t.start_at).slice(0, 16) : "",
-                    end_at: t.end_at ? String(t.end_at).slice(0, 16) : "",
+                    start_at: toMoscowDateTimeInput(t.start_at),
+                    end_at: toMoscowDateTimeInput(t.end_at),
                     location: t.location || "",
                     address: t.address || "",
                     yandex_maps_url: t.yandex_maps_url || "",
@@ -118,8 +119,8 @@ export default function TournamentSettingsPage() {
                     registration_chat_id: settings.registration_chat_id || settings.chat_id || null,
                     allow_join: settings.allow_join,
                     archived: settings.archived,
-                    start_at: settings.start_at || null,
-                    end_at: settings.end_at || null,
+                    start_at: fromMoscowDateTimeInput(settings.start_at),
+                    end_at: fromMoscowDateTimeInput(settings.end_at),
                     location: settings.location || null,
                     address: settings.address || null,
                     yandex_maps_url: settings.yandex_maps_url || null,
@@ -226,8 +227,10 @@ export default function TournamentSettingsPage() {
                                     <label className={labelClass}>Начало</label>
                                     <input
                                         type="datetime-local"
+                                        step={1800}
                                         value={settings.start_at}
                                         onChange={(e) => setSettings(prev => ({ ...prev, start_at: e.target.value }))}
+                                        onBlur={(e) => setSettings(prev => ({ ...prev, start_at: normalizeHalfHourDateTimeInput(e.target.value) }))}
                                         className={inputClass}
                                     />
                                 </div>
@@ -235,8 +238,10 @@ export default function TournamentSettingsPage() {
                                     <label className={labelClass}>Окончание</label>
                                     <input
                                         type="datetime-local"
+                                        step={1800}
                                         value={settings.end_at}
                                         onChange={(e) => setSettings(prev => ({ ...prev, end_at: e.target.value }))}
+                                        onBlur={(e) => setSettings(prev => ({ ...prev, end_at: normalizeHalfHourDateTimeInput(e.target.value) }))}
                                         className={inputClass}
                                     />
                                 </div>

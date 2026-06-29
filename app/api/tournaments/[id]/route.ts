@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/telegram"
 import { deleteTournament, getTournamentById, updateTournament } from "@/lib/db"
+import { fromMoscowDateTimeInput } from "@/lib/date-time"
 
 export async function GET(_request: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -91,6 +92,11 @@ export async function PATCH(request: NextRequest, ctx: { params: Promise<{ id: s
         // Handle chat_id special case (empty string → null)
         if (key === 'chat_id' || key === 'registration_chat_id') {
           updates[key] = body[key] ? String(body[key]) : null
+        } else if ((key === 'start_at' || key === 'end_at') && typeof body[key] === 'string') {
+          const value = String(body[key])
+          updates[key] = value.includes("T") && !value.includes("+") && !value.endsWith("Z")
+            ? fromMoscowDateTimeInput(value)
+            : value || null
         } else {
           updates[key] = body[key]
         }

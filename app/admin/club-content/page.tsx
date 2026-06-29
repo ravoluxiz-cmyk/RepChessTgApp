@@ -6,7 +6,7 @@ import ChessBackground from "@/components/ChessBackground"
 import { ImageUploadField } from "@/components/admin/image-upload-field"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import type { ClubContent, ClubContentType } from "@/lib/club-content"
-import { CLUB_CONTENT_TYPE_LABELS, CLUB_CONTENT_TYPES } from "@/lib/club-content"
+import { CLUB_CONTENT_TYPE_LABELS, CLUB_CONTENT_TYPES, getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content"
 import { ArrowLeft, Edit3, Plus, Save, Trash2 } from "lucide-react"
 
 type FormState = {
@@ -16,6 +16,8 @@ type FormState = {
   subtitle: string
   body: string
   image_url: string
+  image_urls: string[]
+  image_position: string
   external_url: string
   author_name: string
   is_published: boolean
@@ -29,6 +31,8 @@ const EMPTY_FORM: FormState = {
   subtitle: "",
   body: "",
   image_url: "",
+  image_urls: [],
+  image_position: "center center",
   external_url: "",
   author_name: "",
   is_published: true,
@@ -97,7 +101,9 @@ export default function AdminClubContentPage() {
       title: item.title || "",
       subtitle: item.subtitle || "",
       body: item.body || "",
-      image_url: item.image_url || "",
+      image_url: getClubContentCoverImage(item),
+      image_urls: getClubContentImages(item),
+      image_position: normalizeClubContentImagePosition(item.image_position),
       external_url: item.external_url || "",
       author_name: item.author_name || "",
       is_published: item.is_published !== false,
@@ -115,6 +121,37 @@ export default function AdminClubContentPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  function updateImage(index: number, value: string) {
+    setForm((prev) => {
+      const nextImages = [...prev.image_urls]
+      nextImages[index] = value
+      const compactImages = nextImages.map((item) => item.trim()).filter(Boolean).slice(0, 8)
+      return {
+        ...prev,
+        image_url: compactImages[0] || "",
+        image_urls: compactImages,
+      }
+    })
+  }
+
+  function addImageSlot() {
+    setForm((prev) => {
+      if (prev.image_urls.length >= 8) return prev
+      return { ...prev, image_urls: [...prev.image_urls, ""] }
+    })
+  }
+
+  function removeImage(index: number) {
+    setForm((prev) => {
+      const compactImages = prev.image_urls.filter((_, imageIndex) => imageIndex !== index).filter(Boolean).slice(0, 8)
+      return {
+        ...prev,
+        image_url: compactImages[0] || "",
+        image_urls: compactImages,
+      }
+    })
+  }
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     setSaving(true)
@@ -127,6 +164,9 @@ export default function AdminClubContentPage() {
         headers,
         body: JSON.stringify({
           ...form,
+          image_url: form.image_urls[0] || form.image_url || "",
+          image_urls: form.image_urls.filter(Boolean).slice(0, 8),
+          image_position: normalizeClubContentImagePosition(form.image_position),
           sort_order: Number(form.sort_order || 100),
         }),
       })
@@ -218,18 +258,68 @@ export default function AdminClubContentPage() {
                 <textarea rows={7} value={form.body} onChange={(e) => setForm((prev) => ({ ...prev, body: e.target.value }))} className={`${inputClass} resize-none`} />
               </label>
 
+              <div className="space-y-4 rounded-2xl border border-[#151515]/10 bg-[#151515]/5 p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-bold">Фотографии карточки</div>
+                    <div className="mt-1 text-xs font-semibold text-[#151515]/55">До 8 фото. Первое фото будет обложкой на главной.</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addImageSlot}
+                    disabled={form.image_urls.length >= 8}
+                    className="shrink-0 rounded-full bg-[#151515] px-3 py-2 text-xs font-black uppercase text-white disabled:opacity-40"
+                  >
+                    + фото
+                  </button>
+                </div>
+
+                {(form.image_urls.length ? form.image_urls : [""]).map((image, index) => (
+                  <div key={index} className="rounded-2xl border border-[#151515]/10 bg-white/60 p-3">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="text-sm font-black uppercase text-[#151515]/60">Фото {index + 1}</span>
+                      {form.image_urls.length > 1 && (
+                        <button type="button" onClick={() => removeImage(index)} className="text-xs font-black uppercase text-red-600">
+                          Удалить
+                        </button>
+                      )}
+                    </div>
+                    <ImageUploadField
+                      value={image}
+                      onChange={(value) => updateImage(index, value)}
+                      endpoint="/api/admin/club-content/upload"
+                      authHeader={initData ? `Bearer ${initData}` : undefined}
+                      inputClassName={inputClass}
+                      labelClassName="sr-only"
+                      label={`Фото ${index + 1}`}
+                      previewAlt="Картинка клубной карточки"
+                      previewClassName="aspect-[4/3] w-full object-cover"
+                      previewStyle={{ objectPosition: form.image_position }}
+                    />
+                  </div>
+                ))}
+
+                <label className="block">
+                  <span className="mb-2 block font-semibold">Область фотографии</span>
+                  <select
+                    value={form.image_position}
+                    onChange={(event) => setForm((prev) => ({ ...prev, image_position: event.target.value }))}
+                    className={inputClass}
+                  >
+                    <option value="center center">Центр</option>
+                    <option value="center top">Верх</option>
+                    <option value="center bottom">Низ</option>
+                    <option value="left center">Слева</option>
+                    <option value="right center">Справа</option>
+                    <option value="left top">Слева сверху</option>
+                    <option value="right top">Справа сверху</option>
+                    <option value="left bottom">Слева снизу</option>
+                    <option value="right bottom">Справа снизу</option>
+                  </select>
+                </label>
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                <ImageUploadField
-                  value={form.image_url}
-                  onChange={(value) => setForm((prev) => ({ ...prev, image_url: value }))}
-                  endpoint="/api/admin/club-content/upload"
-                  authHeader={initData ? `Bearer ${initData}` : undefined}
-                  inputClassName={inputClass}
-                  labelClassName="mb-2 block font-semibold"
-                  label="Картинка / фото галереи"
-                  previewAlt="Картинка клубной карточки"
-                  previewClassName="aspect-[4/3] w-full object-cover"
-                />
                 <label className="block">
                   <span className="mb-2 block font-semibold">Внешняя ссылка</span>
                   <input value={form.external_url} onChange={(e) => setForm((prev) => ({ ...prev, external_url: e.target.value }))} className={inputClass} />
@@ -309,6 +399,17 @@ export default function AdminClubContentPage() {
                         {item.subtitle && <p className="mt-1 text-white/70">{item.subtitle}</p>}
                         {item.body && <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/58">{item.body}</p>}
                       </div>
+                      {getClubContentCoverImage(item) && (
+                        <div className="h-24 w-full shrink-0 overflow-hidden rounded-2xl bg-white/10 sm:w-32">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={getClubContentCoverImage(item)}
+                            alt=""
+                            className="h-full w-full object-cover"
+                            style={{ objectPosition: normalizeClubContentImagePosition(item.image_position) }}
+                          />
+                        </div>
+                      )}
                       <div className="flex shrink-0 gap-2">
                         <button onClick={() => edit(item)} className="rounded-full bg-white p-3 text-[#151515]" title="Редактировать">
                           <Edit3 className="h-4 w-4" />

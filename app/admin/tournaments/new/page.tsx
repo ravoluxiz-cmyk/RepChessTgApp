@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
+import { fromMoscowDateTimeInput, normalizeHalfHourDateTimeInput } from "@/lib/date-time"
 import { ArrowLeft, LogOut, Trash2, Search, X } from "lucide-react"
 import { PosterUploadField } from "@/components/admin/poster-upload-field"
 
@@ -110,8 +111,8 @@ export default function AdminCreateTournamentPage() {
           if (d.show_opponent_names !== undefined) setShowOpponentNames(Boolean(d.show_opponent_names))
           if (d.chat_id !== undefined) setChatId(String(d.chat_id))
           if (d.registration_chat_id !== undefined) setRegistrationChatId(String(d.registration_chat_id))
-          if (d.start_at !== undefined) setStartAt(String(d.start_at))
-          if (d.end_at !== undefined) setEndAt(String(d.end_at))
+          if (d.start_at !== undefined) setStartAt(normalizeHalfHourDateTimeInput(String(d.start_at)))
+          if (d.end_at !== undefined) setEndAt(normalizeHalfHourDateTimeInput(String(d.end_at)))
           if (d.location !== undefined) setLocation(String(d.location))
           if (d.address !== undefined) setAddress(String(d.address))
           if (d.yandex_maps_url !== undefined) setYandexMapsUrl(String(d.yandex_maps_url))
@@ -150,8 +151,8 @@ export default function AdminCreateTournamentPage() {
         show_opponent_names: showOpponentNames,
         chat_id: chatId,
         registration_chat_id: registrationChatId,
-        start_at: startAt,
-        end_at: endAt,
+        start_at: normalizeHalfHourDateTimeInput(startAt),
+        end_at: normalizeHalfHourDateTimeInput(endAt),
         location,
         address,
         yandex_maps_url: yandexMapsUrl,
@@ -254,8 +255,8 @@ export default function AdminCreateTournamentPage() {
           show_opponent_names: showOpponentNames ? 1 : 0,
           chat_id: chatId || null,
           registration_chat_id: registrationChatId || chatId || null,
-          start_at: startAt || null,
-          end_at: endAt || null,
+          start_at: fromMoscowDateTimeInput(startAt),
+          end_at: fromMoscowDateTimeInput(endAt),
           location: location || null,
           address: address || null,
           yandex_maps_url: yandexMapsUrl || null,
@@ -341,8 +342,10 @@ export default function AdminCreateTournamentPage() {
                 <label className="text-white block mb-2">Дата и время начала</label>
                 <input
                   type="datetime-local"
+                  step={1800}
                   value={startAt}
                   onChange={(e) => setStartAt(e.target.value)}
+                  onBlur={(e) => setStartAt(normalizeHalfHourDateTimeInput(e.target.value))}
                   className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
                 />
               </div>
@@ -350,8 +353,10 @@ export default function AdminCreateTournamentPage() {
                 <label className="text-white block mb-2">Дата и время окончания</label>
                 <input
                   type="datetime-local"
+                  step={1800}
                   value={endAt}
                   onChange={(e) => setEndAt(e.target.value)}
+                  onBlur={(e) => setEndAt(normalizeHalfHourDateTimeInput(e.target.value))}
                   className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
                 />
               </div>

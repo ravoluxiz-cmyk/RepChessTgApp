@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, type ChangeEvent } from "react"
+import { useRef, useState, type ChangeEvent, type CSSProperties } from "react"
 import { ImageIcon, Loader2, Upload, X } from "lucide-react"
 
 interface ImageUploadFieldProps {
@@ -14,6 +14,7 @@ interface ImageUploadFieldProps {
   helpText?: string
   previewAlt?: string
   previewClassName?: string
+  previewStyle?: CSSProperties
 }
 
 export function ImageUploadField({
@@ -27,6 +28,7 @@ export function ImageUploadField({
   helpText = "JPG, PNG, WebP или GIF до 8 МБ. Можно также вставить прямую ссылку ниже.",
   previewAlt = "Изображение",
   previewClassName = "aspect-[16/9] w-full object-cover",
+  previewStyle,
 }: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
@@ -72,7 +74,7 @@ export function ImageUploadField({
       {value && (
         <div className="overflow-hidden rounded-lg border border-white/10 bg-black/20">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt={previewAlt} className={previewClassName} />
+          <img src={value} alt={previewAlt} className={previewClassName} style={previewStyle} />
         </div>
       )}
 

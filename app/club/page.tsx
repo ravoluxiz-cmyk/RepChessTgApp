@@ -4,8 +4,14 @@ import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import type { ClubContent, ClubContentType } from "@/lib/club-content"
-import { CLUB_CONTENT_TYPE_DESCRIPTIONS, CLUB_CONTENT_TYPE_LABELS, CLUB_CONTENT_TYPES } from "@/lib/club-content"
-import { ArrowLeft, Camera, ExternalLink, Megaphone, Quote, ScrollText, Sparkles, Trophy } from "lucide-react"
+import {
+  CLUB_CONTENT_TYPE_DESCRIPTIONS,
+  CLUB_CONTENT_TYPE_LABELS,
+  CLUB_CONTENT_TYPES,
+  getClubContentImages,
+  normalizeClubContentImagePosition,
+} from "@/lib/club-content"
+import { ArrowLeft, Camera, ChevronLeft, ChevronRight, ExternalLink, Megaphone, Quote, ScrollText, Sparkles, Trophy } from "lucide-react"
 
 const TYPE_ICONS: Record<ClubContentType, typeof Trophy> = {
   honor: Trophy,
@@ -23,6 +29,57 @@ const TYPE_ACCENTS: Record<ClubContentType, string> = {
   rules: "bg-[#20d66b] text-[#151515]",
   review: "bg-[#ff1515] text-white",
   gallery: "bg-white/15 text-white",
+}
+
+function ClubContentImageCarousel({ item }: { item: ClubContent }) {
+  const images = getClubContentImages(item)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const imagePosition = normalizeClubContentImagePosition(item.image_position)
+
+  if (!images.length) return null
+
+  function showPrevious() {
+    setActiveIndex((current) => current === 0 ? images.length - 1 : current - 1)
+  }
+
+  function showNext() {
+    setActiveIndex((current) => current === images.length - 1 ? 0 : current + 1)
+  }
+
+  return (
+    <div className="relative overflow-hidden">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={images[activeIndex]}
+        alt=""
+        className="h-56 w-full object-cover"
+        style={{ objectPosition: imagePosition }}
+      />
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={showPrevious}
+            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition hover:bg-black/80"
+            aria-label="Предыдущее фото"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onClick={showNext}
+            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition hover:bg-black/80"
+            aria-label="Следующее фото"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+          <div className="absolute bottom-3 right-3 rounded-full bg-black/62 px-3 py-1 text-xs font-black text-white backdrop-blur">
+            {activeIndex + 1}/{images.length}
+          </div>
+        </>
+      )}
+    </div>
+  )
 }
 
 export default function ClubPage() {
@@ -146,10 +203,7 @@ export default function ClubPage() {
                   const Icon = TYPE_ICONS[item.type]
                   return (
                     <article key={`${item.type}-${item.id}-${item.title}`} className="brand-panel-dark overflow-hidden rounded-[22px]">
-                      {item.image_url && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={item.image_url} alt="" className="h-56 w-full object-cover" />
-                      )}
+                      <ClubContentImageCarousel item={item} />
                       <div className="p-5">
                         <div className="mb-4 flex flex-wrap items-center gap-2">
                           <span className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black uppercase ${TYPE_ACCENTS[item.type]}`}>

@@ -2,7 +2,12 @@ import { supabase, supabaseAdmin } from './supabase'
 import type { PlayerStatus } from './player-status'
 import { normalizePlayerStatus, resolvePlayerStatus } from './player-status'
 import type { ClubContent, ClubContentType } from './club-content'
-import { DEFAULT_CLUB_CONTENT, normalizeClubContentType } from './club-content'
+import {
+  DEFAULT_CLUB_CONTENT,
+  normalizeClubContentImagePosition,
+  normalizeClubContentImages,
+  normalizeClubContentType,
+} from './club-content'
 
 // Types matching our database schema
 export interface User {
@@ -921,12 +926,15 @@ export async function listClubContent(options: {
   return rows.map((item) => ({
     ...item,
     type: normalizeClubContentType(item.type),
+    image_urls: normalizeClubContentImages(item.image_urls, item.image_url),
+    image_position: normalizeClubContentImagePosition(item.image_position),
   }))
 }
 
 export async function createClubContent(content: ClubContent): Promise<ClubContent | null> {
   const now = new Date().toISOString()
   const isPublished = content.is_published !== false
+  const imageUrls = normalizeClubContentImages(content.image_urls, content.image_url)
 
   const { data, error } = await supabaseAdmin
     .from('club_content')
@@ -935,7 +943,9 @@ export async function createClubContent(content: ClubContent): Promise<ClubConte
       title: content.title,
       subtitle: content.subtitle || null,
       body: content.body || null,
-      image_url: content.image_url || null,
+      image_url: imageUrls[0] || null,
+      image_urls: imageUrls,
+      image_position: normalizeClubContentImagePosition(content.image_position),
       external_url: content.external_url || null,
       author_name: content.author_name || null,
       is_published: isPublished,
@@ -963,7 +973,14 @@ export async function updateClubContent(contentId: number, fields: Partial<ClubC
   if (fields.title !== undefined) payload.title = fields.title
   if (fields.subtitle !== undefined) payload.subtitle = fields.subtitle || null
   if (fields.body !== undefined) payload.body = fields.body || null
-  if (fields.image_url !== undefined) payload.image_url = fields.image_url || null
+  if (fields.image_url !== undefined || fields.image_urls !== undefined) {
+    const imageUrls = normalizeClubContentImages(fields.image_urls, fields.image_url)
+    payload.image_url = imageUrls[0] || null
+    payload.image_urls = imageUrls
+  }
+  if (fields.image_position !== undefined) {
+    payload.image_position = normalizeClubContentImagePosition(fields.image_position)
+  }
   if (fields.external_url !== undefined) payload.external_url = fields.external_url || null
   if (fields.author_name !== undefined) payload.author_name = fields.author_name || null
   if (fields.is_published !== undefined) {

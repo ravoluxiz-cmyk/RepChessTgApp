@@ -1,7 +1,7 @@
 import ChessBackground from "@/components/ChessBackground";
 import { HomeHero } from "@/components/home/home-hero";
 import { MobileDock } from "@/components/home/mobile-dock";
-import { CLUB_CONTENT_TYPE_LABELS } from "@/lib/club-content";
+import { CLUB_CONTENT_TYPE_LABELS, getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content";
 import { listClubContent, listTournaments, type Tournament } from "@/lib/db";
 import { ArrowRight, Brain, Building2, CalendarDays, Camera, Flame, GraduationCap, Handshake, MapPin, MessageCircle, Search, Send, ShoppingBag, Sparkles, Trophy, Users, Zap } from "lucide-react";
 
@@ -116,9 +116,9 @@ const FORMATS = [
 ]
 
 const HONOR_FALLBACK = [
-  { title: "Игрок месяца", name: "Герой клубного вечера", metric: "за стабильную игру и вайб" },
-  { title: "Лучший новичок", name: "Первый турнир", metric: "за смелость прийти и сыграть" },
-  { title: "Топ посещаемости", name: "Постоянный участник", metric: "за любовь к клубным вечерам" },
+  { title: "Игрок месяца", name: "Герой клубного вечера", metric: "за стабильную игру и вайб", imageUrl: "", imagePosition: "center center" },
+  { title: "Лучший новичок", name: "Первый турнир", metric: "за смелость прийти и сыграть", imageUrl: "", imagePosition: "center center" },
+  { title: "Топ посещаемости", name: "Постоянный участник", metric: "за любовь к клубным вечерам", imageUrl: "", imagePosition: "center center" },
 ]
 
 const SEO_TOPICS = [
@@ -181,7 +181,13 @@ export default async function Home() {
   const upcomingTournament = getUpcomingTournament(tournaments)
   const visibleEvents = getVisibleEvents(tournaments)
   const galleryItems = clubContent
-    .filter((item) => item.type === "gallery" && item.image_url)
+    .filter((item) => item.type === "gallery")
+    .flatMap((item) => getClubContentImages(item).map((imageUrl, index) => ({
+      id: `${item.id}-${index}`,
+      title: item.title,
+      imageUrl,
+      imagePosition: normalizeClubContentImagePosition(item.image_position),
+    })))
     .slice(0, 6)
   const featuredClubItems = clubContent
     .filter((item) => item.type !== "gallery")
@@ -354,9 +360,15 @@ export default async function Home() {
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {galleryItems.map((item, index) => (
-                  <figure key={`${item.id}-${item.title}`} className={`group relative overflow-hidden rounded-[18px] border border-white/10 bg-white/5 ${index === 0 ? "col-span-2 row-span-2" : ""}`}>
+                  <figure key={item.id} className={`group relative overflow-hidden rounded-[18px] border border-white/10 bg-white/5 ${index === 0 ? "col-span-2 row-span-2" : ""}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={item.image_url || ""} alt={item.title} className="aspect-square h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]" loading="lazy" />
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="aspect-square h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+                      style={{ objectPosition: item.imagePosition }}
+                      loading="lazy"
+                    />
                     <figcaption className="absolute inset-x-2 bottom-2 rounded-2xl bg-black/62 px-3 py-2 text-xs font-bold text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
                       {item.title}
                     </figcaption>
@@ -427,12 +439,26 @@ export default async function Home() {
 
             <div className="grid gap-3 md:grid-cols-3">
               {featuredClubItems.map((item, index) => (
-                <article key={`${item.id}-${item.title}`} className="relative min-h-[220px] overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.06] p-5">
+                <article key={`${item.id}-${item.title}`} className="relative min-h-[220px] overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.06]">
                   <div className="absolute right-4 top-4 brand-font text-5xl text-white/[0.05]">{String(index + 1).padStart(2, "0")}</div>
-                  <div className="mb-4 w-fit rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-[#151515]">{CLUB_CONTENT_TYPE_LABELS[item.type]}</div>
-                  <h3 className="text-xl font-black text-white">{item.title}</h3>
-                  {item.subtitle && <p className="mt-3 text-sm leading-relaxed text-white/62">{item.subtitle}</p>}
-                  {item.body && <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-white/48">{item.body}</p>}
+                  {getClubContentCoverImage(item) && (
+                    <div className="h-36 overflow-hidden bg-white/5">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={getClubContentCoverImage(item)}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        style={{ objectPosition: normalizeClubContentImagePosition(item.image_position) }}
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <div className="mb-4 w-fit rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-[#151515]">{CLUB_CONTENT_TYPE_LABELS[item.type]}</div>
+                    <h3 className="text-xl font-black text-white">{item.title}</h3>
+                    {item.subtitle && <p className="mt-3 text-sm leading-relaxed text-white/62">{item.subtitle}</p>}
+                    {item.body && <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-white/48">{item.body}</p>}
+                  </div>
                 </article>
               ))}
             </div>
@@ -454,14 +480,30 @@ export default async function Home() {
                 title: item.title,
                 name: item.author_name || item.subtitle || "Участник клуба",
                 metric: item.body || "за вклад в клубную культуру",
+                imageUrl: getClubContentCoverImage(item),
+                imagePosition: normalizeClubContentImagePosition(item.image_position),
               })) : HONOR_FALLBACK).map((item) => (
-                <article key={`${item.title}-${item.name}`} className="rounded-[20px] border border-[#151515]/10 bg-[#151515]/5 p-5">
-                  <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#151515] text-white">
-                    <Trophy className="h-7 w-7" />
+                <article key={`${item.title}-${item.name}`} className="overflow-hidden rounded-[20px] border border-[#151515]/10 bg-[#151515]/5">
+                  {item.imageUrl ? (
+                    <div className="h-44 overflow-hidden bg-[#151515]/10">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.imageUrl}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        style={{ objectPosition: item.imagePosition }}
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : null}
+                  <div className="p-5">
+                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#151515] text-white">
+                      <Trophy className="h-7 w-7" />
+                    </div>
+                    <div className="text-xs font-black uppercase text-[#151515]/52">{item.title}</div>
+                    <h3 className="brand-font mt-2 text-2xl leading-none">{item.name}</h3>
+                    <p className="mt-4 text-sm font-semibold leading-relaxed text-[#151515]/62">{item.metric}</p>
                   </div>
-                  <div className="text-xs font-black uppercase text-[#151515]/52">{item.title}</div>
-                  <h3 className="brand-font mt-2 text-2xl leading-none">{item.name}</h3>
-                  <p className="mt-4 text-sm font-semibold leading-relaxed text-[#151515]/62">{item.metric}</p>
                 </article>
               ))}
             </div>
