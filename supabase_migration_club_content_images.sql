@@ -29,3 +29,5 @@ alter table public.club_content
         'right bottom'
       )
     );
+
+notify pgrst, 'reload schema';

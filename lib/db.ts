@@ -9,6 +9,26 @@ import {
   normalizeClubContentType,
 } from './club-content'
 
+function isMissingClubContentImageSchema(error: unknown) {
+  if (!error || typeof error !== 'object') return false
+
+  const supabaseError = error as { code?: unknown; message?: unknown }
+  const code = String(supabaseError.code || '')
+  const message = String(supabaseError.message || '')
+
+  return (
+    code === 'PGRST204' &&
+    (message.includes("'image_urls'") || message.includes("'image_position'"))
+  )
+}
+
+function withoutClubContentImageSchemaFields(payload: Record<string, unknown>) {
+  const legacyPayload = { ...payload }
+  delete legacyPayload.image_urls
+  delete legacyPayload.image_position
+  return legacyPayload
+}
+
 // Types matching our database schema
 export interface User {
   id?: number
@@ -936,27 +956,43 @@ export async function createClubContent(content: ClubContent): Promise<ClubConte
   const isPublished = content.is_published !== false
   const imageUrls = normalizeClubContentImages(content.image_urls, content.image_url)
 
+  const payload: Record<string, unknown> = {
+    type: normalizeClubContentType(content.type),
+    title: content.title,
+    subtitle: content.subtitle || null,
+    body: content.body || null,
+    image_url: imageUrls[0] || null,
+    image_urls: imageUrls,
+    image_position: normalizeClubContentImagePosition(content.image_position),
+    external_url: content.external_url || null,
+    author_name: content.author_name || null,
+    is_published: isPublished,
+    is_featured: !!content.is_featured,
+    sort_order: Number(content.sort_order || 100),
+    published_at: isPublished ? content.published_at || now : content.published_at || null,
+  }
+
   const { data, error } = await supabaseAdmin
     .from('club_content')
-    .insert({
-      type: normalizeClubContentType(content.type),
-      title: content.title,
-      subtitle: content.subtitle || null,
-      body: content.body || null,
-      image_url: imageUrls[0] || null,
-      image_urls: imageUrls,
-      image_position: normalizeClubContentImagePosition(content.image_position),
-      external_url: content.external_url || null,
-      author_name: content.author_name || null,
-      is_published: isPublished,
-      is_featured: !!content.is_featured,
-      sort_order: Number(content.sort_order || 100),
-      published_at: isPublished ? content.published_at || now : content.published_at || null,
-    })
+    .insert(payload)
     .select()
     .single()
 
   if (error) {
+    if (isMissingClubContentImageSchema(error)) {
+      const { data: retryData, error: retryError } = await supabaseAdmin
+        .from('club_content')
+        .insert(withoutClubContentImageSchemaFields(payload))
+        .select()
+        .single()
+
+      if (!retryError) {
+        return retryData as ClubContent
+      }
+
+      console.error('Error creating club content after schema fallback:', retryError)
+    }
+
     console.error('Error creating club content:', error)
     return null
   }
@@ -998,6 +1034,21 @@ export async function updateClubContent(contentId: number, fields: Partial<ClubC
     .single()
 
   if (error) {
+    if (isMissingClubContentImageSchema(error)) {
+      const { data: retryData, error: retryError } = await supabaseAdmin
+        .from('club_content')
+        .update(withoutClubContentImageSchemaFields(payload))
+        .eq('id', contentId)
+        .select()
+        .single()
+
+      if (!retryError) {
+        return retryData as ClubContent
+      }
+
+      console.error('Error updating club content after schema fallback:', retryError)
+    }
+
     console.error('Error updating club content:', error)
     return null
   }
