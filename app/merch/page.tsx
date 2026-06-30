@@ -1,148 +1,31 @@
-"use client"
-
-import { useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Check, Copy, Minus, Plus, Send, ShoppingBag } from "lucide-react"
+import Link from "next/link"
+import { ArrowLeft, ShoppingBag } from "lucide-react"
 import ChessBackground from "@/components/ChessBackground"
+import MerchOrderWidget from "@/components/merch/merch-order-widget"
+import { merchProducts } from "@/lib/merch-products"
 
-const products = [
-  {
-    id: "repchess-merch-01",
-    name: "Белая футболка I Hate Chess",
-    price: 2500,
-    image: "/merch/repchess-merch-01.jpg",
-    colors: ["Белый"],
-  },
-  {
-    id: "repchess-merch-02",
-    name: "Графитовая футболка Я ненавижу шахматы",
-    price: 2500,
-    image: "/merch/repchess-merch-02.jpg",
-    colors: ["Графит"],
-  },
-  {
-    id: "repchess-merch-03",
-    name: "Красная футболка I Hate Chess",
-    price: 2500,
-    image: "/merch/repchess-merch-03.jpg",
-    colors: ["Красный"],
-  },
-  {
-    id: "repchess-merch-04",
-    name: "Клубный мерч Rep Chess KRD 04",
-    price: 3500,
-    image: "/merch/repchess-merch-04.jpg",
-    colors: ["Уточнить"],
-  },
-  {
-    id: "repchess-merch-05",
-    name: "Клубный мерч Rep Chess KRD 05",
-    price: 3500,
-    image: "/merch/repchess-merch-05.jpg",
-    colors: ["Уточнить"],
-  },
-  {
-    id: "repchess-merch-06",
-    name: "Клубный мерч Rep Chess KRD 06",
-    price: 3500,
-    image: "/merch/repchess-merch-06.jpg",
-    colors: ["Уточнить"],
-  },
-  {
-    id: "repchess-merch-07",
-    name: "Клубный мерч Rep Chess KRD 07",
-    price: 3500,
-    image: "/merch/repchess-merch-07.jpg",
-    colors: ["Уточнить"],
-  },
-  {
-    id: "repchess-merch-08",
-    name: "Клубный мерч Rep Chess KRD 08",
-    price: 3500,
-    image: "/merch/repchess-merch-08.jpg",
-    colors: ["Уточнить"],
-  },
-  {
-    id: "repchess-merch-09",
-    name: "Клубный мерч Rep Chess KRD 09",
-    price: 3500,
-    image: "/merch/repchess-merch-09.jpg",
-    colors: ["Уточнить"],
-  },
-  {
-    id: "repchess-merch-10",
-    name: "Клубный мерч Rep Chess KRD 10",
-    price: 3500,
-    image: "/merch/repchess-merch-10.jpg",
-    colors: ["Уточнить"],
-  },
-]
-
-const sizes = ["S", "M", "L", "XL"]
+const orderProducts = merchProducts.map(({ id, name, price, image, colors }) => ({
+  id,
+  name,
+  price,
+  image,
+  colors,
+}))
 
 export default function MerchPage() {
-  const router = useRouter()
-  const [canShare, setCanShare] = useState(false)
-  const [productId, setProductId] = useState(products[0].id)
-  const product = products.find((item) => item.id === productId) || products[0]
-  const [size, setSize] = useState("M")
-  const [color, setColor] = useState(product.colors[0])
-  const [quantity, setQuantity] = useState(1)
-  const [contact, setContact] = useState("")
-  const [copied, setCopied] = useState(false)
-
-  const orderText = useMemo(() => {
-    const total = product.price * quantity
-    return [
-      "Заказ REP CHESS KRD",
-      `Товар: ${product.name}`,
-      `Артикул: ${product.id}`,
-      `Цвет: ${color}`,
-      `Размер: ${size}`,
-      `Количество: ${quantity}`,
-      `Итого: ${total.toLocaleString("ru-RU")} ₽`,
-      contact ? `Контакт: ${contact}` : null,
-    ].filter(Boolean).join("\n")
-  }, [color, contact, product.id, product.name, product.price, quantity, size])
-
-  useEffect(() => {
-    setCanShare(Boolean(navigator.share))
-  }, [])
-
-  const selectProduct = (id: string) => {
-    const next = products.find((item) => item.id === id)
-    if (!next) return
-    setProductId(id)
-    setColor(next.colors[0])
-  }
-
-  const shareOrder = async () => {
-    setCopied(false)
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: "Заказ REP CHESS KRD", text: orderText })
-        return
-      }
-      await navigator.clipboard.writeText(orderText)
-      setCopied(true)
-    } catch {
-      setCopied(false)
-    }
-  }
-
   return (
     <ChessBackground>
       <div className="min-h-screen w-full px-4 py-6 sm:px-6">
         <div className="mx-auto flex max-w-7xl flex-col gap-6">
           <header className="flex items-center justify-between gap-3">
-            <button
-              onClick={() => router.push("/")}
+            <Link
+              href="/"
               className="brand-underlink inline-flex items-center gap-2 px-3 py-2 text-white transition-colors hover:text-white/70"
               aria-label="Назад"
             >
               <ArrowLeft className="h-5 w-5" />
               <span className="font-semibold">Главная</span>
-            </button>
+            </Link>
             <div className="brand-chip inline-flex items-center gap-2 px-3 py-2">
               <ShoppingBag className="h-5 w-5" />
               <span className="brand-font text-sm">Мерч</span>
@@ -154,16 +37,16 @@ export default function MerchPage() {
             <div className="grid gap-5 md:grid-cols-[1fr_260px] md:items-end">
               <div>
                 <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Drop / Lookbook</div>
-                <h1 className="brand-title text-4xl text-white sm:text-6xl">REP CHESS KRD MERCH</h1>
-                <p className="mt-4 max-w-2xl text-white/62">
-                  Футболки и вещи клуба. Выбери карточку, размер и оставь контакт, дальше напишем и уточним детали.
+                <h1 className="brand-title text-4xl text-white sm:text-6xl">Шахматный мерч Rep Chess KRD</h1>
+                <p className="mt-4 max-w-3xl text-white/62">
+                  Футболки, лонгсливы и клубные вещи для тех, кто играет в шахматы в Краснодаре, ходит на турниры Rep Chess KRD и хочет носить мерч с живой клубной историей.
                 </p>
                 <div className="brand-accent-line mt-5 w-52" />
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-center md:grid-cols-1 md:text-left">
                 <div className="rounded-2xl bg-white px-3 py-3 text-[#151515]">
-                  <div className="brand-font text-2xl">{products.length}</div>
+                  <div className="brand-font text-2xl">{merchProducts.length}</div>
                   <div className="text-xs font-black uppercase opacity-60">позиций</div>
                 </div>
                 <div className="rounded-2xl bg-[#ff1515] px-3 py-3 text-white">
@@ -179,126 +62,85 @@ export default function MerchPage() {
           </div>
 
           <section className="grid gap-5 lg:grid-cols-[1fr_360px]">
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {products.map((item, index) => (
-                <button
+            <div className="grid gap-5">
+              {merchProducts.map((item, index) => (
+                <article
                   key={item.id}
-                  onClick={() => selectProduct(item.id)}
-                  className={`group overflow-hidden rounded-[18px] text-left text-[#151515] transition-transform hover:-translate-y-1 ${
-                    item.id === product.id
-                      ? "brand-panel"
-                      : "brand-panel"
-                  }`}
+                  id={item.id}
+                  className="brand-panel overflow-hidden text-[#151515]"
+                  itemScope
+                  itemType="https://schema.org/Product"
                 >
-                  <div className="relative border-b border-[#151515]/10 bg-[#151515]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="aspect-[4/5] w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                      loading={index < 3 ? "eager" : "lazy"}
-                    />
-                    <div className="brand-font absolute left-3 top-3 rounded-full border border-[#151515]/15 bg-white px-2.5 py-1 text-xs text-black shadow-lg">
-                      {item.price.toLocaleString("ru-RU")} ₽
-                    </div>
-                    {item.id === product.id && (
-                      <div className="brand-font absolute bottom-3 right-3 rounded-full border border-[#151515]/15 bg-[#ffd600] px-2.5 py-1 text-xs text-black shadow-lg">
-                        Выбрано
+                  <meta itemProp="sku" content={item.id} />
+                  <meta itemProp="brand" content="Rep Chess KRD" />
+                  <meta itemProp="category" content={item.category} />
+                  <div className="grid gap-0 lg:grid-cols-[340px_1fr]">
+                    <div className="relative border-b border-[#151515]/10 bg-[#151515] lg:border-b-0 lg:border-r">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.image}
+                        alt={`${item.name} - шахматный мерч Rep Chess KRD`}
+                        className="aspect-[4/5] w-full object-cover lg:h-full"
+                        loading={index < 2 ? "eager" : "lazy"}
+                        itemProp="image"
+                      />
+                      <div className="brand-font absolute left-3 top-3 rounded-full border border-[#151515]/15 bg-white px-2.5 py-1 text-xs text-black shadow-lg">
+                        {item.price.toLocaleString("ru-RU")} ₽
                       </div>
-                    )}
+                    </div>
+
+                    <div className="p-5 sm:p-6">
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        <span className="brand-chip px-3 py-1 text-xs font-black uppercase">{item.category}</span>
+                        <span className="rounded-full bg-[#151515] px-3 py-1 text-xs font-black uppercase text-white">{item.colors.join(", ")}</span>
+                      </div>
+
+                      <h2 className="brand-title text-3xl leading-none sm:text-4xl" itemProp="name">{item.name}</h2>
+                      <p className="mt-3 max-w-3xl text-base font-semibold leading-relaxed text-[#151515]/62" itemProp="description">
+                        {item.shortDescription}
+                      </p>
+
+                      <div className="mt-5 grid gap-3 text-sm font-bold text-[#151515]/68 sm:grid-cols-3">
+                        <div className="rounded-2xl border border-[#151515]/10 bg-white px-4 py-3">
+                          <div className="text-xs font-black uppercase opacity-50">Цена</div>
+                          <div className="mt-1 text-[#151515]" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                            <meta itemProp="priceCurrency" content="RUB" />
+                            <meta itemProp="availability" content="https://schema.org/InStock" />
+                            <meta itemProp="url" content={`https://repchesskrd.ru/merch#${item.id}`} />
+                            <data itemProp="price" value={String(item.price)}>{item.price.toLocaleString("ru-RU")} ₽</data>
+                          </div>
+                        </div>
+                        <div className="rounded-2xl border border-[#151515]/10 bg-white px-4 py-3">
+                          <div className="text-xs font-black uppercase opacity-50">Размеры</div>
+                          <div className="mt-1 text-[#151515]">S / M / L / XL</div>
+                        </div>
+                        <div className="rounded-2xl border border-[#151515]/10 bg-white px-4 py-3">
+                          <div className="text-xs font-black uppercase opacity-50">Заказ</div>
+                          <a className="mt-1 inline-flex text-[#151515] underline decoration-[#151515]/30 underline-offset-4" href="#merch-order">
+                            Выбрать справа
+                          </a>
+                        </div>
+                      </div>
+
+                      <details className="mt-5 rounded-2xl border border-[#151515]/10 bg-white p-4">
+                        <summary className="cursor-pointer text-sm font-black uppercase text-[#151515]">
+                          Полное SEO-описание товара
+                        </summary>
+                        <div className="mt-4 space-y-4 text-sm font-semibold leading-relaxed text-[#151515]/68">
+                          {item.seoParagraphs.map((paragraph) => (
+                            <p key={paragraph}>{paragraph}</p>
+                          ))}
+                        </div>
+                      </details>
+                    </div>
                   </div>
-                  <div className="p-4">
-                    <div className="brand-font text-sm">{item.name}</div>
-                    <div className="mt-1 text-sm font-semibold text-[#151515]/55">{item.id}</div>
-                  </div>
-                </button>
+                </article>
               ))}
             </div>
 
-            <aside className="brand-panel h-fit rounded-[18px] p-5 text-[#151515] lg:sticky lg:top-6">
-              <h2 className="brand-title mb-4 text-3xl">Заказ</h2>
-
-              <div className="space-y-5">
-                <div className="overflow-hidden rounded-2xl border border-[#151515]/10 bg-[#151515]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={product.image} alt={product.name} className="aspect-[4/5] w-full object-cover" />
-                </div>
-
-                <div>
-                  <div className="brand-font text-lg">{product.name}</div>
-                  <div className="mt-1 font-bold text-[#151515]/60">{product.price.toLocaleString("ru-RU")} ₽</div>
-                </div>
-
-                <div>
-                  <div className="mb-2 text-sm font-semibold text-[#151515]/60">Цвет</div>
-                  <div className="flex flex-wrap gap-2">
-                    {product.colors.map((item) => (
-                      <button
-                        key={item}
-                        onClick={() => setColor(item)}
-                        className={`rounded-full border px-3 py-2 text-sm font-bold ${
-                          color === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515]/15 bg-white text-[#151515]"
-                        }`}
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="mb-2 text-sm font-semibold text-[#151515]/60">Размер</div>
-                  <div className="flex flex-wrap gap-2">
-                    {sizes.map((item) => (
-                      <button
-                        key={item}
-                        onClick={() => setSize(item)}
-                        className={`min-w-11 rounded-full border px-3 py-2 text-sm font-bold ${
-                          size === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515]/15 bg-white text-[#151515]"
-                        }`}
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="mb-2 text-sm font-semibold text-[#151515]/60">Количество</div>
-                  <div className="inline-flex items-center rounded-full border border-[#151515]/15 bg-white">
-                    <button onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="p-3" aria-label="Уменьшить">
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="w-10 text-center font-bold">{quantity}</span>
-                    <button onClick={() => setQuantity((value) => Math.min(9, value + 1))} className="p-3" aria-label="Увеличить">
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-[#151515]/60">Telegram или телефон</span>
-                  <input
-                    value={contact}
-                    onChange={(event) => setContact(event.target.value)}
-                    className="w-full rounded-2xl border border-[#151515]/15 bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
-                    placeholder="@username"
-                  />
-                </label>
-
-                <div className="rounded-2xl border border-[#151515]/10 bg-white p-4 text-sm font-semibold text-[#151515]/80">
-                  <pre className="whitespace-pre-wrap font-sans">{orderText}</pre>
-                </div>
-
-                <button
-                  onClick={shareOrder}
-                  className="brand-button inline-flex w-full items-center justify-center gap-2 px-4 py-3"
-                >
-                  {copied ? <Check className="h-5 w-5" /> : canShare ? <Send className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                  {copied ? "Заявка скопирована" : "Отправить заявку"}
-                </button>
-              </div>
-            </aside>
+            <div id="merch-order">
+              <MerchOrderWidget products={orderProducts} />
+            </div>
           </section>
         </div>
       </div>

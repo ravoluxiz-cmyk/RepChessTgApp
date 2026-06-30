@@ -1,55 +1,44 @@
 import type { Metadata } from "next"
-
-const merchItems = [
-  ["Белая футболка I Hate Chess", 2500, "repchess-merch-01.jpg"],
-  ["Графитовая футболка Я ненавижу шахматы", 2500, "repchess-merch-02.jpg"],
-  ["Красная футболка I Hate Chess", 2500, "repchess-merch-03.jpg"],
-  ["Клубный мерч Rep Chess KRD 04", 3500, "repchess-merch-04.jpg"],
-  ["Клубный мерч Rep Chess KRD 05", 3500, "repchess-merch-05.jpg"],
-  ["Клубный мерч Rep Chess KRD 06", 3500, "repchess-merch-06.jpg"],
-  ["Клубный мерч Rep Chess KRD 07", 3500, "repchess-merch-07.jpg"],
-  ["Клубный мерч Rep Chess KRD 08", 3500, "repchess-merch-08.jpg"],
-  ["Клубный мерч Rep Chess KRD 09", 3500, "repchess-merch-09.jpg"],
-  ["Клубный мерч Rep Chess KRD 10", 3500, "repchess-merch-10.jpg"],
-] as const
+import { merchProducts } from "@/lib/merch-products"
 
 const productListJsonLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
   name: "Шахматный мерч Rep Chess KRD",
-  itemListElement: merchItems.map(([name, price, image], index) => ({
+  itemListElement: merchProducts.map((product, index) => ({
     "@type": "ListItem",
     position: index + 1,
     item: {
       "@type": "Product",
-      name,
-      image: `https://repchesskrd.ru/merch/${image}`,
-      description: `${name}: клубная вещь Rep Chess KRD для шахматного комьюнити Краснодара.`,
+      name: product.name,
+      sku: product.id,
+      image: `https://repchesskrd.ru${product.image}`,
+      description: product.seoDescription,
       brand: {
         "@type": "Brand",
         name: "Rep Chess KRD",
       },
-      category: "Apparel",
+      category: product.category,
       offers: {
         "@type": "Offer",
-        price,
+        price: product.price,
         priceCurrency: "RUB",
         availability: "https://schema.org/InStock",
-        url: "https://repchesskrd.ru/merch",
+        url: `https://repchesskrd.ru/merch#${product.id}`,
       },
     },
   })),
 }
 
 export const metadata: Metadata = {
-  title: "Шахматный мерч Rep Chess KRD - футболки и клубные вещи",
-  description: "Клубный шахматный мерч Rep Chess KRD: футболки I Hate Chess, вещи клуба, карточки товаров, цены, размеры и заявка на заказ в Краснодаре.",
+  title: "Шахматный мерч Rep Chess KRD - футболки, лонгсливы и клубные вещи",
+  description: "Купить шахматный мерч Rep Chess KRD в Краснодаре: футболки I Hate Chess, лонгсливы, клубная одежда, цены, размеры и заявка на заказ.",
   alternates: {
     canonical: "/merch",
   },
   openGraph: {
     title: "Шахматный мерч Rep Chess KRD",
-    description: "Футболки I Hate Chess и клубные вещи Rep Chess KRD.",
+    description: "Футболки, лонгсливы и клубные вещи Rep Chess KRD для шахматного комьюнити Краснодара.",
     url: "https://repchesskrd.ru/merch",
   },
 }
