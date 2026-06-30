@@ -75,12 +75,12 @@ export default function MerchPage() {
                   <meta itemProp="brand" content="Rep Chess KRD" />
                   <meta itemProp="category" content={item.category} />
                   <div className="grid gap-0 lg:grid-cols-[340px_1fr]">
-                    <div className="relative border-b border-[#151515]/10 bg-[#151515] lg:border-b-0 lg:border-r">
+                    <div className="relative self-start border-b border-[#151515]/10 bg-[#151515] lg:border-b-0 lg:border-r">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.image}
                         alt={`${item.name} - шахматный мерч Rep Chess KRD`}
-                        className="aspect-[4/5] w-full object-cover lg:h-full"
+                        className="aspect-[4/5] w-full bg-[#151515] object-contain"
                         loading={index < 2 ? "eager" : "lazy"}
                         itemProp="image"
                       />
@@ -124,7 +124,7 @@ export default function MerchPage() {
 
                       <details className="mt-5 rounded-2xl border border-[#151515]/10 bg-white p-4">
                         <summary className="cursor-pointer text-sm font-black uppercase text-[#151515]">
-                          Полное SEO-описание товара
+                          Полное описание товара
                         </summary>
                         <div className="mt-4 space-y-4 text-sm font-semibold leading-relaxed text-[#151515]/68">
                           {item.seoParagraphs.map((paragraph) => (
