@@ -1,0 +1,120 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+
+export type HomeGalleryItem = {
+  id: string
+  title: string
+  imageUrl: string
+  imagePosition: string
+}
+
+export function HomeGalleryCarousel({ items }: { items: HomeGalleryItem[] }) {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const activeItem = items[activeIndex]
+
+  useEffect(() => {
+    if (items.length < 2) return
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % items.length)
+    }, 3800)
+
+    return () => window.clearInterval(timer)
+  }, [items.length])
+
+  if (!items.length) {
+    return (
+      <div className="rounded-[24px] border border-white/10 bg-white/5 p-6 text-white/62">
+        Фотоотчеты скоро появятся здесь. Самое свежее пока выкладываем в Telegram.
+      </div>
+    )
+  }
+
+  function showPrevious() {
+    setActiveIndex((current) => (current === 0 ? items.length - 1 : current - 1))
+  }
+
+  function showNext() {
+    setActiveIndex((current) => (current + 1) % items.length)
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          key={activeItem.id}
+          src={activeItem.imageUrl}
+          alt={activeItem.title}
+          className="aspect-[4/3] w-full object-cover transition duration-500 sm:aspect-[16/10]"
+          style={{ objectPosition: activeItem.imagePosition }}
+          loading="lazy"
+        />
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 via-black/26 to-transparent p-4 pt-16">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <div className="mb-2 w-fit rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-[#151515]">
+                Галерея
+              </div>
+              <div className="text-xl font-black text-white sm:text-2xl">{activeItem.title}</div>
+            </div>
+            {items.length > 1 && (
+              <div className="rounded-full bg-black/55 px-3 py-1 text-xs font-black text-white backdrop-blur">
+                {activeIndex + 1}/{items.length}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {items.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={showPrevious}
+              className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[#151515] shadow-[0_12px_35px_rgba(0,0,0,0.28)] transition hover:scale-105"
+              aria-label="Предыдущее фото"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <button
+              type="button"
+              onClick={showNext}
+              className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[#151515] shadow-[0_12px_35px_rgba(0,0,0,0.28)] transition hover:scale-105"
+              aria-label="Следующее фото"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          </>
+        )}
+      </div>
+
+      {items.length > 1 && (
+        <div className="grid grid-cols-4 gap-2">
+          {items.slice(0, 8).map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setActiveIndex(index)}
+              className={`overflow-hidden rounded-2xl border bg-white transition ${
+                activeIndex === index ? "border-[#fff200] opacity-100" : "border-white/10 opacity-55 hover:opacity-85"
+              }`}
+              aria-label={`Открыть фото ${index + 1}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.imageUrl}
+                alt=""
+                className="aspect-square w-full object-cover"
+                style={{ objectPosition: item.imagePosition }}
+                loading="lazy"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

@@ -1,4 +1,5 @@
 import ChessBackground from "@/components/ChessBackground";
+import { HomeGalleryCarousel } from "@/components/home/home-gallery-carousel";
 import { HomeHero } from "@/components/home/home-hero";
 import { MobileDock } from "@/components/home/mobile-dock";
 import { CLUB_CONTENT_TYPE_LABELS, getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content";
@@ -359,28 +360,7 @@ export default async function Home() {
                 <Camera className="hidden h-10 w-10 text-white/45 sm:block" />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {galleryItems.map((item, index) => (
-                  <figure key={item.id} className={`group relative overflow-hidden rounded-[18px] border border-white/10 bg-white/5 ${index === 0 ? "col-span-2 row-span-2" : ""}`}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.imageUrl}
-                      alt={item.title}
-                      className="aspect-square h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
-                      style={{ objectPosition: item.imagePosition }}
-                      loading="lazy"
-                    />
-                    <figcaption className="absolute inset-x-2 bottom-2 rounded-2xl bg-black/62 px-3 py-2 text-xs font-bold text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
-                      {item.title}
-                    </figcaption>
-                  </figure>
-                ))}
-                {galleryItems.length === 0 && (
-                  <div className="col-span-full rounded-[18px] border border-white/10 bg-white/5 p-6 text-white/62">
-                    Фотоотчеты скоро появятся здесь. Самое свежее пока выкладываем в Telegram.
-                  </div>
-                )}
-              </div>
+              <HomeGalleryCarousel items={galleryItems} />
             </article>
 
             <article className="brand-panel p-5 sm:p-6">
