@@ -442,8 +442,8 @@ export default function AdminClubContentPage() {
                 <div className="rounded-[18px] border border-[#151515]/10 bg-white/70 p-3">
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <div>
-                      <div className="font-bold">Фокус кадра</div>
-                      <div className="mt-1 text-xs font-semibold text-[#151515]/55">Выбери, какую часть фото держать в видимой области.</div>
+                      <div className="font-bold">Кадрирование</div>
+                      <div className="mt-1 text-xs font-semibold text-[#151515]/55">Перетащи большую рамку на нужную часть фото.</div>
                     </div>
                     <span className="rounded-full bg-[#151515]/8 px-3 py-1 text-xs font-black uppercase text-[#151515]/60">
                       {form.image_position}
@@ -468,7 +468,7 @@ export default function AdminClubContentPage() {
                           event.currentTarget.releasePointerCapture(event.pointerId)
                         }}
                         onPointerCancel={() => setDraggingFocus(false)}
-                        className="relative aspect-[16/10] cursor-crosshair overflow-hidden select-none touch-none"
+                        className="relative aspect-[4/3] cursor-grab overflow-hidden select-none touch-none active:cursor-grabbing"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -478,9 +478,16 @@ export default function AdminClubContentPage() {
                           style={{ objectPosition: form.image_position }}
                           draggable={false}
                         />
-                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,transparent_22%,rgba(0,0,0,0.35)_23%,rgba(0,0,0,0.35)_100%)]" />
+                        <div className="pointer-events-none absolute inset-0 bg-black/25" />
                         <div
-                          className="pointer-events-none absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-[24px] border-2 border-white shadow-[0_0_0_999px_rgba(0,0,0,0.14),0_0_0_4px_rgba(255,242,0,0.75)]"
+                          className="pointer-events-none absolute h-[68%] w-[76%] -translate-x-1/2 -translate-y-1/2 rounded-[22px] border-2 border-white shadow-[0_0_0_999px_rgba(0,0,0,0.28),0_0_0_5px_rgba(255,242,0,0.85)]"
+                          style={{
+                            left: `${getFocusPoint(form.image_position).x}%`,
+                            top: `${getFocusPoint(form.image_position).y}%`,
+                          }}
+                        />
+                        <div
+                          className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#fff200] ring-4 ring-white"
                           style={{
                             left: `${getFocusPoint(form.image_position).x}%`,
                             top: `${getFocusPoint(form.image_position).y}%`,
