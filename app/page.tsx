@@ -27,14 +27,6 @@ function getTournamentTime(tournament: Tournament) {
   return Number.isNaN(time) ? Number.MAX_SAFE_INTEGER : time
 }
 
-function getUpcomingTournament(tournaments: Tournament[]) {
-  const now = Date.now()
-  return tournaments
-    .filter((tournament) => Number(tournament.archived ?? 0) === 0)
-    .filter((tournament) => getTournamentTime(tournament) >= now || Number(tournament.allow_join) === 1)
-    .sort((a, b) => getTournamentTime(a) - getTournamentTime(b))[0] || null
-}
-
 function getVisibleEvents(tournaments: Tournament[]) {
   const now = Date.now()
 
@@ -180,7 +172,6 @@ export default async function Home() {
     listClubContent({ publishedOnly: true }),
   ])
 
-  const upcomingTournament = getUpcomingTournament(tournaments)
   const visibleEvents = getVisibleEvents(tournaments)
   const galleryItems = clubContent
     .filter((item) => item.type === "gallery")
@@ -350,8 +341,8 @@ export default async function Home() {
             </div>
           </section>
 
-          <section className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
-            <article className="brand-panel-dark overflow-hidden p-5 sm:p-6">
+          <section>
+            <article className="brand-panel-dark overflow-hidden p-5 sm:p-7">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Живой клуб</div>
@@ -361,29 +352,6 @@ export default async function Home() {
               </div>
 
               <HomeGalleryCarousel items={galleryItems} />
-            </article>
-
-            <article className="brand-panel p-5 sm:p-6">
-              <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Ближайший вход</div>
-              {upcomingTournament ? (
-                <>
-                  <h2 className="brand-font text-2xl leading-tight sm:text-3xl">{upcomingTournament.title}</h2>
-                  <p className="mt-4 leading-relaxed text-[#151515]/68">Открой карточку, посмотри место и формат, нажми запись. Без длинных анкет и лишних кругов.</p>
-                  <a href="/tournaments" className="brand-button mt-6 inline-flex w-full items-center justify-center gap-2 px-5 py-3">
-                    Перейти к записи
-                    <ArrowRight className="h-5 w-5" />
-                  </a>
-                </>
-              ) : (
-                <>
-                  <h2 className="brand-font text-2xl leading-tight sm:text-3xl">Скоро новый drop</h2>
-                  <p className="mt-4 leading-relaxed text-[#151515]/68">Новый анонс обычно сначала появляется в канале. Потом уже красиво ложится на сайт.</p>
-                  <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="brand-button mt-6 inline-flex w-full items-center justify-center gap-2 px-5 py-3">
-                    Telegram
-                    <Send className="h-5 w-5" />
-                  </a>
-                </>
-              )}
             </article>
           </section>
 
@@ -423,12 +391,12 @@ export default async function Home() {
                 <article key={`${item.id}-${item.title}`} className="relative min-h-[220px] overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.06]">
                   <div className="absolute right-4 top-4 brand-font text-5xl text-white/[0.05]">{String(index + 1).padStart(2, "0")}</div>
                   {getClubContentCoverImage(item) && (
-                    <div className="h-36 overflow-hidden bg-white/5">
+                    <div className="h-60 overflow-hidden bg-black/20 sm:h-72">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={getClubContentCoverImage(item)}
                         alt=""
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-contain"
                         style={{ objectPosition: normalizeClubContentImagePosition(item.image_position) }}
                         loading="lazy"
                       />
@@ -466,12 +434,12 @@ export default async function Home() {
               })) : HONOR_FALLBACK).map((item) => (
                 <article key={`${item.title}-${item.name}`} className="overflow-hidden rounded-[20px] border border-[#151515]/10 bg-[#151515]/5">
                   {item.imageUrl ? (
-                    <div className="h-44 overflow-hidden bg-[#151515]/10">
+                    <div className="h-64 overflow-hidden bg-[#151515]/10 sm:h-80">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.imageUrl}
                         alt=""
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-contain"
                         style={{ objectPosition: item.imagePosition }}
                         loading="lazy"
                       />
