@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react"
+import { type ChangeEvent, type FormEvent, type PointerEvent, useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
@@ -39,17 +39,25 @@ const EMPTY_FORM: FormState = {
   sort_order: "100",
 }
 
-const IMAGE_POSITIONS = [
-  { value: "left top", label: "ЛВ" },
-  { value: "center top", label: "В" },
-  { value: "right top", label: "ПВ" },
-  { value: "left center", label: "Л" },
-  { value: "center center", label: "Ц" },
-  { value: "right center", label: "П" },
-  { value: "left bottom", label: "ЛН" },
-  { value: "center bottom", label: "Н" },
-  { value: "right bottom", label: "ПН" },
-]
+function getFocusPoint(position: string) {
+  const normalized = normalizeClubContentImagePosition(position)
+  const percentMatch = normalized.match(/^(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/)
+
+  if (percentMatch) {
+    return { x: Number(percentMatch[1]), y: Number(percentMatch[2]) }
+  }
+
+  const [horizontal, vertical] = normalized.split(" ")
+  const x = horizontal === "left" ? 18 : horizontal === "right" ? 82 : 50
+  const y = vertical === "top" ? 18 : vertical === "bottom" ? 82 : 50
+  return { x, y }
+}
+
+function formatFocusPoint(x: number, y: number) {
+  const cleanX = Math.min(100, Math.max(0, x))
+  const cleanY = Math.min(100, Math.max(0, y))
+  return `${Math.round(cleanX)}% ${Math.round(cleanY)}%`
+}
 
 export default function AdminClubContentPage() {
   const router = useRouter()
@@ -62,6 +70,7 @@ export default function AdminClubContentPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploadingImages, setUploadingImages] = useState(false)
+  const [draggingFocus, setDraggingFocus] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -216,6 +225,13 @@ export default function AdminClubContentPage() {
     setImages(form.image_urls.filter((_, imageIndex) => imageIndex !== index))
   }
 
+  function updateImageFocus(event: PointerEvent<HTMLDivElement>) {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const x = ((event.clientX - rect.left) / rect.width) * 100
+    const y = ((event.clientY - rect.top) / rect.height) * 100
+    setForm((prev) => ({ ...prev, image_position: formatFocusPoint(x, y) }))
+  }
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     setSaving(true)
@@ -286,8 +302,8 @@ export default function AdminClubContentPage() {
           {message && <div className="mb-4 rounded-lg border border-emerald-400/30 bg-emerald-500/15 p-4 text-emerald-100">{message}</div>}
           {error && <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/15 p-4 text-red-100">{error}</div>}
 
-          <div className="grid gap-5 xl:grid-cols-[560px_1fr]">
-            <form onSubmit={submit} className="brand-panel space-y-4 rounded-[22px] p-5 text-[#151515]">
+          <div className="space-y-5">
+            <form onSubmit={submit} className="brand-panel space-y-5 rounded-[22px] p-5 text-[#151515] sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <div className="brand-font text-2xl">{form.id ? "Редактировать" : "Новая карточка в ленту"}</div>
                 {form.id && (
@@ -300,29 +316,32 @@ export default function AdminClubContentPage() {
                 Добавление не перезаписывает раздел. “Закрепить” поднимает карточку выше, но остальные записи остаются в ленте.
               </div>
 
-              <label className="block">
-                <span className="mb-2 block font-semibold">Тип</span>
-                <select value={form.type} onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value as ClubContentType }))} className={inputClass}>
-                  {CLUB_CONTENT_TYPES.map((type) => <option key={type} value={type}>{CLUB_CONTENT_TYPE_LABELS[type]}</option>)}
-                </select>
-              </label>
+              <div className="grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)]">
+                <div className="space-y-4">
+                  <label className="block">
+                    <span className="mb-2 block font-semibold">Тип</span>
+                    <select value={form.type} onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value as ClubContentType }))} className={inputClass}>
+                      {CLUB_CONTENT_TYPES.map((type) => <option key={type} value={type}>{CLUB_CONTENT_TYPE_LABELS[type]}</option>)}
+                    </select>
+                  </label>
 
-              <label className="block">
-                <span className="mb-2 block font-semibold">Заголовок</span>
-                <input required value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} className={inputClass} />
-              </label>
+                  <label className="block">
+                    <span className="mb-2 block font-semibold">Заголовок</span>
+                    <input required value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} className={inputClass} />
+                  </label>
 
-              <label className="block">
-                <span className="mb-2 block font-semibold">Подзаголовок</span>
-                <input value={form.subtitle} onChange={(e) => setForm((prev) => ({ ...prev, subtitle: e.target.value }))} className={inputClass} />
-              </label>
+                  <label className="block">
+                    <span className="mb-2 block font-semibold">Подзаголовок</span>
+                    <input value={form.subtitle} onChange={(e) => setForm((prev) => ({ ...prev, subtitle: e.target.value }))} className={inputClass} />
+                  </label>
 
-              <label className="block">
-                <span className="mb-2 block font-semibold">Текст</span>
-                <textarea rows={7} value={form.body} onChange={(e) => setForm((prev) => ({ ...prev, body: e.target.value }))} className={`${inputClass} resize-none`} />
-              </label>
+                  <label className="block">
+                    <span className="mb-2 block font-semibold">Текст</span>
+                    <textarea rows={9} value={form.body} onChange={(e) => setForm((prev) => ({ ...prev, body: e.target.value }))} className={`${inputClass} resize-none`} />
+                  </label>
+                </div>
 
-              <div className="space-y-4 rounded-2xl border border-[#151515]/10 bg-[#151515]/5 p-3">
+                <div className="space-y-4 rounded-2xl border border-[#151515]/10 bg-[#151515]/5 p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="font-bold">Фотографии</div>
@@ -431,41 +450,52 @@ export default function AdminClubContentPage() {
                     </span>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-[120px_1fr] sm:items-center">
-                    <div className="grid grid-cols-3 gap-1">
-                      {IMAGE_POSITIONS.map((position) => (
-                        <button
-                          key={position.value}
-                          type="button"
-                          onClick={() => setForm((prev) => ({ ...prev, image_position: position.value }))}
-                          className={`aspect-square rounded-xl border text-xs font-black transition ${
-                            form.image_position === position.value
-                              ? "border-[#151515] bg-[#151515] text-white"
-                              : "border-[#151515]/15 bg-white text-[#151515]/60 hover:bg-[#f4f4f0]"
-                          }`}
-                        >
-                          {position.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="overflow-hidden rounded-2xl border border-[#151515]/10 bg-[#151515]/10">
-                      {form.image_urls[0] ? (
-                        // eslint-disable-next-line @next/next/no-img-element
+                  <div className="overflow-hidden rounded-2xl border border-[#151515]/10 bg-[#151515]/10">
+                    {form.image_urls[0] ? (
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onPointerDown={(event) => {
+                          setDraggingFocus(true)
+                          event.currentTarget.setPointerCapture(event.pointerId)
+                          updateImageFocus(event)
+                        }}
+                        onPointerMove={(event) => {
+                          if (draggingFocus) updateImageFocus(event)
+                        }}
+                        onPointerUp={(event) => {
+                          setDraggingFocus(false)
+                          event.currentTarget.releasePointerCapture(event.pointerId)
+                        }}
+                        onPointerCancel={() => setDraggingFocus(false)}
+                        className="relative aspect-[16/10] cursor-crosshair overflow-hidden select-none touch-none"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={form.image_urls[0]}
                           alt=""
-                          className="aspect-[16/10] w-full object-cover"
+                          className="h-full w-full object-cover"
                           style={{ objectPosition: form.image_position }}
+                          draggable={false}
                         />
-                      ) : (
-                        <div className="flex aspect-[16/10] items-center justify-center text-sm font-bold text-[#151515]/45">
-                          Превью появится после загрузки фото
-                        </div>
-                      )}
-                    </div>
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,transparent_22%,rgba(0,0,0,0.35)_23%,rgba(0,0,0,0.35)_100%)]" />
+                        <div
+                          className="pointer-events-none absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-[24px] border-2 border-white shadow-[0_0_0_999px_rgba(0,0,0,0.14),0_0_0_4px_rgba(255,242,0,0.75)]"
+                          style={{
+                            left: `${getFocusPoint(form.image_position).x}%`,
+                            top: `${getFocusPoint(form.image_position).y}%`,
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex aspect-[16/10] items-center justify-center text-sm font-bold text-[#151515]/45">
+                        Превью появится после загрузки фото
+                      </div>
+                    )}
                   </div>
                 </div>
+              </div>
+
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">

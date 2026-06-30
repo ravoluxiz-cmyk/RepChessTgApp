@@ -66,6 +66,14 @@ export function getClubContentCoverImage(item: Pick<ClubContent, "image_url" | "
 
 export function normalizeClubContentImagePosition(value: unknown): string {
   const raw = String(value || "").trim().toLowerCase()
+  const percentMatch = raw.match(/^(-?\d+(?:\.\d+)?)%\s+(-?\d+(?:\.\d+)?)%$/)
+
+  if (percentMatch) {
+    const x = Math.min(100, Math.max(0, Number(percentMatch[1])))
+    const y = Math.min(100, Math.max(0, Number(percentMatch[2])))
+    return `${Number(x.toFixed(1))}% ${Number(y.toFixed(1))}%`
+  }
+
   const allowed = new Set([
     "left top",
     "center top",

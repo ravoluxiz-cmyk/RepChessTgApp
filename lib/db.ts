@@ -10,33 +10,14 @@ import {
 } from './club-content'
 
 const CLUB_CONTENT_GALLERY_MARKER = 'repchess:gallery'
+const CLUB_CONTENT_META_MARKER = 'repchess:club-content-meta'
 
-function isMissingClubContentImageSchema(error: unknown) {
-  if (!error || typeof error !== 'object') return false
-
-  const supabaseError = error as { code?: unknown; message?: unknown }
-  const code = String(supabaseError.code || '')
-  const message = String(supabaseError.message || '')
-
-  return (
-    code === 'PGRST204' &&
-    (message.includes("'image_urls'") || message.includes("'image_position'"))
-  )
-}
-
-function withoutMissingClubContentSchemaFields(error: unknown, payload: Record<string, unknown>) {
-  const fallbackPayload = { ...payload }
-  const message = error && typeof error === 'object' ? String((error as { message?: unknown }).message || '') : ''
-
-  if (message.includes("'image_urls'")) delete fallbackPayload.image_urls
-  if (message.includes("'image_position'")) delete fallbackPayload.image_position
-
-  if ('image_urls' in fallbackPayload && 'image_position' in fallbackPayload && message.length === 0) {
-    delete fallbackPayload.image_urls
-    delete fallbackPayload.image_position
-  }
-
-  return fallbackPayload
+type ClubContentMeta = {
+  marker?: string
+  logical_type?: ClubContentType
+  external_url?: string | null
+  image_urls?: string[]
+  image_position?: string | null
 }
 
 function toDbClubContentType(type: unknown) {
@@ -44,21 +25,56 @@ function toDbClubContentType(type: unknown) {
   return normalizedType === 'gallery' ? 'news' : normalizedType
 }
 
-function resolveClubContentExternalUrl(type: unknown, externalUrl: unknown) {
-  return normalizeClubContentType(type) === 'gallery'
-    ? CLUB_CONTENT_GALLERY_MARKER
-    : String(externalUrl || '').trim() || null
+function parseClubContentMeta(value: unknown): ClubContentMeta | null {
+  const raw = String(value || '').trim()
+  if (!raw.startsWith('{')) return null
+
+  try {
+    const parsed = JSON.parse(raw) as ClubContentMeta | null
+    if (!parsed || parsed.marker !== CLUB_CONTENT_META_MARKER) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function buildClubContentExternalValue(
+  type: unknown,
+  externalUrl: unknown,
+  imageUrls: string[],
+  imagePosition: unknown
+) {
+  const normalizedType = normalizeClubContentType(type)
+  const cleanExternalUrl = String(externalUrl || '').trim() || null
+  const cleanImages = normalizeClubContentImages(imageUrls)
+  const cleanPosition = normalizeClubContentImagePosition(imagePosition)
+  const needsMeta = normalizedType === 'gallery' || cleanImages.length > 1 || cleanPosition !== 'center center'
+
+  if (!needsMeta) return cleanExternalUrl
+
+  const meta: ClubContentMeta = {
+    marker: CLUB_CONTENT_META_MARKER,
+    logical_type: normalizedType,
+    external_url: cleanExternalUrl,
+    image_urls: cleanImages,
+    image_position: cleanPosition,
+  }
+
+  return JSON.stringify(meta)
 }
 
 function fromDbClubContent(item: ClubContent): ClubContent {
-  const isGallery = item.external_url === CLUB_CONTENT_GALLERY_MARKER
+  const meta = parseClubContentMeta(item.external_url)
+  const isLegacyGallery = item.external_url === CLUB_CONTENT_GALLERY_MARKER
+  const type = normalizeClubContentType(meta?.logical_type || (isLegacyGallery ? 'gallery' : item.type))
+  const imageUrls = normalizeClubContentImages(meta?.image_urls || item.image_urls, item.image_url)
 
   return {
     ...item,
-    type: isGallery ? 'gallery' : normalizeClubContentType(item.type),
-    external_url: isGallery ? null : item.external_url,
-    image_urls: normalizeClubContentImages(item.image_urls, item.image_url),
-    image_position: normalizeClubContentImagePosition(item.image_position),
+    type,
+    external_url: meta ? meta.external_url || null : isLegacyGallery ? null : item.external_url,
+    image_urls: imageUrls,
+    image_position: normalizeClubContentImagePosition(meta?.image_position || item.image_position),
   }
 }
 
@@ -990,9 +1006,7 @@ export async function createClubContent(content: ClubContent): Promise<ClubConte
     subtitle: content.subtitle || null,
     body: content.body || null,
     image_url: imageUrls[0] || null,
-    image_urls: imageUrls,
-    image_position: normalizeClubContentImagePosition(content.image_position),
-    external_url: resolveClubContentExternalUrl(type, content.external_url),
+    external_url: buildClubContentExternalValue(type, content.external_url, imageUrls, content.image_position),
     author_name: content.author_name || null,
     is_published: isPublished,
     is_featured: !!content.is_featured,
@@ -1007,20 +1021,6 @@ export async function createClubContent(content: ClubContent): Promise<ClubConte
     .single()
 
   if (error) {
-    if (isMissingClubContentImageSchema(error)) {
-      const { data: retryData, error: retryError } = await supabaseAdmin
-        .from('club_content')
-        .insert(withoutMissingClubContentSchemaFields(error, payload))
-        .select()
-        .single()
-
-      if (!retryError) {
-        return fromDbClubContent(retryData as ClubContent)
-      }
-
-      console.error('Error creating club content after schema fallback:', retryError)
-    }
-
     console.error('Error creating club content:', error)
     return null
   }
@@ -1040,13 +1040,16 @@ export async function updateClubContent(contentId: number, fields: Partial<ClubC
   if (fields.image_url !== undefined || fields.image_urls !== undefined) {
     const imageUrls = normalizeClubContentImages(fields.image_urls, fields.image_url)
     payload.image_url = imageUrls[0] || null
-    payload.image_urls = imageUrls
   }
-  if (fields.image_position !== undefined) {
-    payload.image_position = normalizeClubContentImagePosition(fields.image_position)
-  }
-  if (fields.external_url !== undefined || fields.type !== undefined) {
-    payload.external_url = resolveClubContentExternalUrl(fields.type, fields.external_url)
+  if (
+    fields.external_url !== undefined ||
+    fields.type !== undefined ||
+    fields.image_url !== undefined ||
+    fields.image_urls !== undefined ||
+    fields.image_position !== undefined
+  ) {
+    const imageUrls = normalizeClubContentImages(fields.image_urls, fields.image_url)
+    payload.external_url = buildClubContentExternalValue(fields.type, fields.external_url, imageUrls, fields.image_position)
   }
   if (fields.author_name !== undefined) payload.author_name = fields.author_name || null
   if (fields.is_published !== undefined) {
@@ -1064,21 +1067,6 @@ export async function updateClubContent(contentId: number, fields: Partial<ClubC
     .single()
 
   if (error) {
-    if (isMissingClubContentImageSchema(error)) {
-      const { data: retryData, error: retryError } = await supabaseAdmin
-        .from('club_content')
-        .update(withoutMissingClubContentSchemaFields(error, payload))
-        .eq('id', contentId)
-        .select()
-        .single()
-
-      if (!retryError) {
-        return fromDbClubContent(retryData as ClubContent)
-      }
-
-      console.error('Error updating club content after schema fallback:', retryError)
-    }
-
     console.error('Error updating club content:', error)
     return null
   }
