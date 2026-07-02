@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { ArrowLeft, ShoppingBag } from "lucide-react"
 import ChessBackground from "@/components/ChessBackground"
 import MerchOrderWidget from "@/components/merch/merch-order-widget"
 import { merchProducts } from "@/lib/merch-products"
@@ -23,11 +22,10 @@ export default function MerchPage() {
               className="brand-underlink inline-flex items-center gap-2 px-3 py-2 text-white transition-colors hover:text-white/70"
               aria-label="Назад"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <span aria-hidden="true">←</span>
               <span className="font-semibold">Главная</span>
             </Link>
             <div className="brand-chip inline-flex items-center gap-2 px-3 py-2">
-              <ShoppingBag className="h-5 w-5" />
               <span className="brand-font text-sm">Мерч</span>
             </div>
           </header>
@@ -37,21 +35,21 @@ export default function MerchPage() {
             <div className="grid gap-5 md:grid-cols-[1fr_260px] md:items-end">
               <div>
                 <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Drop / Lookbook</div>
-                <h1 className="brand-title text-4xl text-white sm:text-6xl">Шахматный мерч Rep Chess KRD</h1>
+                <h1 className="brand-title text-[2.45rem] leading-none text-white sm:text-6xl">Шахматный мерч Rep Chess KRD</h1>
                 <p className="mt-4 max-w-3xl text-white/62">
                   Футболки, лонгсливы и клубные вещи для тех, кто играет в шахматы в Краснодаре, ходит на турниры Rep Chess KRD и хочет носить мерч с живой клубной историей.
                 </p>
                 <div className="brand-accent-line mt-5 w-52" />
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-center md:grid-cols-1 md:text-left">
+              <div className="grid grid-cols-1 gap-2 text-center sm:grid-cols-3 md:grid-cols-1 md:text-left">
                 <div className="rounded-2xl bg-white px-3 py-3 text-[#151515]">
                   <div className="brand-font text-2xl">{merchProducts.length}</div>
                   <div className="text-xs font-black uppercase opacity-60">позиций</div>
                 </div>
                 <div className="rounded-2xl bg-[#ff1515] px-3 py-3 text-white">
-                  <div className="brand-font text-2xl">2.5+</div>
-                  <div className="text-xs font-black uppercase opacity-80">тыс ₽</div>
+                  <div className="brand-font text-2xl">от 2 500 ₽</div>
+                  <div className="text-xs font-black uppercase opacity-80">цена</div>
                 </div>
                 <div className="rounded-2xl bg-[#fff200] px-3 py-3 text-[#151515]">
                   <div className="brand-font text-2xl">S-XL</div>

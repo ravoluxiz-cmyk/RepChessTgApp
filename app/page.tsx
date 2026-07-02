@@ -4,7 +4,6 @@ import { HomeHero } from "@/components/home/home-hero";
 import { MobileDock } from "@/components/home/mobile-dock";
 import { CLUB_CONTENT_TYPE_LABELS, getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content";
 import { listClubContent, listTournaments, type Tournament } from "@/lib/db";
-import { ArrowRight, Brain, Building2, CalendarDays, Camera, Flame, GraduationCap, Handshake, MapPin, MessageCircle, Search, Send, ShoppingBag, Sparkles, Trophy, Users, Zap } from "lucide-react";
 
 const TELEGRAM_URL = "https://t.me/RepChessKRD"
 
@@ -55,7 +54,6 @@ const SCENARIOS = [
     text: "Не знаешь, что такое швейцарка? Нормально. Покажем, куда садиться, когда жать часы и с кем играть.",
     cta: "Старт для новичка",
     href: "/beginners",
-    icon: GraduationCap,
     accent: "#20d66b",
   },
   {
@@ -63,7 +61,6 @@ const SCENARIOS = [
     text: "Блиц, Фишер, рейтинг, новые соперники и партии, после которых хочется сразу обсудить позицию.",
     cta: "К расписанию",
     href: "/tournaments",
-    icon: Trophy,
     accent: "#fff200",
   },
   {
@@ -71,7 +68,6 @@ const SCENARIOS = [
     text: "Соберем шахматный вечер для команды, бара, фестиваля или площадки. Можно турнир, лекцию или микс.",
     cta: "Запросить формат",
     href: "/partners",
-    icon: Building2,
     accent: "#1357ff",
   },
   {
@@ -79,7 +75,6 @@ const SCENARIOS = [
     text: "Там новости, фото, правила, отзывы, доска почета и все, что обычно происходит между турнирами.",
     cta: "Открыть клуб",
     href: "/club",
-    icon: MessageCircle,
     accent: "#ff1515",
   },
   {
@@ -87,7 +82,6 @@ const SCENARIOS = [
     text: "Футболки и клубные вещи Rep Chess KRD. Смотри карточки, выбирай размер, оставляй заявку.",
     cta: "Открыть витрину",
     href: "/merch",
-    icon: ShoppingBag,
     accent: "#fff200",
   },
 ]
@@ -100,12 +94,12 @@ const CLUB_NUMBERS = [
 ]
 
 const FORMATS = [
-  { title: "BLITZ 5+3", text: "Быстро, шумно, с часами. Иногда успеваешь подумать, иногда просто веришь руке.", icon: Zap },
-  { title: "Новички", text: "Без экзамена на входе. Объясним формат и поможем сыграть первую партию.", icon: GraduationCap },
-  { title: "Фишер", text: "960 стартовых позиций. Меньше заучки, больше настоящего шахматного хаоса.", icon: Sparkles },
-  { title: "Лекции", text: "Разбираем партии, идеи и позиции нормальным языком, а не как в старой методичке.", icon: Brain },
-  { title: "Корпоративы", text: "Шахматный вечер для команды: турнир, квиз, лекция или свободная игра.", icon: Handshake },
-  { title: "Hand & Brain", text: "Один говорит фигуру, второй делает ход. Дружба проверяется за пять минут.", icon: Users },
+  { title: "Блиц", text: "Быстро, шумно, с часами. Иногда успеваешь подумать, иногда просто веришь руке." },
+  { title: "Новички", text: "Без экзамена на входе. Объясним формат и поможем сыграть первую партию." },
+  { title: "Фишер", text: "960 стартовых позиций. Меньше заучки, больше настоящего шахматного хаоса." },
+  { title: "Лекции", text: "Разбираем партии, идеи и позиции нормальным языком, а не как в старой методичке." },
+  { title: "Корпоративы", text: "Шахматный вечер для команды: турнир, квиз, лекция или свободная игра." },
+  { title: "Hand & Brain", text: "Один говорит фигуру, второй делает ход. Дружба проверяется за пять минут." },
 ]
 
 const HONOR_FALLBACK = [
@@ -212,12 +206,10 @@ export default async function Home() {
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="brand-button inline-flex items-center justify-center gap-2 px-5 py-3">
-                  <Send className="h-5 w-5" />
                   Telegram-канал
                 </a>
                 <a href="/club" className="brand-button-dark inline-flex items-center justify-center gap-2 px-5 py-3">
-                  Новости клуба
-                  <ArrowRight className="h-5 w-5" />
+                  Новости клуба →
                 </a>
               </div>
             </div>
@@ -244,8 +236,7 @@ export default async function Home() {
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Ближайшие события</h2>
               </div>
               <a href="/tournaments" className="inline-flex items-center gap-2 text-sm font-black uppercase text-white/70 transition hover:text-white">
-                Всё расписание
-                <ArrowRight className="h-4 w-4" />
+                Всё расписание →
               </a>
             </div>
 
@@ -268,17 +259,16 @@ export default async function Home() {
                         </div>
                         <h3 className="brand-font text-2xl leading-none text-white">{tournament.title}</h3>
                         <div className="mt-4 grid gap-2 text-sm font-semibold text-white/62">
-                          <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{getTournamentDate(tournament)}</div>
-                          <div className="flex items-center gap-2"><MapPin className="h-4 w-4" />{tournament.location || tournament.address || "место скоро"}</div>
-                          <div className="flex items-center gap-2"><Trophy className="h-4 w-4" />{tournament.format || "club format"}</div>
-                          <div className="flex items-center gap-2"><Users className="h-4 w-4" />{Number(tournament.registration_count || 0)} уже в списке</div>
+                          <div>{getTournamentDate(tournament)}</div>
+                          <div>{tournament.location || tournament.address || "место скоро"}</div>
+                          <div>{tournament.format || "club format"}</div>
+                          <div>{Number(tournament.registration_count || 0)} уже в списке</div>
                         </div>
                         <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-white/52">
                           {tournament.description || "Приходи за 10 минут до начала. Формат объясним на месте, даже если это твой первый клубный вечер."}
                         </p>
                         <a href="/tournaments" className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black uppercase text-[#151515] transition hover:bg-[#fff200]">
-                          Записаться
-                          <ArrowRight className="h-4 w-4" />
+                          Записаться →
                         </a>
                       </div>
                     </article>
@@ -291,37 +281,28 @@ export default async function Home() {
                 <p className="mt-3 max-w-2xl text-white/62">Новое событие появится здесь карточкой. А если хочешь узнать первым, лучше заглянуть в канал.</p>
                 <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black uppercase text-[#151515]">
                   Открыть Telegram
-                  <Send className="h-4 w-4" />
                 </a>
               </div>
             )}
           </section>
 
           <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            {SCENARIOS.map((scenario) => {
-              const Icon = scenario.icon
-              return (
+            {SCENARIOS.map((scenario) => (
                 <a key={scenario.title} href={scenario.href} className="brand-panel group relative min-h-[260px] overflow-hidden p-5 transition hover:-translate-y-1 hover:bg-white">
                   <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-90 transition group-hover:scale-110" style={{ backgroundColor: scenario.accent }} />
-                  <Icon className="relative z-10 h-8 w-8 text-[#151515]" />
-                  <h3 className="brand-font relative z-10 mt-8 text-2xl leading-none">{scenario.title}</h3>
+                  <h3 className="brand-font relative z-10 mt-16 text-2xl leading-none">{scenario.title}</h3>
                   <p className="relative z-10 mt-4 text-sm font-semibold leading-relaxed text-[#151515]/68">{scenario.text}</p>
                   <div className="relative z-10 mt-6 inline-flex items-center gap-2 text-sm font-black uppercase">
-                    {scenario.cta}
-                    <ArrowRight className="h-4 w-4" />
+                    {scenario.cta} →
                   </div>
                 </a>
-              )
-            })}
+            ))}
           </section>
 
           <section className="brand-panel-dark p-5 sm:p-7" aria-labelledby="seo-chess-krasnodar">
             <div className="mb-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
               <div>
-                <div className="brand-chip mb-3 inline-flex w-fit items-center gap-2 px-3 py-1 text-xs font-black uppercase">
-                  <Search className="h-4 w-4" />
-                  Шахматы Краснодар
-                </div>
+                <div className="brand-chip mb-3 inline-flex w-fit px-3 py-1 text-xs font-black uppercase">Шахматы Краснодар</div>
                 <h2 id="seo-chess-krasnodar" className="brand-title text-3xl text-white sm:text-5xl">
                   Где играть в шахматы в Краснодаре
                 </h2>
@@ -348,7 +329,6 @@ export default async function Home() {
                   <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Живой клуб</div>
                   <h2 className="brand-title text-3xl text-white sm:text-5xl">Не кружок. Событие.</h2>
                 </div>
-                <Camera className="hidden h-10 w-10 text-white/45 sm:block" />
               </div>
 
               <HomeGalleryCarousel items={galleryItems} />
@@ -361,16 +341,13 @@ export default async function Home() {
               <h2 className="brand-title text-3xl text-white sm:text-5xl">Для разных людей и настроений</h2>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {FORMATS.map((format) => {
-                const Icon = format.icon
-                return (
-                  <article key={format.title} className="rounded-[20px] border border-white/10 bg-white/[0.06] p-5 transition hover:bg-white/[0.1]">
-                    <Icon className="h-7 w-7 text-[#fff200]" />
-                    <h3 className="brand-font mt-5 text-xl leading-none text-white">{format.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-white/58">{format.text}</p>
-                  </article>
-                )
-              })}
+              {FORMATS.map((format, index) => (
+                <article key={format.title} className="rounded-[20px] border border-white/10 bg-white/[0.06] p-5 transition hover:bg-white/[0.1]">
+                  <div className="brand-font text-sm text-[#fff200]">{String(index + 1).padStart(2, "0")}</div>
+                  <h3 className="brand-font mt-5 text-xl leading-none text-white">{format.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-white/58">{format.text}</p>
+                </article>
+              ))}
             </div>
           </section>
 
@@ -381,8 +358,7 @@ export default async function Home() {
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Полезное внутри клуба</h2>
               </div>
               <a href="/club" className="inline-flex items-center gap-2 text-sm font-black uppercase text-white/70 transition hover:text-white">
-                Все материалы
-                <ArrowRight className="h-4 w-4" />
+                Все материалы →
               </a>
             </div>
 
@@ -407,6 +383,9 @@ export default async function Home() {
                     <h3 className="text-xl font-black text-white">{item.title}</h3>
                     {item.subtitle && <p className="mt-3 text-sm leading-relaxed text-white/62">{item.subtitle}</p>}
                     {item.body && <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-white/48">{item.body}</p>}
+                    <a href="/club" className="mt-4 inline-flex text-sm font-black uppercase text-white/72 transition hover:text-white">
+                      Открыть материал →
+                    </a>
                   </div>
                 </article>
               ))}
@@ -420,8 +399,7 @@ export default async function Home() {
                 <h2 className="brand-title text-3xl sm:text-5xl">Лента участников</h2>
               </div>
               <a href="/club" className="inline-flex items-center gap-2 rounded-full bg-[#151515] px-4 py-3 text-sm font-black uppercase text-white">
-                Вся доска почета
-                <ArrowRight className="h-4 w-4" />
+                Вся доска почета →
               </a>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
@@ -446,9 +424,6 @@ export default async function Home() {
                     </div>
                   ) : null}
                   <div className="p-5">
-                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#151515] text-white">
-                      <Trophy className="h-7 w-7" />
-                    </div>
                     <div className="text-xs font-black uppercase text-[#151515]/52">{item.title}</div>
                     <h3 className="brand-font mt-2 text-2xl leading-none">{item.name}</h3>
                     <p className="mt-4 text-sm font-semibold leading-relaxed text-[#151515]/62">{item.metric}</p>
@@ -468,7 +443,6 @@ export default async function Home() {
               </p>
               <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="brand-button mt-6 inline-flex w-full items-center justify-center gap-2 px-5 py-3 sm:w-auto">
                 Подписаться на Rep Chess KRD
-                <Flame className="h-5 w-5" />
               </a>
             </div>
           </section>

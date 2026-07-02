@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export type HomeGalleryItem = {
   id: string
@@ -48,7 +47,7 @@ export function HomeGalleryCarousel({ items }: { items: HomeGalleryItem[] }) {
           key={activeItem.id}
           src={activeItem.imageUrl}
           alt={activeItem.title}
-          className="aspect-[4/3] w-full object-cover transition duration-500 sm:aspect-[16/10]"
+          className="aspect-[4/3] w-full object-cover transition duration-500 sm:aspect-[16/10] md:aspect-[16/8]"
           style={{ objectPosition: activeItem.imagePosition }}
           loading="lazy"
         />
@@ -56,9 +55,6 @@ export function HomeGalleryCarousel({ items }: { items: HomeGalleryItem[] }) {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 via-black/26 to-transparent p-4 pt-16">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <div className="mb-2 w-fit rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-[#151515]">
-                Галерея
-              </div>
               <div className="text-xl font-black text-white sm:text-2xl">{activeItem.title}</div>
             </div>
             {items.length > 1 && (
@@ -74,25 +70,25 @@ export function HomeGalleryCarousel({ items }: { items: HomeGalleryItem[] }) {
             <button
               type="button"
               onClick={showPrevious}
-              className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[#151515] shadow-[0_12px_35px_rgba(0,0,0,0.28)] transition hover:scale-105"
+              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-2xl font-black leading-none text-[#151515] shadow-[0_12px_35px_rgba(0,0,0,0.28)] transition hover:scale-105"
               aria-label="Предыдущее фото"
             >
-              <ChevronLeft className="h-6 w-6" />
+              ‹
             </button>
             <button
               type="button"
               onClick={showNext}
-              className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[#151515] shadow-[0_12px_35px_rgba(0,0,0,0.28)] transition hover:scale-105"
+              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-2xl font-black leading-none text-[#151515] shadow-[0_12px_35px_rgba(0,0,0,0.28)] transition hover:scale-105"
               aria-label="Следующее фото"
             >
-              <ChevronRight className="h-6 w-6" />
+              ›
             </button>
           </>
         )}
       </div>
 
       {items.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="hidden grid-cols-4 gap-2 sm:grid">
           {items.slice(0, 8).map((item, index) => (
             <button
               key={item.id}

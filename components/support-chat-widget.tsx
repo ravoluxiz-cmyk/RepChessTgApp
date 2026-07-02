@@ -1,7 +1,6 @@
 "use client"
 
 import { FormEvent, useMemo, useState } from "react"
-import { Bot, Headphones, MessageCircle, Send, X } from "lucide-react"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 
 type ChatMessage = {
@@ -73,21 +72,18 @@ export default function SupportChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-24 right-4 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
       {open && (
         <section className="flex h-[min(620px,calc(100vh-96px))] w-[calc(100vw-32px)] max-w-[390px] flex-col overflow-hidden rounded-[26px] border border-white/15 bg-[#151515]/95 text-white shadow-[0_24px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <header className="flex items-center justify-between border-b border-white/10 bg-white/[0.06] px-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff200] text-[#151515]">
-                <Bot className="h-5 w-5" />
-              </div>
               <div>
                 <div className="brand-font text-lg leading-none">Rep Bot</div>
                 <div className="text-xs font-semibold text-white/55">FAQ и помощь администратора</div>
               </div>
             </div>
             <button onClick={() => setOpen(false)} className="rounded-full bg-white/10 p-2 text-white/70 hover:bg-white/15 hover:text-white">
-              <X className="h-4 w-4" />
+              Закрыть
             </button>
           </header>
 
@@ -134,7 +130,7 @@ export default function SupportChatWidget() {
                 className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-white/30"
               />
               <button disabled={sending || !message.trim()} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#fff200] text-[#151515] disabled:opacity-50">
-                <Send className="h-5 w-5" />
+                →
               </button>
             </form>
           </div>
@@ -143,10 +139,10 @@ export default function SupportChatWidget() {
 
       <button
         onClick={() => setOpen((value) => !value)}
-        className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#151515] shadow-[0_18px_45px_rgba(0,0,0,0.35)] transition hover:scale-105"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-sm font-black uppercase text-[#151515] shadow-[0_18px_45px_rgba(0,0,0,0.35)] transition hover:scale-105 sm:h-16 sm:w-16"
         title="Открыть чат помощи"
       >
-        {open ? <Headphones className="h-7 w-7" /> : <MessageCircle className="h-7 w-7" />}
+        {open ? "ок" : "чат"}
       </button>
     </div>
   )
