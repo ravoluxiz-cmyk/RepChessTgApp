@@ -326,7 +326,6 @@ export default async function Home() {
             <article className="brand-panel-dark overflow-hidden p-5 sm:p-7">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
-                  <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Живой клуб</div>
                   <h2 className="brand-title text-3xl text-white sm:text-5xl">Не кружок. Событие.</h2>
                 </div>
               </div>

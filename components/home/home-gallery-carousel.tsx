@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 export type HomeGalleryItem = {
   id: string
@@ -12,16 +12,6 @@ export type HomeGalleryItem = {
 export function HomeGalleryCarousel({ items }: { items: HomeGalleryItem[] }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const activeItem = items[activeIndex]
-
-  useEffect(() => {
-    if (items.length < 2) return
-
-    const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % items.length)
-    }, 3800)
-
-    return () => window.clearInterval(timer)
-  }, [items.length])
 
   if (!items.length) {
     return (
@@ -40,7 +30,7 @@ export function HomeGalleryCarousel({ items }: { items: HomeGalleryItem[] }) {
   }
 
   return (
-    <div className="space-y-3">
+    <div>
       <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -86,31 +76,6 @@ export function HomeGalleryCarousel({ items }: { items: HomeGalleryItem[] }) {
           </>
         )}
       </div>
-
-      {items.length > 1 && (
-        <div className="hidden grid-cols-4 gap-2 sm:grid">
-          {items.slice(0, 8).map((item, index) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setActiveIndex(index)}
-              className={`overflow-hidden rounded-2xl border bg-white transition ${
-                activeIndex === index ? "border-[#fff200] opacity-100" : "border-white/10 opacity-55 hover:opacity-85"
-              }`}
-              aria-label={`Открыть фото ${index + 1}`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.imageUrl}
-                alt=""
-                className="aspect-square w-full object-cover"
-                style={{ objectPosition: item.imagePosition }}
-                loading="lazy"
-              />
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

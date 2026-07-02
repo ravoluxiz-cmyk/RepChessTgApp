@@ -32,29 +32,13 @@ export default function MerchPage() {
 
           <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
             <div className="brand-bg-icons pointer-events-none absolute -right-16 -top-24 h-72 w-72 opacity-[0.08]" />
-            <div className="grid gap-5 md:grid-cols-[1fr_260px] md:items-end">
+            <div className="grid gap-5">
               <div>
-                <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Drop / Lookbook</div>
                 <h1 className="brand-title text-[2.45rem] leading-none text-white sm:text-6xl">Шахматный мерч Rep Chess KRD</h1>
                 <p className="mt-4 max-w-3xl text-white/62">
                   Футболки, лонгсливы и клубные вещи для тех, кто играет в шахматы в Краснодаре, ходит на турниры Rep Chess KRD и хочет носить мерч с живой клубной историей.
                 </p>
                 <div className="brand-accent-line mt-5 w-52" />
-              </div>
-
-              <div className="grid grid-cols-1 gap-2 text-center sm:grid-cols-3 md:grid-cols-1 md:text-left">
-                <div className="rounded-2xl bg-white px-3 py-3 text-[#151515]">
-                  <div className="brand-font text-2xl">{merchProducts.length}</div>
-                  <div className="text-xs font-black uppercase opacity-60">позиций</div>
-                </div>
-                <div className="rounded-2xl bg-[#ff1515] px-3 py-3 text-white">
-                  <div className="brand-font text-2xl">от 2 500 ₽</div>
-                  <div className="text-xs font-black uppercase opacity-80">цена</div>
-                </div>
-                <div className="rounded-2xl bg-[#fff200] px-3 py-3 text-[#151515]">
-                  <div className="brand-font text-2xl">S-XL</div>
-                  <div className="text-xs font-black uppercase opacity-70">размеры</div>
-                </div>
               </div>
             </div>
           </div>
