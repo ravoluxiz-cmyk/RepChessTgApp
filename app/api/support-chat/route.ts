@@ -19,11 +19,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Напишите вопрос" }, { status: 400 })
   }
 
-  const { answer, confidence } = getHelpBotReply(message)
-  const shouldEscalate = !!body?.force_admin || !answer || confidence < 0.5
-  const botText = answer
-    ? answer.answer
-    : "Я не уверен, что правильно понял вопрос. Передам его администратору, чтобы вам помогли лично."
+  const result = getHelpBotReply(message)
+  const shouldEscalate = !!body?.force_admin || result.shouldEscalate
+  const botText = result.answer.answer
 
   let supportRequest = null
   if (shouldEscalate) {
@@ -39,9 +37,12 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     reply: shouldEscalate
-      ? `${botText}\n\nЗаявка для администратора ${supportRequest ? "создана" : "будет создана после настройки таблицы support_requests"}.`
+      ? `${botText}\n\n${supportRequest ? "Заявка создана. Администратор увидит ее в кабинете." : "Я попытался создать заявку, но таблица support_requests пока недоступна."}`
       : botText,
-    topic: answer?.topic || null,
+    topic: result.answer.topic,
+    title: result.answer.title,
+    confidence: result.confidence,
+    suggestions: result.suggestions,
     escalated: shouldEscalate,
     support_request_id: supportRequest?.id || null,
   })
