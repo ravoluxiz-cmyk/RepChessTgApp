@@ -253,7 +253,6 @@ export default async function Home() {
                       <div className="p-5">
                         <div className="mb-4 flex flex-wrap items-center gap-2">
                           <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${getEventStatusClass(status)}`}>{status}</span>
-                          <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-black uppercase text-white/64">beginner friendly</span>
                         </div>
                         <h3 className="brand-font text-2xl leading-none text-white">{tournament.title}</h3>
                         <div className="mt-4 grid gap-2 text-sm font-semibold text-white/62">

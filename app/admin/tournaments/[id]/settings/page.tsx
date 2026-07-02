@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { fromMoscowDateTimeInput, normalizeHalfHourDateTimeInput, toMoscowDateTimeInput } from "@/lib/date-time"
+import { HALF_HOUR_STEP_SECONDS, fromMoscowDateTimeInput, normalizeHalfHourDateTimeInput, normalizeHalfHourDateTimeOnChange, toMoscowDateTimeInput } from "@/lib/date-time"
 import { ArrowLeft } from "lucide-react"
 import { PosterUploadField } from "@/components/admin/poster-upload-field"
 
@@ -227,9 +227,9 @@ export default function TournamentSettingsPage() {
                                     <label className={labelClass}>Начало</label>
                                     <input
                                         type="datetime-local"
-                                        step={1800}
+                                        step={HALF_HOUR_STEP_SECONDS}
                                         value={settings.start_at}
-                                        onChange={(e) => setSettings(prev => ({ ...prev, start_at: e.target.value }))}
+                                        onChange={(e) => setSettings(prev => ({ ...prev, start_at: normalizeHalfHourDateTimeOnChange(e.target.value) }))}
                                         onBlur={(e) => setSettings(prev => ({ ...prev, start_at: normalizeHalfHourDateTimeInput(e.target.value) }))}
                                         className={inputClass}
                                     />
@@ -238,9 +238,9 @@ export default function TournamentSettingsPage() {
                                     <label className={labelClass}>Окончание</label>
                                     <input
                                         type="datetime-local"
-                                        step={1800}
+                                        step={HALF_HOUR_STEP_SECONDS}
                                         value={settings.end_at}
-                                        onChange={(e) => setSettings(prev => ({ ...prev, end_at: e.target.value }))}
+                                        onChange={(e) => setSettings(prev => ({ ...prev, end_at: normalizeHalfHourDateTimeOnChange(e.target.value) }))}
                                         onBlur={(e) => setSettings(prev => ({ ...prev, end_at: normalizeHalfHourDateTimeInput(e.target.value) }))}
                                         className={inputClass}
                                     />

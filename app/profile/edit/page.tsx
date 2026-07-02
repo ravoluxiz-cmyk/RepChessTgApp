@@ -41,6 +41,10 @@ export default function ProfileEditPage() {
         })
 
         if (!response.ok) {
+          if (response.status === 401 && !initData) {
+            router.push("/login?next=/profile/edit")
+            return
+          }
           throw new Error("Failed to fetch profile")
         }
 

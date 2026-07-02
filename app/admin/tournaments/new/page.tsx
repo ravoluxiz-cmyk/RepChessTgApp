@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { fromMoscowDateTimeInput, normalizeHalfHourDateTimeInput } from "@/lib/date-time"
+import { HALF_HOUR_STEP_SECONDS, fromMoscowDateTimeInput, normalizeHalfHourDateTimeInput, normalizeHalfHourDateTimeOnChange } from "@/lib/date-time"
 import { ArrowLeft, LogOut, Trash2, Search, X } from "lucide-react"
 import { PosterUploadField } from "@/components/admin/poster-upload-field"
 
@@ -342,9 +342,9 @@ export default function AdminCreateTournamentPage() {
                 <label className="text-white block mb-2">Дата и время начала</label>
                 <input
                   type="datetime-local"
-                  step={1800}
+                  step={HALF_HOUR_STEP_SECONDS}
                   value={startAt}
-                  onChange={(e) => setStartAt(e.target.value)}
+                  onChange={(e) => setStartAt(normalizeHalfHourDateTimeOnChange(e.target.value))}
                   onBlur={(e) => setStartAt(normalizeHalfHourDateTimeInput(e.target.value))}
                   className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
                 />
@@ -353,9 +353,9 @@ export default function AdminCreateTournamentPage() {
                 <label className="text-white block mb-2">Дата и время окончания</label>
                 <input
                   type="datetime-local"
-                  step={1800}
+                  step={HALF_HOUR_STEP_SECONDS}
                   value={endAt}
-                  onChange={(e) => setEndAt(e.target.value)}
+                  onChange={(e) => setEndAt(normalizeHalfHourDateTimeOnChange(e.target.value))}
                   onBlur={(e) => setEndAt(normalizeHalfHourDateTimeInput(e.target.value))}
                   className="w-full bg-white/10 text-white p-3 rounded-lg outline-none"
                 />

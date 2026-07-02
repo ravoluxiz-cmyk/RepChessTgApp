@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/telegram"
 import { deleteTournament, getTournamentById, updateTournament } from "@/lib/db"
-import { fromMoscowDateTimeInput } from "@/lib/date-time"
+import { fromMoscowDateTimeInput, normalizeDateTimeMinutePrecision } from "@/lib/date-time"
 
 export async function GET(_request: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -96,7 +96,7 @@ export async function PATCH(request: NextRequest, ctx: { params: Promise<{ id: s
           const value = String(body[key])
           updates[key] = value.includes("T") && !value.includes("+") && !value.endsWith("Z")
             ? fromMoscowDateTimeInput(value)
-            : value || null
+            : normalizeDateTimeMinutePrecision(value)
         } else {
           updates[key] = body[key]
         }

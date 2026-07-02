@@ -1,26 +1,33 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getTelegramUserFromHeaders } from "@/lib/telegram"
-import { getWebProfileUserFromHeaders } from "@/lib/web-auth"
 import {
   getUserByTelegramId,
   createUser,
   updateUserProfile,
+  updateUserProfileById,
   type UserProfileData,
+  getSiteUserBySessionHash,
 } from "@/lib/db"
+import { getSiteSessionSecretFromHeaders, hashSessionSecret } from "@/lib/site-auth"
 
 const DEFAULT_RATING = 1500
 
 // GET /api/profile - Get user profile (auto-creates if not exists)
 export async function GET(request: NextRequest) {
   try {
+    const siteSessionSecret = getSiteSessionSecretFromHeaders(request.headers)
+    const siteSessionUser = siteSessionSecret ? await getSiteUserBySessionHash(hashSessionSecret(siteSessionSecret)) : null
+
+    if (siteSessionUser) {
+      return NextResponse.json({ user: siteSessionUser.user, account: { id: siteSessionUser.account.id, login: siteSessionUser.account.login } })
+    }
+
     // Get Telegram user from headers
-    const telegramUser =
-      getTelegramUserFromHeaders(request.headers) ||
-      getWebProfileUserFromHeaders(request.headers)
+    const telegramUser = getTelegramUserFromHeaders(request.headers)
 
     if (!telegramUser) {
       return NextResponse.json(
-        { error: "Unauthorized", message: "Invalid Telegram authentication" },
+        { error: "Unauthorized", message: "Войдите в профиль" },
         { status: 401 }
       )
     }
@@ -57,13 +64,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Get Telegram user from headers
-    const telegramUser =
-      getTelegramUserFromHeaders(request.headers) ||
-      getWebProfileUserFromHeaders(request.headers)
+    const telegramUser = getTelegramUserFromHeaders(request.headers)
 
     if (!telegramUser) {
       return NextResponse.json(
-        { error: "Unauthorized", message: "Invalid Telegram authentication" },
+        { error: "Unauthorized", message: "Войдите в профиль" },
         { status: 401 }
       )
     }
@@ -128,14 +133,15 @@ export async function POST(request: NextRequest) {
 // PUT /api/profile - Update user profile
 export async function PUT(request: NextRequest) {
   try {
-    // Get Telegram user from headers
-    const telegramUser =
-      getTelegramUserFromHeaders(request.headers) ||
-      getWebProfileUserFromHeaders(request.headers)
+    const siteSessionSecret = getSiteSessionSecretFromHeaders(request.headers)
+    const siteSessionUser = siteSessionSecret ? await getSiteUserBySessionHash(hashSessionSecret(siteSessionSecret)) : null
 
-    if (!telegramUser) {
+    // Get Telegram user from headers
+    const telegramUser = siteSessionUser ? null : getTelegramUserFromHeaders(request.headers)
+
+    if (!telegramUser && !siteSessionUser) {
       return NextResponse.json(
-        { error: "Unauthorized", message: "Invalid Telegram authentication" },
+        { error: "Unauthorized", message: "Войдите в профиль" },
         { status: 401 }
       )
     }
@@ -175,14 +181,18 @@ export async function PUT(request: NextRequest) {
       bio: bio || null,
     }
 
-    const updated = await updateUserProfile(telegramUser.id, profileData)
+    const updated = siteSessionUser
+      ? await updateUserProfileById(siteSessionUser.user.id!, profileData)
+      : await updateUserProfile(telegramUser!.id, profileData)
 
     if (!updated) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
     // Get updated user
-    const updatedUser = await getUserByTelegramId(telegramUser.id)
+    const updatedUser = siteSessionUser
+      ? { ...siteSessionUser.user, ...profileData }
+      : await getUserByTelegramId(telegramUser!.id)
 
     return NextResponse.json({ user: updatedUser })
   } catch (error) {

@@ -75,6 +75,10 @@ export default function ProfilePage() {
         })
 
         if (!response.ok) {
+          if (response.status === 401 && !initData) {
+            router.push("/login?next=/profile")
+            return
+          }
           const errorData = await response.json().catch(() => ({}))
           console.error("Profile fetch failed:", response.status, errorData)
           throw new Error(errorData.message || `HTTP ${response.status}`)

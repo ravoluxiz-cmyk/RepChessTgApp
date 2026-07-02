@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/telegram"
 import { createTournament, listTournaments, type Tournament } from "@/lib/db"
-import { fromMoscowDateTimeInput } from "@/lib/date-time"
+import { fromMoscowDateTimeInput, normalizeDateTimeMinutePrecision } from "@/lib/date-time"
 
 export const dynamic = "force-dynamic"
 
@@ -60,10 +60,10 @@ export async function POST(request: NextRequest) {
       archived: body.archived ?? 0,
       start_at: typeof body.start_at === "string" && body.start_at.includes("T") && !body.start_at.includes("+") && !body.start_at.endsWith("Z")
         ? fromMoscowDateTimeInput(body.start_at)
-        : body.start_at || null,
+        : normalizeDateTimeMinutePrecision(body.start_at),
       end_at: typeof body.end_at === "string" && body.end_at.includes("T") && !body.end_at.includes("+") && !body.end_at.endsWith("Z")
         ? fromMoscowDateTimeInput(body.end_at)
-        : body.end_at || null,
+        : normalizeDateTimeMinutePrecision(body.end_at),
       location: body.location || null,
       address: body.address || null,
       yandex_maps_url: body.yandex_maps_url || null,

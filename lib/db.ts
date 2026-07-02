@@ -104,6 +104,26 @@ export interface UserProfileData {
   bio?: string | null
 }
 
+export interface SiteUserAccount {
+  id?: number
+  user_id: number
+  login: string
+  password_hash: string
+  password_salt: string
+  created_at?: string
+  updated_at?: string
+  last_login_at?: string | null
+}
+
+export interface SiteUserSession {
+  id?: number
+  account_id: number
+  session_hash: string
+  user_agent?: string | null
+  expires_at: string
+  created_at?: string
+}
+
 export interface Tournament {
   id?: number
   title: string
@@ -322,6 +342,173 @@ export async function updateUserProfile(
 
   if (error) {
     console.error('Error updating user profile:', error)
+    return false
+  }
+
+  return true
+}
+
+export async function updateUserProfileById(
+  userId: number,
+  profileData: UserProfileData
+): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('users')
+    .update({
+      first_name: profileData.first_name,
+      last_name: profileData.last_name,
+      chesscom_url: profileData.chesscom_url || null,
+      lichess_url: profileData.lichess_url || null,
+      bio: profileData.bio || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', userId)
+
+  if (error) {
+    console.error('Error updating user profile by id:', error)
+    return false
+  }
+
+  return true
+}
+
+export async function getSiteUserAccountByLogin(login: string): Promise<SiteUserAccount | null> {
+  const { data, error } = await supabaseAdmin
+    .from('site_user_accounts')
+    .select('*')
+    .eq('login', login)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null
+    console.error('Error getting site user account:', error)
+    return null
+  }
+
+  return data as SiteUserAccount
+}
+
+export async function isSiteAuthStorageReady(): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('site_user_accounts')
+    .select('id')
+    .limit(1)
+
+  if (error) {
+    console.error('Site auth storage is not ready:', error)
+    return false
+  }
+
+  return true
+}
+
+export async function getSiteUserAccountById(accountId: number): Promise<SiteUserAccount | null> {
+  const { data, error } = await supabaseAdmin
+    .from('site_user_accounts')
+    .select('*')
+    .eq('id', accountId)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null
+    console.error('Error getting site user account by id:', error)
+    return null
+  }
+
+  return data as SiteUserAccount
+}
+
+export async function createSiteUserAccount(account: SiteUserAccount): Promise<SiteUserAccount | null> {
+  const { data, error } = await supabaseAdmin
+    .from('site_user_accounts')
+    .insert({
+      user_id: account.user_id,
+      login: account.login,
+      password_hash: account.password_hash,
+      password_salt: account.password_salt,
+      last_login_at: account.last_login_at || null,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating site user account:', error)
+    return null
+  }
+
+  return data as SiteUserAccount
+}
+
+export async function touchSiteUserAccountLogin(accountId: number): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('site_user_accounts')
+    .update({ last_login_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('id', accountId)
+
+  if (error) {
+    console.error('Error touching site user account login:', error)
+  }
+}
+
+export async function createSiteUserSession(session: SiteUserSession): Promise<SiteUserSession | null> {
+  const { data, error } = await supabaseAdmin
+    .from('site_user_sessions')
+    .insert({
+      account_id: session.account_id,
+      session_hash: session.session_hash,
+      user_agent: session.user_agent || null,
+      expires_at: session.expires_at,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating site user session:', error)
+    return null
+  }
+
+  return data as SiteUserSession
+}
+
+export async function getSiteUserBySessionHash(sessionHash: string): Promise<{ user: User; account: SiteUserAccount } | null> {
+  if (!sessionHash) return null
+
+  const { data: session, error } = await supabaseAdmin
+    .from('site_user_sessions')
+    .select('*')
+    .eq('session_hash', sessionHash)
+    .single()
+
+  if (error) {
+    if (error.code !== 'PGRST116') {
+      console.error('Error getting site user session:', error)
+    }
+    return null
+  }
+
+  const typedSession = session as SiteUserSession
+  if (new Date(typedSession.expires_at).getTime() <= Date.now()) {
+    await deleteSiteUserSession(sessionHash)
+    return null
+  }
+
+  const account = await getSiteUserAccountById(typedSession.account_id)
+  if (!account) return null
+
+  const user = await getUserById(account.user_id)
+  if (!user) return null
+
+  return { user, account }
+}
+
+export async function deleteSiteUserSession(sessionHash: string): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('site_user_sessions')
+    .delete()
+    .eq('session_hash', sessionHash)
+
+  if (error) {
+    console.error('Error deleting site user session:', error)
     return false
   }
 

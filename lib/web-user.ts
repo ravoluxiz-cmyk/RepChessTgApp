@@ -45,5 +45,5 @@ export function getProfileAuthHeaders(initData: string): Record<string, string> 
     return { Authorization: `Bearer ${initData}` }
   }
 
-  return getWebUserAuthHeaders()
+  return {}
 }
