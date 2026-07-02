@@ -80,7 +80,6 @@ export default function AdminSupportRequestsPage() {
           </button>
 
           <section className="relative mb-6 overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
-            <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Support Desk</div>
             <div className="flex items-start gap-3">
               <Headphones className="mt-1 h-8 w-8 text-[#fff200]" />
               <div>

@@ -292,7 +292,6 @@ export default function AdminClubContentPage() {
 
           <section className="relative mb-6 overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
             <div className="brand-bg-icons pointer-events-none absolute -right-20 -top-24 h-72 w-72 opacity-[0.08]" />
-            <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Club CMS</div>
             <h1 className="brand-title text-4xl text-white sm:text-6xl">Контент клуба</h1>
             <p className="mt-3 max-w-2xl text-white/62">
               Каждый раздел работает как лента: можно добавлять несколько участников, новостей, лекций, отзывов и фото.

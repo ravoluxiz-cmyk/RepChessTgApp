@@ -2,7 +2,7 @@ import ChessBackground from "@/components/ChessBackground";
 import { HomeGalleryCarousel } from "@/components/home/home-gallery-carousel";
 import { HomeHero } from "@/components/home/home-hero";
 import { MobileDock } from "@/components/home/mobile-dock";
-import { CLUB_CONTENT_TYPE_LABELS, getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content";
+import { getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content";
 import { listClubContent, listTournaments, type Tournament } from "@/lib/db";
 
 const TELEGRAM_URL = "https://t.me/RepChessKRD"
@@ -197,7 +197,6 @@ export default async function Home() {
           <section className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
             <div className="brand-panel-dark relative overflow-hidden p-5 sm:p-7">
               <div className="brand-bg-icons pointer-events-none absolute -right-20 -top-24 h-72 w-72 opacity-[0.08]" />
-              <div className="brand-chip mb-5 w-fit px-3 py-1 text-xs font-black uppercase">Кто мы</div>
               <h2 className="brand-title max-w-3xl text-3xl text-white sm:text-5xl md:text-6xl">
                 Шахматы без пыли
               </h2>
@@ -232,7 +231,6 @@ export default async function Home() {
           <section className="brand-panel-dark p-5 sm:p-7">
             <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
-                <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Скоро играем</div>
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Ближайшие события</h2>
               </div>
               <a href="/tournaments" className="inline-flex items-center gap-2 text-sm font-black uppercase text-white/70 transition hover:text-white">
@@ -302,7 +300,6 @@ export default async function Home() {
           <section className="brand-panel-dark p-5 sm:p-7" aria-labelledby="seo-chess-krasnodar">
             <div className="mb-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
               <div>
-                <div className="brand-chip mb-3 inline-flex w-fit px-3 py-1 text-xs font-black uppercase">Шахматы Краснодар</div>
                 <h2 id="seo-chess-krasnodar" className="brand-title text-3xl text-white sm:text-5xl">
                   Где играть в шахматы в Краснодаре
                 </h2>
@@ -336,7 +333,6 @@ export default async function Home() {
 
           <section className="brand-panel-dark p-5 sm:p-7">
             <div className="mb-5">
-              <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Форматы</div>
               <h2 className="brand-title text-3xl text-white sm:text-5xl">Для разных людей и настроений</h2>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -353,7 +349,6 @@ export default async function Home() {
           <section className="brand-panel-dark p-5 sm:p-7">
             <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
-                <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Клубная лента</div>
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Полезное внутри клуба</h2>
               </div>
               <a href="/club" className="inline-flex items-center gap-2 text-sm font-black uppercase text-white/70 transition hover:text-white">
@@ -378,7 +373,6 @@ export default async function Home() {
                     </div>
                   )}
                   <div className="p-5">
-                    <div className="mb-4 w-fit rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-[#151515]">{CLUB_CONTENT_TYPE_LABELS[item.type]}</div>
                     <h3 className="text-xl font-black text-white">{item.title}</h3>
                     {item.subtitle && <p className="mt-3 text-sm leading-relaxed text-white/62">{item.subtitle}</p>}
                     {item.body && <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-white/48">{item.body}</p>}
@@ -394,7 +388,6 @@ export default async function Home() {
           <section className="brand-panel p-5 sm:p-7">
             <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
-                <div className="brand-chip mb-3 w-fit px-3 py-1 text-xs font-black uppercase">Доска почёта</div>
                 <h2 className="brand-title text-3xl sm:text-5xl">Лента участников</h2>
               </div>
               <a href="/club" className="inline-flex items-center gap-2 rounded-full bg-[#151515] px-4 py-3 text-sm font-black uppercase text-white">
@@ -435,7 +428,6 @@ export default async function Home() {
           <section className="brand-panel relative overflow-hidden p-5 sm:p-7">
             <div className="brand-sticker pointer-events-none absolute -right-10 top-8 h-12 w-36 rotate-[-12deg] bg-[#ff1515]" />
             <div className="max-w-3xl">
-              <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Канал клуба</div>
               <h2 className="brand-title text-3xl sm:text-5xl">Все начинается в Telegram</h2>
               <p className="mt-4 text-base leading-relaxed text-[#151515]/68 sm:text-lg">
                 Там быстрее всего появляются анонсы, переносы, фото, обсуждения и записи на ближайшие шахматные вечера.

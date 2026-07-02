@@ -101,7 +101,6 @@ export default function TournamentsPage() {
             <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.06] p-5 text-center shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
               <div className="brand-bg-icons pointer-events-none absolute -right-20 -top-20 h-72 w-72 opacity-[0.08]" />
               <div className="brand-sticker pointer-events-none absolute left-5 top-5 hidden h-8 w-20 rotate-[-7deg] bg-[#1357ff] sm:block" />
-              <div className="brand-chip mx-auto mb-4 w-fit px-3 py-1 text-xs font-bold uppercase">Rep Chess KRD Events</div>
               <h1 className="brand-title text-4xl text-white sm:text-6xl md:text-7xl">
                 Расписание турниров
               </h1>

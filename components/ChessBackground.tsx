@@ -18,7 +18,6 @@ const fadeUpVariants = {
 };
 
 export default function ChessBackground({
-  badge = "Обучающая платформа",
   title1 = "Освойте",
   title2 = "Новые Навыки",
   description = "Каждый урок приближает вас к мастерству. Начните свой путь к знаниям уже сегодня.",
@@ -45,19 +44,6 @@ export default function ChessBackground({
           children
         ) : (
           <div className="max-w-4xl mx-auto text-center">
-            <motion.div
-              custom={0}
-              variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
-              className="brand-chip mb-8 inline-flex items-center gap-2 px-4 py-2 md:mb-12"
-            >
-              <div className="h-2 w-2 bg-[#151515]" />
-              <span className="text-sm font-bold uppercase tracking-wide">
-                {badge}
-              </span>
-            </motion.div>
-
             <motion.div
               custom={1}
               variants={fadeUpVariants}

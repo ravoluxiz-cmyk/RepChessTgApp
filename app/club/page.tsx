@@ -140,9 +140,6 @@ export default function ClubPage() {
 
           <section className="relative mb-6 overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
             <div className="brand-bg-illustration pointer-events-none absolute -right-24 -bottom-20 h-80 w-[420px] opacity-[0.08]" />
-            <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">
-              Клубная лента
-            </div>
             <div className="grid gap-5 lg:grid-cols-[1fr_360px] lg:items-end">
               <div>
                 <h1 className="brand-title text-4xl text-white sm:text-6xl">Клуб Rep Chess KRD</h1>
@@ -200,16 +197,11 @@ export default function ClubPage() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 {visibleContent.map((item) => {
-                  const Icon = TYPE_ICONS[item.type]
                   return (
                     <article key={`${item.type}-${item.id}-${item.title}`} className="brand-panel-dark overflow-hidden rounded-[22px]">
                       <ClubContentImageCarousel item={item} />
                       <div className="p-5">
                         <div className="mb-4 flex flex-wrap items-center gap-2">
-                          <span className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black uppercase ${TYPE_ACCENTS[item.type]}`}>
-                            <Icon className="h-4 w-4" />
-                            {CLUB_CONTENT_TYPE_LABELS[item.type]}
-                          </span>
                           {item.is_featured && <span className="rounded-full bg-white/10 px-3 py-2 text-xs font-black uppercase text-white/70">Важно</span>}
                         </div>
                         <h2 className="brand-font text-2xl leading-none text-white">{item.title}</h2>

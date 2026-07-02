@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Check, Clock, Copy, Send, Target, Trophy } from "lucide-react"
+import { ArrowLeft, Check, Clock, Copy, Send, Target } from "lucide-react"
 import ChessBackground from "@/components/ChessBackground"
 
 const levels = ["Начинаю", "Играю турниры", "Хочу готовиться серьезно"]
@@ -60,15 +60,10 @@ export default function LessonsPage() {
               <ArrowLeft className="h-5 w-5" />
               <span className="font-semibold">Главная</span>
             </button>
-            <div className="brand-chip inline-flex items-center gap-2 px-3 py-2">
-              <Trophy className="h-5 w-5" />
-              <span className="brand-font text-sm">Уроки</span>
-            </div>
           </header>
 
           <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
             <div className="brand-bg-illustration pointer-events-none absolute -right-24 -bottom-20 h-72 w-96 opacity-[0.08]" />
-            <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Training request</div>
             <h1 className="brand-title text-4xl text-white sm:text-6xl">Запись на урок</h1>
             <p className="mt-4 max-w-2xl text-white/62">
               Оставь заявку на урок шахмат: уровень, удобное время и что хочется подтянуть.

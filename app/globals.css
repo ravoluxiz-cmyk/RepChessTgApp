@@ -165,14 +165,6 @@
     backdrop-filter: blur(18px);
   }
 
-  .brand-chip {
-    border: 1px solid rgb(21 21 21 / 0.16);
-    border-radius: 999px;
-    background: rgb(247 247 242 / 0.94);
-    color: #151515;
-    box-shadow: 0 12px 40px rgb(0 0 0 / 0.16);
-  }
-
   .brand-button {
     border: 1px solid rgb(21 21 21 / 0.26);
     border-radius: 999px;

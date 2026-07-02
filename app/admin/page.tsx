@@ -84,7 +84,6 @@ export default function AdminMainMenuPage() {
           <div className="mx-auto max-w-5xl">
             <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
               <div className="brand-bg-icons pointer-events-none absolute -right-20 -top-24 h-72 w-72 opacity-[0.07]" />
-              <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Admin Command Center</div>
               <h1 className="brand-title text-3xl text-white sm:text-5xl lg:text-6xl">
                 Управление клубом
               </h1>

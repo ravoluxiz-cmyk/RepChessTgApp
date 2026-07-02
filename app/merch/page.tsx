@@ -25,9 +25,6 @@ export default function MerchPage() {
               <span aria-hidden="true">←</span>
               <span className="font-semibold">Главная</span>
             </Link>
-            <div className="brand-chip inline-flex items-center gap-2 px-3 py-2">
-              <span className="brand-font text-sm">Мерч</span>
-            </div>
           </header>
 
           <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
@@ -72,11 +69,6 @@ export default function MerchPage() {
                     </div>
 
                     <div className="p-5 sm:p-6">
-                      <div className="mb-3 flex flex-wrap gap-2">
-                        <span className="brand-chip px-3 py-1 text-xs font-black uppercase">{item.category}</span>
-                        <span className="rounded-full bg-[#151515] px-3 py-1 text-xs font-black uppercase text-white">{item.colors.join(", ")}</span>
-                      </div>
-
                       <h2 className="brand-title text-3xl leading-none sm:text-4xl" itemProp="name">{item.name}</h2>
                       <p className="mt-3 max-w-3xl text-base font-semibold leading-relaxed text-[#151515]/62" itemProp="description">
                         {item.shortDescription}

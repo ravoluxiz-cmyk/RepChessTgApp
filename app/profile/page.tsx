@@ -198,9 +198,6 @@ export default function ProfilePage() {
                     <User className="w-12 h-12" />
                   </div>
                   <div>
-                    <div className="brand-chip mb-2 w-fit px-3 py-1 text-xs font-black uppercase">
-                      Rep Player
-                    </div>
                     <h2 className="brand-title text-3xl text-white sm:text-5xl">
                       {displayName || "Игрок"}
                     </h2>

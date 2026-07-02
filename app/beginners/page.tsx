@@ -38,7 +38,6 @@ export default function BeginnersPage() {
           <section className="mt-6 grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
             <div className="brand-panel-dark relative overflow-hidden p-5 sm:p-8">
               <div className="brand-bg-icons pointer-events-none absolute -right-24 -top-24 h-80 w-80 opacity-[0.08]" />
-              <div className="brand-chip mb-5 w-fit px-3 py-1 text-xs font-black uppercase">Beginner friendly</div>
               <h1 className="brand-title text-4xl text-white sm:text-6xl md:text-7xl">Первый турнир без паники</h1>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/66 sm:text-lg">
                 Нормально, если ты не знаешь, что такое швейцарка, как ставить часы или что делать после партии. Приходи, объясним на месте. Это шахматы для начинающих, а не вступительный экзамен.
@@ -79,7 +78,6 @@ export default function BeginnersPage() {
 
           <section className="mt-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="brand-panel p-5 sm:p-6">
-              <div className="brand-chip mb-4 w-fit px-3 py-1 text-xs font-black uppercase">Как это проходит</div>
               <div className="space-y-4">
                 {STEPS.map((step, index) => (
                   <div key={step} className="flex gap-4">
