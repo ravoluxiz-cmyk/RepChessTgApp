@@ -22,7 +22,7 @@ const FORMAT_CARDS = [
   },
   {
     title: "Обучение",
-    text: "Формат для начинающих: объясняем правила, часы, базовые идеи и помогаем спокойно сыграть первые партии.",
+    text: "Формат для начинающих: объясняем правила, часы, базовые идеи и спокойно ведем людей через первые партии.",
   },
   {
     title: "Фестивальный спот",
@@ -31,10 +31,10 @@ const FORMAT_CARDS = [
 ]
 
 const WE_HANDLE = [
-  "привозим шахматы и часы",
+  "привозим игровой инвентарь",
   "готовим формат и регламент",
   "ведем событие",
-  "помогаем с анонсом",
+  "готовим анонс",
   "объясняем правила участникам",
   "считаем результаты",
   "делаем событие понятным даже для тех, кто давно не играл",
@@ -44,6 +44,7 @@ const VENUE_NEEDS = [
   "столы и стулья",
   "нормальный свет",
   "место под игроков",
+  "фиксированный гонорар за проведение",
   "возможность заранее согласовать время и формат",
   "контакт ответственного человека на площадке",
 ]
@@ -110,7 +111,7 @@ export default function PartnersPage() {
   return (
     <ChessBackground>
       <main className="min-h-screen px-4 py-8 text-white">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-7xl">
           <button onClick={() => router.push("/")} className="mb-6 inline-flex items-center gap-2 text-white/70 hover:text-white">
             <ArrowLeft className="h-5 w-5" />
             Главное меню
@@ -123,16 +124,16 @@ export default function PartnersPage() {
               <div>
                 <h1 className="brand-title text-3xl sm:text-5xl">Провести мероприятие с Rep Chess KRD</h1>
                 <p className="mt-3 max-w-2xl text-white/62">
-                  Привезем шахматы на площадку, в офис или на фестиваль. Можно сделать турнир, лекцию, квиз или спокойный вечер с досками.
+                  Организуем шахматное событие для площадки, офиса или фестиваля. Привозим инвентарь, готовим анонс, ведем игру и собираем понятный формат под гостей.
                 </p>
               </div>
             </div>
           </div>
 
-          <section className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <section className="mb-6 grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-5">
             {FORMAT_CARDS.map((item) => (
-              <article key={item.title} className="brand-panel-dark rounded-[18px] p-5">
-                <h2 className="brand-font text-xl text-white">{item.title}</h2>
+              <article key={item.title} className="brand-panel-dark flex h-full min-h-[250px] flex-col rounded-[18px] p-5">
+                <h2 className="brand-font min-h-[58px] text-lg leading-none text-white xl:text-xl">{item.title}</h2>
                 <p className="mt-3 text-sm leading-relaxed text-white/62">{item.text}</p>
               </article>
             ))}
