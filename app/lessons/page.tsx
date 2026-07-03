@@ -68,6 +68,9 @@ export default function LessonsPage() {
             <p className="mt-4 max-w-2xl text-white/62">
               Оставь заявку на урок шахмат: уровень, удобное время и что хочется подтянуть.
             </p>
+            <a href="/lessons/chess-krasnodar" className="mt-4 inline-flex text-sm font-black uppercase text-white/72 transition hover:text-white">
+              Подробнее про уроки шахмат в Краснодаре →
+            </a>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="rounded-full bg-white px-3 py-2 text-sm font-black text-[#151515]">Индивидуально</span>
               <span className="rounded-full bg-[#fff200] px-3 py-2 text-sm font-black text-[#151515]">Группа</span>

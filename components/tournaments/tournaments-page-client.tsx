@@ -60,6 +60,9 @@ export function TournamentsPageClient({ tournaments }: { tournaments: Tournament
             <p className="mx-auto mt-4 max-w-2xl text-base text-white/62 sm:text-lg">
               Ближайшие шахматные турниры Rep Chess KRD в Краснодаре.
             </p>
+            <a href="/tournaments/krasnodar" className="mt-4 inline-flex text-sm font-black uppercase text-white/72 transition hover:text-white">
+              Подробно про турниры в Краснодаре →
+            </a>
 
             {tournaments.length > 0 && (
               <div className="mt-6 flex flex-wrap justify-center gap-2">

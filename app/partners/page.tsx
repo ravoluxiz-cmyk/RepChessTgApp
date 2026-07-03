@@ -126,6 +126,9 @@ export default function PartnersPage() {
                 <p className="mt-3 max-w-2xl text-white/62">
                   Организуем шахматное событие для площадки, офиса или фестиваля. Привозим инвентарь, готовим анонс, ведем игру и собираем понятный формат под гостей.
                 </p>
+                <a href="/corporate/chess-events-krasnodar" className="mt-4 inline-flex text-sm font-black uppercase text-white/72 transition hover:text-white">
+                  Подробнее про шахматные мероприятия для компаний →
+                </a>
               </div>
             </div>
           </div>

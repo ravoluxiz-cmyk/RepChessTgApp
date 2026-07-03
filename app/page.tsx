@@ -98,26 +98,38 @@ const SEO_TOPICS = [
   {
     title: "Шахматы в Краснодаре",
     text: "Ищешь шахматы в Краснодаре не в формате тихого кружка? У нас играют офлайн, знакомятся, спорят о партиях и возвращаются на следующие вечера.",
+    href: "/chess-krasnodar",
+    cta: "Где играть",
   },
   {
     title: "Турниры по шахматам",
     text: "В расписании есть дата, площадка, формат, афиша и запись. Самые быстрые анонсы и переносы все равно сначала улетают в Telegram.",
+    href: "/tournaments/krasnodar",
+    cta: "Турниры",
   },
   {
     title: "Шахматы для начинающих",
     text: "Можно прийти без рейтинга и без уверенности в себе. Организатор объяснит пары, часы и что делать после партии.",
+    href: "/beginners/chess-krasnodar",
+    cta: "Новичкам",
   },
   {
     title: "Уроки, лекции и клубный контент",
     text: "Проводим уроки шахмат, лекции и разборы. Плюс собираем новости клуба, отзывы и доску почета, чтобы история вечеров не терялась.",
+    href: "/lessons/chess-krasnodar",
+    cta: "Уроки",
   },
   {
     title: "Мерч и стиль клуба",
     text: "В мерче лежат футболки и вещи Rep Chess KRD. Не обязательная форма, просто приятно, когда клуб виден и вне доски.",
+    href: "/merch",
+    cta: "Мерч",
   },
   {
     title: "Шахматные мероприятия для компаний",
     text: "Делаем корпоративные турниры, лекции и шахматные зоны для компаний, баров, фестивалей и городских проектов.",
+    href: "/corporate/chess-events-krasnodar",
+    cta: "Для компаний",
   },
 ]
 
@@ -315,6 +327,9 @@ export default async function Home() {
                 <article key={topic.title} className="rounded-[20px] border border-white/10 bg-white/[0.06] p-5">
                   <h3 className="brand-font text-xl leading-tight text-white">{topic.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-white/58">{topic.text}</p>
+                  <a href={topic.href} className="mt-4 inline-flex text-xs font-black uppercase text-white/72 transition hover:text-white">
+                    {topic.cta} →
+                  </a>
                 </article>
               ))}
             </div>
