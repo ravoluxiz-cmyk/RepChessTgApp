@@ -37,9 +37,10 @@ export function HomeGalleryCarousel({ items }: { items: HomeGalleryItem[] }) {
           key={activeItem.id}
           src={activeItem.imageUrl}
           alt={activeItem.title}
-          className="aspect-[4/3] w-full object-cover transition duration-500 sm:aspect-[16/10] md:aspect-[16/8]"
+          className="aspect-[4/3] w-full object-cover sm:aspect-[16/10] md:aspect-[16/8]"
           style={{ objectPosition: activeItem.imagePosition }}
           loading="lazy"
+          decoding="async"
         />
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 via-black/26 to-transparent p-4 pt-16">

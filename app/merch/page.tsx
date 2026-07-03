@@ -61,6 +61,7 @@ export default function MerchPage() {
                         alt={`${item.name} - шахматный мерч Rep Chess KRD`}
                         className="aspect-[4/5] w-full bg-[#151515] object-contain"
                         loading={index < 2 ? "eager" : "lazy"}
+                        decoding="async"
                         itemProp="image"
                       />
                       <div className="brand-font absolute left-3 top-3 rounded-full border border-[#151515]/15 bg-white px-2.5 py-1 text-xs text-black shadow-lg">

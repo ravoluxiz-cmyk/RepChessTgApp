@@ -134,7 +134,7 @@ export default function AdminClubContentPage() {
       is_featured: !!item.is_featured,
       sort_order: String(item.sort_order ?? 100),
     })
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    window.scrollTo({ top: 0, behavior: "auto" })
   }
 
   function startNew(type?: ClubContentType) {
@@ -143,7 +143,7 @@ export default function AdminClubContentPage() {
     setError(null)
     setManualImageUrl("")
     setForm({ ...EMPTY_FORM, type: nextType })
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    window.scrollTo({ top: 0, behavior: "auto" })
   }
 
   function setImages(images: string[]) {

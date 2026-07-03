@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { CalendarDays, CheckCircle2, ExternalLink, ListChecks, MapPin, Scale, Trophy, Users } from "lucide-react"
-import { motion } from "framer-motion"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import { getProfileAuthHeaders } from "@/lib/web-user"
 
@@ -34,7 +33,6 @@ export interface Tournament {
 
 interface TournamentCardProps {
   tournament: Tournament
-  index: number
 }
 
 const formatLabels: Record<string, string> = {
@@ -94,7 +92,7 @@ function formatDateSticker(value?: string | null) {
   }
 }
 
-export function TournamentCard({ tournament, index }: TournamentCardProps) {
+export function TournamentCard({ tournament }: TournamentCardProps) {
   const { initData, isReady } = useTelegramWebApp()
   const [registering, setRegistering] = useState(false)
   const [registered, setRegistered] = useState(false)
@@ -157,28 +155,11 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
     }
   }
 
-  const fadeUpVariant = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        delay: index * 0.1,
-        ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number],
-      },
-    },
-  }
   const dateSticker = formatDateSticker(tournament.start_at || tournament.created_at)
   const scheduleLabel = tournament.start_at ? formatSchedule(tournament.start_at) : formatCreatedAt(tournament.created_at)
 
   return (
-    <motion.div
-      variants={fadeUpVariant}
-      initial="hidden"
-      animate="visible"
-      className="brand-panel relative overflow-hidden rounded-[18px] transition-transform duration-300 hover:-translate-y-1"
-    >
+    <article className="brand-panel relative overflow-hidden rounded-[18px] transition-transform duration-150 hover:-translate-y-0.5">
       <div className="grid md:grid-cols-[minmax(220px,320px)_1fr]">
         <div className="relative min-h-56 border-b border-[#151515]/10 bg-[#151515] md:min-h-full md:border-b-0 md:border-r">
           <div className="absolute left-4 top-4 z-10 rounded-2xl bg-white px-3 py-2 text-center text-[#151515] shadow-[0_14px_40px_rgba(0,0,0,0.28)]">
@@ -336,6 +317,6 @@ export function TournamentCard({ tournament, index }: TournamentCardProps) {
       </div>
 
       <div className="brand-accent-line pointer-events-none absolute inset-x-0 bottom-0" />
-    </motion.div>
+    </article>
   )
 }

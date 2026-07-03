@@ -46,7 +46,7 @@ export default function SupportChatWidget() {
 
   useEffect(() => {
     if (!open) return
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
+    bottomRef.current?.scrollIntoView({ behavior: "auto", block: "end" })
   }, [messages, open, sending])
 
   async function send(text: string, forceAdmin = false) {
@@ -98,7 +98,7 @@ export default function SupportChatWidget() {
   return (
     <div className="fixed bottom-24 right-4 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
       {open && (
-        <section className="flex h-[min(680px,calc(100vh-108px))] w-[calc(100vw-28px)] max-w-[430px] flex-col overflow-hidden rounded-[28px] border border-white/14 bg-[#111]/96 text-white shadow-[0_24px_90px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+        <section className="flex h-[min(680px,calc(100vh-108px))] w-[calc(100vw-28px)] max-w-[430px] flex-col overflow-hidden rounded-[28px] border border-white/14 bg-[#111] text-white shadow-[0_14px_42px_rgba(0,0,0,0.46)]">
           <header className="flex items-start justify-between gap-4 border-b border-white/10 bg-white/[0.06] px-4 py-4">
             <div>
               <div className="brand-font text-xl leading-none">Rep Chess бот</div>
@@ -195,7 +195,7 @@ export default function SupportChatWidget() {
 
       <button
         onClick={() => setOpen((value) => !value)}
-        className="flex h-14 min-w-14 items-center justify-center rounded-full bg-white px-5 text-sm font-black uppercase text-[#151515] shadow-[0_18px_45px_rgba(0,0,0,0.35)] transition hover:scale-105 sm:h-16"
+        className="flex h-14 min-w-14 items-center justify-center rounded-full bg-white px-5 text-sm font-black uppercase text-[#151515] shadow-[0_10px_28px_rgba(0,0,0,0.32)] transition hover:scale-[1.02] sm:h-16"
         title="Открыть чат помощи"
       >
         {open ? "закрыть" : "чат"}

@@ -247,7 +247,13 @@ export default async function Home() {
                       {tournament.poster_url && (
                         <div className="overflow-hidden bg-black/20">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={tournament.poster_url} alt={tournament.title} className="aspect-[16/10] w-full object-cover transition duration-300 hover:scale-[1.035]" loading="lazy" />
+                          <img
+                            src={tournament.poster_url}
+                            alt={tournament.title}
+                            className="aspect-[16/10] w-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
                         </div>
                       )}
                       <div className="p-5">
@@ -368,6 +374,7 @@ export default async function Home() {
                         className="h-full w-full object-contain"
                         style={{ objectPosition: normalizeClubContentImagePosition(item.image_position) }}
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   )}
@@ -411,6 +418,7 @@ export default async function Home() {
                         className="h-full w-full object-contain"
                         style={{ objectPosition: item.imagePosition }}
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   ) : null}

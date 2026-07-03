@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react"
 import ChessBackground from "@/components/ChessBackground"
 import { BackButton } from "@/components/ui/back-button"
 import { TournamentCard, Tournament } from "@/components/tournaments/tournament-card"
-import { motion } from "framer-motion"
 
 type TournamentFilter = "all" | "open" | "upcoming"
 
@@ -88,17 +87,12 @@ export default function TournamentsPage() {
       <div className="w-full max-w-6xl mx-auto px-2 sm:px-4">
         <div className="min-h-screen py-12 flex flex-col gap-8">
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col gap-6"
-          >
+          <div className="flex flex-col gap-6">
             <div className="flex justify-start">
               <BackButton />
             </div>
 
-            <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.06] p-5 text-center shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
+            <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.06] p-5 text-center shadow-[0_14px_44px_rgba(0,0,0,0.24)] sm:p-8 md:backdrop-blur-sm">
               <div className="brand-bg-icons pointer-events-none absolute -right-20 -top-20 h-72 w-72 opacity-[0.08]" />
               <div className="brand-sticker pointer-events-none absolute left-5 top-5 hidden h-8 w-20 rotate-[-7deg] bg-[#1357ff] sm:block" />
               <h1 className="brand-title text-4xl text-white sm:text-6xl md:text-7xl">
@@ -125,7 +119,7 @@ export default function TournamentsPage() {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Content */}
           <div className="flex-1">
@@ -149,8 +143,8 @@ export default function TournamentsPage() {
 
             {!loading && !error && visibleTournaments.length > 0 && (
               <div className="space-y-5">
-                {visibleTournaments.map((tournament, index) => (
-                  <TournamentCard key={tournament.id} tournament={tournament} index={index} />
+                {visibleTournaments.map((tournament) => (
+                  <TournamentCard key={tournament.id} tournament={tournament} />
                 ))}
               </div>
             )}

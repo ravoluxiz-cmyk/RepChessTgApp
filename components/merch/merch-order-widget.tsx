@@ -88,7 +88,7 @@ export default function MerchOrderWidget({ products }: { products: OrderProduct[
 
         <div className="overflow-hidden rounded-2xl border border-[#151515]/10 bg-[#151515]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={product.image} alt={product.name} className="aspect-[4/5] w-full object-cover" />
+          <img src={product.image} alt={product.name} className="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async" />
         </div>
 
         <div>
