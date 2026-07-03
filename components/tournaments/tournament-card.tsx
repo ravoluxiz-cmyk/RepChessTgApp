@@ -5,32 +5,7 @@ import { CalendarDays, CheckCircle2, ExternalLink, ListChecks, MapPin, Scale, Tr
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import { getProfileAuthHeaders } from "@/lib/web-user"
 import { TELEGRAM_URL, formatRegistrationCount, formatTournamentFormat } from "@/lib/tournament-display"
-
-export interface Tournament {
-  id: number | string
-  title: string
-  format: string
-  points_win: number
-  points_loss: number
-  points_draw: number
-  bye_points: number
-  rounds: number
-  tiebreakers: string
-  team_mode: string
-  allow_join?: number
-  archived?: number
-  created_at?: string
-  start_at?: string | null
-  end_at?: string | null
-  location?: string | null
-  event_url?: string | null
-  address?: string | null
-  yandex_maps_url?: string | null
-  poster_url?: string | null
-  registration_count?: number
-  description?: string | null
-  source?: "manual" | "google_calendar" | "supabase"
-}
+import type { Tournament } from "@/lib/db"
 
 interface TournamentCardProps {
   tournament: Tournament

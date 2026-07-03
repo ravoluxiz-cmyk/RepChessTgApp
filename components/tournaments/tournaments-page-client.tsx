@@ -86,7 +86,7 @@ export function TournamentsPageClient({ tournaments }: { tournaments: Tournament
           {visibleTournaments.length > 0 ? (
             <div className="space-y-5">
               {visibleTournaments.map((tournament) => (
-                <TournamentCard key={tournament.id} tournament={tournament} />
+                <TournamentCard key={tournament.id ?? tournament.title} tournament={tournament} />
               ))}
             </div>
           ) : (
