@@ -306,6 +306,9 @@ export default async function Home() {
                 Если коротко: у нас. Есть расписание, турниры для разных уровней, уроки, лекции, мерч и отдельные форматы для компаний.
               </p>
             </div>
+            <a href="/chess-krasnodar" className="mb-5 inline-flex text-sm font-black uppercase text-white/72 transition hover:text-white">
+              Подробно про шахматы в Краснодаре →
+            </a>
 
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {SEO_TOPICS.map((topic) => (

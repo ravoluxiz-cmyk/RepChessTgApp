@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
   const routes = [
     { path: "/", priority: 1 },
+    { path: "/chess-krasnodar", priority: 0.92 },
     { path: "/tournaments", priority: 0.9 },
     { path: "/beginners", priority: 0.86 },
     { path: "/club", priority: 0.85 },

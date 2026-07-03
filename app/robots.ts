@@ -7,6 +7,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: [
           "/",
+          "/chess-krasnodar",
           "/tournaments",
           "/beginners",
           "/club",
