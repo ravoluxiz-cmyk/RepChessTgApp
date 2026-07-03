@@ -106,7 +106,7 @@ export default function BeginnersChessKrasnodarPage() {
       ]}
       faq={faq}
       finalTitle="Первый шаг - выбрать событие"
-      finalText="Для запроса \"шахматы для начинающих Краснодар\" ответ простой: выбери ближайшее событие Rep Chess KRD, приходи за 10 минут до начала и скажи, что ты впервые. Дальше поможем."
+      finalText={'Для запроса "шахматы для начинающих Краснодар" ответ простой: выбери ближайшее событие Rep Chess KRD, приходи за 10 минут до начала и скажи, что ты впервые. Дальше поможем.'}
       primaryHref="/tournaments"
       primaryCta="Выбрать событие"
       secondaryHref="/lessons"
