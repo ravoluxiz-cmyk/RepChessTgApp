@@ -22,6 +22,8 @@ export default function MerchOrderWidget({ products }: { products: OrderProduct[
   const [quantity, setQuantity] = useState(1)
   const [contact, setContact] = useState("")
   const [copied, setCopied] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const orderText = useMemo(() => {
     if (!product) return ""
@@ -52,15 +54,25 @@ export default function MerchOrderWidget({ products }: { products: OrderProduct[
 
   const shareOrder = async () => {
     setCopied(false)
+    setMessage(null)
+    setError(null)
+    if (!contact.trim()) {
+      setError("Добавь Telegram или телефон, чтобы мы могли ответить по заявке.")
+      return
+    }
+
     try {
       if (navigator.share) {
         await navigator.share({ title: "Заказ REP CHESS KRD", text: orderText })
+        setMessage("Заявка подготовлена. Отправь ее нам в Telegram, и мы свяжемся с тобой.")
         return
       }
       await navigator.clipboard.writeText(orderText)
       setCopied(true)
+      setMessage("Заявка скопирована. Отправь ее в Telegram Rep Chess KRD, и мы свяжемся с тобой.")
     } catch {
       setCopied(false)
+      setError("Не удалось подготовить заявку. Проверь контакт и попробуй еще раз.")
     }
   }
 
@@ -72,8 +84,9 @@ export default function MerchOrderWidget({ products }: { products: OrderProduct[
 
       <div className="space-y-5">
         <div>
-          <div className="mb-2 text-sm font-semibold text-[#151515]/60">Товар</div>
+          <label htmlFor="merch-product" className="mb-2 block text-sm font-semibold text-[#151515]/60">Товар</label>
           <select
+            id="merch-product"
             value={product.id}
             onChange={(event) => selectProduct(event.target.value)}
             className="w-full rounded-2xl border border-[#151515]/15 bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
@@ -102,6 +115,7 @@ export default function MerchOrderWidget({ products }: { products: OrderProduct[
             {product.colors.map((item) => (
               <button
                 key={item}
+                type="button"
                 onClick={() => setColor(item)}
                 className={`rounded-full border px-3 py-2 text-sm font-bold ${
                   color === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515]/15 bg-white text-[#151515]"
@@ -119,6 +133,7 @@ export default function MerchOrderWidget({ products }: { products: OrderProduct[
             {sizes.map((item) => (
               <button
                 key={item}
+                type="button"
                 onClick={() => setSize(item)}
                 className={`min-w-11 rounded-full border px-3 py-2 text-sm font-bold ${
                   size === item ? "border-[#151515] bg-[#151515] text-white" : "border-[#151515]/15 bg-white text-[#151515]"
@@ -133,11 +148,11 @@ export default function MerchOrderWidget({ products }: { products: OrderProduct[
         <div>
           <div className="mb-2 text-sm font-semibold text-[#151515]/60">Количество</div>
           <div className="inline-flex items-center rounded-full border border-[#151515]/15 bg-white">
-            <button onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="p-3" aria-label="Уменьшить">
+            <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="p-3" aria-label="Уменьшить">
               <Minus className="h-4 w-4" />
             </button>
             <span className="w-10 text-center font-bold">{quantity}</span>
-            <button onClick={() => setQuantity((value) => Math.min(9, value + 1))} className="p-3" aria-label="Увеличить">
+            <button type="button" onClick={() => setQuantity((value) => Math.min(9, value + 1))} className="p-3" aria-label="Увеличить">
               <Plus className="h-4 w-4" />
             </button>
           </div>
@@ -150,14 +165,28 @@ export default function MerchOrderWidget({ products }: { products: OrderProduct[
             onChange={(event) => setContact(event.target.value)}
             className="w-full rounded-2xl border border-[#151515]/15 bg-white px-3 py-3 text-[#151515] outline-none focus:bg-[#f4f4f0]"
             placeholder="@username"
+            required
           />
         </label>
+
+        {message && (
+          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+            {message}
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-2xl border border-red-500/20 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+            {error}
+          </div>
+        )}
 
         <div className="rounded-2xl border border-[#151515]/10 bg-white p-4 text-sm font-semibold text-[#151515]/80">
           <pre className="whitespace-pre-wrap font-sans">{orderText}</pre>
         </div>
 
         <button
+          type="button"
           onClick={shareOrder}
           className="brand-button inline-flex w-full items-center justify-center gap-2 px-4 py-3"
         >

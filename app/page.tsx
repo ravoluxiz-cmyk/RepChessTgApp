@@ -4,8 +4,7 @@ import { HomeHero } from "@/components/home/home-hero";
 import { MobileDock } from "@/components/home/mobile-dock";
 import { getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content";
 import { listClubContent, listTournaments, type Tournament } from "@/lib/db";
-
-const TELEGRAM_URL = "https://t.me/RepChessKRD"
+import { TELEGRAM_URL, formatRegistrationCount, formatTournamentFormat, getUpcomingTournaments } from "@/lib/tournament-display";
 
 function getTournamentDate(tournament?: Tournament | null) {
   if (!tournament?.start_at) return "Дата скоро"
@@ -19,21 +18,8 @@ function getTournamentDate(tournament?: Tournament | null) {
   }).format(new Date(tournament.start_at))
 }
 
-function getTournamentTime(tournament: Tournament) {
-  const value = tournament.start_at || tournament.created_at
-  if (!value) return Number.MAX_SAFE_INTEGER
-  const time = new Date(value).getTime()
-  return Number.isNaN(time) ? Number.MAX_SAFE_INTEGER : time
-}
-
 function getVisibleEvents(tournaments: Tournament[]) {
-  const now = Date.now()
-
-  return tournaments
-    .filter((tournament) => Number(tournament.archived ?? 0) === 0)
-    .filter((tournament) => getTournamentTime(tournament) >= now || Number(tournament.allow_join) === 1)
-    .sort((a, b) => getTournamentTime(a) - getTournamentTime(b))
-    .slice(0, 3)
+  return getUpcomingTournaments(tournaments, 3)
 }
 
 function getEventStatus(tournament: Tournament) {
@@ -264,14 +250,21 @@ export default async function Home() {
                         <div className="mt-4 grid gap-2 text-sm font-semibold text-white/62">
                           <div>{getTournamentDate(tournament)}</div>
                           <div>{tournament.location || tournament.address || "место скоро"}</div>
-                          <div>{tournament.format || "club format"}</div>
-                          <div>{Number(tournament.registration_count || 0)} уже в списке</div>
+                          <div>{formatTournamentFormat(tournament)}</div>
+                          {Number(tournament.registration_count || 0) > 0 && (
+                            <div>{formatRegistrationCount(tournament.registration_count)}</div>
+                          )}
                         </div>
                         <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-white/52">
                           {tournament.description || "Приходи за 10 минут до начала. Формат объясним на месте, даже если это твой первый клубный вечер."}
                         </p>
-                        <a href="/tournaments" className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black uppercase text-[#151515] transition hover:bg-[#fff200]">
-                          Записаться →
+                        <a
+                          href={tournament.event_url || "/tournaments"}
+                          target={tournament.event_url ? "_blank" : undefined}
+                          rel={tournament.event_url ? "noreferrer" : undefined}
+                          className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black uppercase text-[#151515] transition hover:bg-[#fff200]"
+                        >
+                          {tournament.event_url ? "Открыть запись в Telegram" : "К расписанию"} →
                         </a>
                       </div>
                     </article>

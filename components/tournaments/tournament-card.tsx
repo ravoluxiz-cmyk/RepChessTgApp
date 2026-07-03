@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { CalendarDays, CheckCircle2, ExternalLink, ListChecks, MapPin, Scale, Trophy, Users } from "lucide-react"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import { getProfileAuthHeaders } from "@/lib/web-user"
+import { TELEGRAM_URL, formatRegistrationCount, formatTournamentFormat } from "@/lib/tournament-display"
 
 export interface Tournament {
   id: number | string
@@ -33,14 +34,6 @@ export interface Tournament {
 
 interface TournamentCardProps {
   tournament: Tournament
-}
-
-const formatLabels: Record<string, string> = {
-  swiss: "Швейцарская",
-  swiss_bbp_dutch: "Швейцарская BBP Dutch",
-  round_robin: "Круговая",
-  knockout: "На выбывание",
-  calendar: "Событие календаря",
 }
 
 const teamModeLabels: Record<string, string> = {
@@ -187,9 +180,9 @@ export function TournamentCard({ tournament }: TournamentCardProps) {
                 Запись
               </span>
             )}
-            {typeof tournament.registration_count === "number" && (
+            {typeof tournament.registration_count === "number" && tournament.registration_count > 0 && (
               <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-[#151515]">
-                {tournament.registration_count} заявок
+                {formatRegistrationCount(tournament.registration_count)}
               </span>
             )}
           </div>
@@ -217,7 +210,7 @@ export function TournamentCard({ tournament }: TournamentCardProps) {
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="flex items-center gap-3 text-[#151515]/75">
               <Trophy className="w-5 h-5 text-[#151515]" />
-              <span className="text-base">{formatLabels[tournament.format] || tournament.format}</span>
+              <span className="text-base">{formatTournamentFormat(tournament)}</span>
             </div>
 
             <div className="flex items-center gap-3 text-[#151515]/75">
@@ -265,7 +258,19 @@ export function TournamentCard({ tournament }: TournamentCardProps) {
           </p>
 
           <div className="mt-5 flex flex-wrap gap-2">
-            {Number(tournament.allow_join) === 1 && typeof tournament.id === "number" && (
+            {Number(tournament.allow_join) === 1 && tournament.event_url && (
+              <a
+                href={tournament.event_url}
+                target="_blank"
+                rel="noreferrer"
+                className="brand-button inline-flex items-center gap-2 px-3 py-2 text-sm"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Открыть запись в Telegram
+              </a>
+            )}
+
+            {Number(tournament.allow_join) === 1 && !tournament.event_url && typeof tournament.id === "number" && (
               <button
                 type="button"
                 onClick={handleRegister}
@@ -275,6 +280,18 @@ export function TournamentCard({ tournament }: TournamentCardProps) {
                 <CheckCircle2 className="h-4 w-4" />
                 {registered ? "Вы зарегистрированы" : registering ? "Регистрация..." : "Зарегистрироваться"}
               </button>
+            )}
+
+            {Number(tournament.allow_join) !== 1 && !tournament.event_url && (
+              <a
+                href={TELEGRAM_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="brand-button inline-flex items-center gap-2 px-3 py-2 text-sm"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Запись через Telegram Rep Chess KRD
+              </a>
             )}
 
             {tournament.yandex_maps_url && (
@@ -289,7 +306,7 @@ export function TournamentCard({ tournament }: TournamentCardProps) {
               </a>
             )}
 
-            {tournament.event_url && (
+            {tournament.event_url && Number(tournament.allow_join) !== 1 && (
               <a
                 href={tournament.event_url}
                 target="_blank"

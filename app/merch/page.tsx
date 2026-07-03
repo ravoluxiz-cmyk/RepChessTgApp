@@ -92,7 +92,7 @@ export default function MerchPage() {
                         <div className="rounded-2xl border border-[#151515]/10 bg-white px-4 py-3">
                           <div className="text-xs font-black uppercase opacity-50">Заказ</div>
                           <a className="mt-1 inline-flex text-[#151515] underline decoration-[#151515]/30 underline-offset-4" href="#merch-order">
-                            Выбрать справа
+                            Выбрать товар
                           </a>
                         </div>
                       </div>

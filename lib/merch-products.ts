@@ -29,12 +29,19 @@ const buildSeoParagraphs = (product: MerchProductInput) => [
   `Эта модель закрывает не абстрактный запрос "купить шахматную футболку", а более живую задачу: найти одежду, которую можно надеть на турнир, встречу клуба, лекцию, прогулку или вечер с друзьями после партии. ${product.occasion}. Поэтому карточка описывает не только материал и цвет, а контекст: где эту вещь носят, почему она появилась, как она связана с турнирами Rep Chess KRD и почему шахматы здесь выглядят современно, а не пыльно.`,
 ]
 
+const COLOR_DESCRIPTION: Record<string, string> = {
+  белый: "белого цвета",
+  графитовый: "графитового цвета",
+  красный: "красного цвета",
+}
+
 const createProduct = (product: MerchProductInput): MerchProduct => {
   const seoParagraphs = buildSeoParagraphs(product)
+  const colorDescription = COLOR_DESCRIPTION[product.colorName.toLowerCase()] || `${product.colorName.toLowerCase()} цвета`
 
   return {
     ...product,
-    shortDescription: `${product.productType} ${product.colorName.toLowerCase()} цвета с дизайном ${product.design.toLowerCase()}. Клубный шахматный мерч Rep Chess KRD для турниров, встреч и повседневного образа.`,
+    shortDescription: `${product.productType} ${colorDescription} с дизайном ${product.design.toLowerCase()}. Клубный шахматный мерч Rep Chess KRD для турниров, встреч и повседневного образа.`,
     seoDescription: seoParagraphs.join("\n\n"),
     seoParagraphs,
   }
