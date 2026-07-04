@@ -141,7 +141,7 @@ export function buildTournamentEventJsonLd(tournament: Tournament) {
 export function buildTournamentItemListJsonLd(tournaments: Tournament[]) {
   const events = tournaments
     .map(buildTournamentEventJsonLd)
-    .filter((item): item is Record<string, unknown> => Boolean(item))
+    .filter(Boolean)
 
   return {
     "@type": "ItemList",
