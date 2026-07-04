@@ -57,6 +57,13 @@ export const metadata: Metadata = {
     title: "Rep Chess KRD - шахматы в Краснодаре",
     description: "Telegram-канал, турниры, уроки, лекции, мерч и шахматные мероприятия Rep Chess KRD.",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+  },
   robots: {
     index: true,
     follow: true,
