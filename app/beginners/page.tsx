@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import ChessBackground from "@/components/ChessBackground"
+import { JsonLd } from "@/components/seo/json-ld"
 import { BackButton } from "@/components/ui/back-button"
+import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildGraphJsonLd } from "@/lib/seo"
 import { ArrowRight, CalendarDays, GraduationCap, MessageCircle, ShieldCheck, Trophy } from "lucide-react"
 
 const STEPS = [
@@ -23,14 +26,47 @@ const FAQ = [
   },
 ]
 
-export const metadata = {
+const pageJsonLd = buildGraphJsonLd([
+  {
+    "@type": "WebPage",
+    "@id": "https://repchesskrd.ru/beginners#webpage",
+    name: "Шахматы для начинающих в Краснодаре",
+    url: "https://repchesskrd.ru/beginners",
+    inLanguage: "ru-RU",
+    isPartOf: {
+      "@id": "https://repchesskrd.ru/#website",
+    },
+    about: {
+      "@id": "https://repchesskrd.ru/#organization",
+    },
+  },
+  buildFaqPageJsonLd(FAQ.map((item) => ({
+    question: item.title,
+    answer: item.text,
+  }))),
+  buildBreadcrumbJsonLd([
+    { name: "Главная", path: "/" },
+    { name: "Новичкам", path: "/beginners" },
+  ]),
+])
+
+export const metadata: Metadata = {
   title: "Шахматы для начинающих в Краснодаре",
   description: "Шахматы для начинающих в Краснодаре с Rep Chess KRD: как прийти на первый турнир, что такое швейцарка, как проходит регистрация и где следить за анонсами.",
+  alternates: {
+    canonical: "/beginners",
+  },
+  openGraph: {
+    title: "Шахматы для начинающих в Краснодаре | Rep Chess KRD",
+    description: "Первый турнир, правила, швейцарка и спокойный вход в шахматное комьюнити Краснодара.",
+    url: "https://repchesskrd.ru/beginners",
+  },
 }
 
 export default function BeginnersPage() {
   return (
     <ChessBackground>
+      <JsonLd data={pageJsonLd} />
       <main className="min-h-screen px-4 py-8 text-white">
         <div className="mx-auto max-w-6xl">
           <BackButton />

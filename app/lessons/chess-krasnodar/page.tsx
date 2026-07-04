@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { SeoLandingPage } from "@/components/seo/seo-landing-page"
+import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildGraphJsonLd } from "@/lib/seo"
 
 const SITE_URL = "https://repchesskrd.ru"
 
@@ -22,20 +23,27 @@ const faq = [
   },
 ]
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: "Уроки шахмат в Краснодаре",
-  url: `${SITE_URL}/lessons/chess-krasnodar`,
-  mainEntity: faq.map((item) => ({
-    "@type": "Question",
-    name: item.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.answer,
+const jsonLd = buildGraphJsonLd([
+  {
+    "@type": "WebPage",
+    "@id": `${SITE_URL}/lessons/chess-krasnodar#webpage`,
+    name: "Уроки шахмат в Краснодаре",
+    url: `${SITE_URL}/lessons/chess-krasnodar`,
+    inLanguage: "ru-RU",
+    isPartOf: {
+      "@id": `${SITE_URL}/#website`,
     },
-  })),
-}
+    about: {
+      "@id": `${SITE_URL}/#organization`,
+    },
+  },
+  buildFaqPageJsonLd(faq),
+  buildBreadcrumbJsonLd([
+    { name: "Главная", path: "/" },
+    { name: "Уроки", path: "/lessons" },
+    { name: "Уроки шахмат в Краснодаре", path: "/lessons/chess-krasnodar" },
+  ]),
+])
 
 export const metadata: Metadata = {
   title: "Уроки шахмат в Краснодаре - обучение для новичков и любителей",

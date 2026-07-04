@@ -1,4 +1,5 @@
 import ChessBackground from "@/components/ChessBackground"
+import { JsonLd } from "@/components/seo/json-ld"
 import { BackButton } from "@/components/ui/back-button"
 
 type SeoLinkCard = {
@@ -51,10 +52,7 @@ export function SeoLandingPage({
   return (
     <ChessBackground>
       <main className="min-h-screen px-4 py-8 text-white">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <JsonLd data={jsonLd} />
 
         <div className="mx-auto max-w-6xl">
           <BackButton />

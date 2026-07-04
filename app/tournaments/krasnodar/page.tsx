@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { SeoLandingPage } from "@/components/seo/seo-landing-page"
+import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildGraphJsonLd } from "@/lib/seo"
 
 const SITE_URL = "https://repchesskrd.ru"
 
@@ -22,20 +23,27 @@ const faq = [
   },
 ]
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: "Шахматные турниры в Краснодаре",
-  url: `${SITE_URL}/tournaments/krasnodar`,
-  mainEntity: faq.map((item) => ({
-    "@type": "Question",
-    name: item.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.answer,
+const jsonLd = buildGraphJsonLd([
+  {
+    "@type": "WebPage",
+    "@id": `${SITE_URL}/tournaments/krasnodar#webpage`,
+    name: "Шахматные турниры в Краснодаре",
+    url: `${SITE_URL}/tournaments/krasnodar`,
+    inLanguage: "ru-RU",
+    isPartOf: {
+      "@id": `${SITE_URL}/#website`,
     },
-  })),
-}
+    about: {
+      "@id": `${SITE_URL}/#organization`,
+    },
+  },
+  buildFaqPageJsonLd(faq),
+  buildBreadcrumbJsonLd([
+    { name: "Главная", path: "/" },
+    { name: "Расписание", path: "/tournaments" },
+    { name: "Шахматные турниры в Краснодаре", path: "/tournaments/krasnodar" },
+  ]),
+])
 
 export const metadata: Metadata = {
   title: "Шахматные турниры в Краснодаре - расписание Rep Chess KRD",

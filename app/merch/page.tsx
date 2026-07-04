@@ -1,7 +1,10 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import ChessBackground from "@/components/ChessBackground"
 import MerchOrderWidget from "@/components/merch/merch-order-widget"
+import { JsonLd } from "@/components/seo/json-ld"
 import { merchProducts } from "@/lib/merch-products"
+import { buildBreadcrumbJsonLd, buildGraphJsonLd, buildProductJsonLd } from "@/lib/seo"
 
 const orderProducts = merchProducts.map(({ id, name, price, image, colors }) => ({
   id,
@@ -11,9 +14,45 @@ const orderProducts = merchProducts.map(({ id, name, price, image, colors }) => 
   colors,
 }))
 
+const merchJsonLd = buildGraphJsonLd([
+  {
+    "@type": "CollectionPage",
+    "@id": "https://repchesskrd.ru/merch#webpage",
+    name: "Шахматный мерч Rep Chess KRD",
+    url: "https://repchesskrd.ru/merch",
+    inLanguage: "ru-RU",
+    isPartOf: {
+      "@id": "https://repchesskrd.ru/#website",
+    },
+    about: {
+      "@id": "https://repchesskrd.ru/#organization",
+    },
+  },
+  buildBreadcrumbJsonLd([
+    { name: "Главная", path: "/" },
+    { name: "Мерч", path: "/merch" },
+  ]),
+  ...merchProducts.map(buildProductJsonLd),
+])
+
+export const metadata: Metadata = {
+  title: "Шахматный мерч Rep Chess KRD - футболки и клубные вещи",
+  description:
+    "Шахматный мерч Rep Chess KRD: футболки и клубные вещи для турниров, встреч, фотоотчетов и повседневного образа в Краснодаре.",
+  alternates: {
+    canonical: "/merch",
+  },
+  openGraph: {
+    title: "Шахматный мерч Rep Chess KRD",
+    description: "Футболки и клубные вещи Rep Chess KRD для игроков и друзей клуба.",
+    url: "https://repchesskrd.ru/merch",
+  },
+}
+
 export default function MerchPage() {
   return (
     <ChessBackground>
+      <JsonLd data={merchJsonLd} />
       <div className="min-h-screen w-full px-4 py-6 sm:px-6">
         <div className="mx-auto flex max-w-7xl flex-col gap-6">
           <header className="flex items-center justify-between gap-3">

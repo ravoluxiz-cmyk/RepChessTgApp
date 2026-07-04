@@ -127,7 +127,10 @@ export function TournamentCard({ tournament }: TournamentCardProps) {
   const scheduleLabel = tournament.start_at ? formatSchedule(tournament.start_at) : formatCreatedAt(tournament.created_at)
 
   return (
-    <article className="brand-panel relative overflow-hidden rounded-[18px] transition-transform duration-150 hover:-translate-y-0.5">
+    <article
+      id={typeof tournament.id === "number" ? `tournament-${tournament.id}` : undefined}
+      className="brand-panel relative overflow-hidden rounded-[18px] transition-transform duration-150 hover:-translate-y-0.5"
+    >
       <div className="grid md:grid-cols-[minmax(220px,320px)_1fr]">
         <div className="relative min-h-56 border-b border-[#151515]/10 bg-[#151515] md:min-h-full md:border-b-0 md:border-r">
           <div className="absolute left-4 top-4 z-10 rounded-2xl bg-white px-3 py-2 text-center text-[#151515] shadow-[0_14px_40px_rgba(0,0,0,0.28)]">

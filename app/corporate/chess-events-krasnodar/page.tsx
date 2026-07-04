@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { SeoLandingPage } from "@/components/seo/seo-landing-page"
+import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildGraphJsonLd } from "@/lib/seo"
 
 const SITE_URL = "https://repchesskrd.ru"
 
@@ -22,29 +23,41 @@ const faq = [
   },
 ]
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  name: "Шахматные мероприятия для компаний в Краснодаре",
-  provider: {
-    "@type": "SportsOrganization",
-    name: "Rep Chess KRD",
-    url: SITE_URL,
-  },
-  areaServed: {
-    "@type": "City",
-    name: "Краснодар",
-  },
-  serviceType: "Corporate chess events",
-  mainEntity: faq.map((item) => ({
-    "@type": "Question",
-    name: item.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.answer,
+const jsonLd = buildGraphJsonLd([
+  {
+    "@type": "Service",
+    "@id": `${SITE_URL}/corporate/chess-events-krasnodar#service`,
+    name: "Шахматные мероприятия для компаний в Краснодаре",
+    provider: {
+      "@id": `${SITE_URL}/#organization`,
     },
-  })),
-}
+    areaServed: {
+      "@type": "City",
+      name: "Краснодар",
+    },
+    serviceType: "Corporate chess events",
+    url: `${SITE_URL}/corporate/chess-events-krasnodar`,
+  },
+  {
+    "@type": "WebPage",
+    "@id": `${SITE_URL}/corporate/chess-events-krasnodar#webpage`,
+    name: "Шахматные мероприятия для компаний в Краснодаре",
+    url: `${SITE_URL}/corporate/chess-events-krasnodar`,
+    inLanguage: "ru-RU",
+    isPartOf: {
+      "@id": `${SITE_URL}/#website`,
+    },
+    about: {
+      "@id": `${SITE_URL}/corporate/chess-events-krasnodar#service`,
+    },
+  },
+  buildFaqPageJsonLd(faq),
+  buildBreadcrumbJsonLd([
+    { name: "Главная", path: "/" },
+    { name: "Для площадок", path: "/partners" },
+    { name: "Шахматные мероприятия для компаний", path: "/corporate/chess-events-krasnodar" },
+  ]),
+])
 
 export const metadata: Metadata = {
   title: "Шахматные мероприятия для компаний в Краснодаре - Rep Chess KRD",

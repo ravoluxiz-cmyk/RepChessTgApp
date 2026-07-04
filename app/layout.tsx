@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import SupportChatWidget from "@/components/support-chat-widget";
+import { JsonLd } from "@/components/seo/json-ld";
+import { buildGraphJsonLd, buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -81,32 +83,10 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SportsOrganization",
-  name: "Rep Chess KRD",
-  alternateName: [
-    "Реп Чесс Краснодар",
-    "Rep Chess Краснодар",
-  ],
-  url: "https://repchesskrd.ru",
-  sport: "Chess",
-  areaServed: {
-    "@type": "City",
-    name: "Краснодар",
-  },
-  contactPoint: {
-    "@type": "ContactPoint",
-    contactType: "customer support",
-    url: "https://t.me/RepChessKRD",
-    availableLanguage: "Russian",
-  },
-  sameAs: [
-    "https://repchess.ru",
-    "https://t.me/RepChessKRD",
-  ],
-  description: "Шахматное комьюнити в Краснодаре: Telegram-канал, турниры, уроки, лекции, клубные встречи, мерч и корпоративные шахматные мероприятия.",
-};
+const rootJsonLd = buildGraphJsonLd([
+  buildOrganizationJsonLd(),
+  buildWebsiteJsonLd(),
+]);
 
 export default function RootLayout({
   children,
@@ -117,10 +97,7 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning>
       <head>
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-        />
+        <JsonLd data={rootJsonLd} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

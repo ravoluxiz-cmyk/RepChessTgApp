@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import ChessBackground from "@/components/ChessBackground"
+import { JsonLd } from "@/components/seo/json-ld"
 import { BackButton } from "@/components/ui/back-button"
+import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildGraphJsonLd } from "@/lib/seo"
 
 const SITE_URL = "https://repchesskrd.ru"
 const TELEGRAM_URL = "https://t.me/RepChessKRD"
@@ -60,30 +62,26 @@ const FAQ = [
   },
 ]
 
-const pageJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: "Где играть в шахматы в Краснодаре",
-  url: `${SITE_URL}/chess-krasnodar`,
-  about: {
-    "@type": "SportsActivityLocation",
-    name: "Rep Chess KRD",
-    sport: "Chess",
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Краснодар",
-      addressCountry: "RU",
+const pageJsonLd = buildGraphJsonLd([
+  {
+    "@type": "WebPage",
+    "@id": `${SITE_URL}/chess-krasnodar#webpage`,
+    name: "Где играть в шахматы в Краснодаре",
+    url: `${SITE_URL}/chess-krasnodar`,
+    inLanguage: "ru-RU",
+    isPartOf: {
+      "@id": `${SITE_URL}/#website`,
+    },
+    about: {
+      "@id": `${SITE_URL}/#organization`,
     },
   },
-  mainEntity: FAQ.map((item) => ({
-    "@type": "Question",
-    name: item.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.answer,
-    },
-  })),
-}
+  buildFaqPageJsonLd(FAQ),
+  buildBreadcrumbJsonLd([
+    { name: "Главная", path: "/" },
+    { name: "Шахматы в Краснодаре", path: "/chess-krasnodar" },
+  ]),
+])
 
 export const metadata: Metadata = {
   title: "Где играть в шахматы в Краснодаре - турниры, клуб и уроки",
@@ -116,10 +114,7 @@ export default function ChessKrasnodarPage() {
   return (
     <ChessBackground>
       <main className="min-h-screen px-4 py-8 text-white">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
-        />
+        <JsonLd data={pageJsonLd} />
 
         <div className="mx-auto max-w-6xl">
           <BackButton />
