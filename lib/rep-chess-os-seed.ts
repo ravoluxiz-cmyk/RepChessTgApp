@@ -1,0 +1,375 @@
+type SeedRow = Record<string, unknown>
+
+function addDays(baseDate: Date, days: number) {
+  const date = new Date(baseDate)
+  date.setDate(date.getDate() + days)
+  return date.toISOString().slice(0, 10)
+}
+
+function weekStart(baseDate: Date) {
+  const date = new Date(baseDate)
+  const day = date.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  date.setDate(date.getDate() + diff)
+  return date
+}
+
+export function buildRepChessOsSeedData(baseDate = new Date()) {
+  const weekStartDate = weekStart(baseDate)
+  const weekEndDate = new Date(weekStartDate)
+  weekEndDate.setDate(weekStartDate.getDate() + 6)
+
+  const directions: SeedRow[] = [
+    {
+      name: "Regular Events",
+      description: "Регулярные турниры и площадки",
+      goal: "Стабильная сетка турниров без операционного перегрева",
+      target_revenue: 0,
+      current_status: "Работает, но требует новой экономики",
+      main_metric: "events/month",
+      risks: "Фиксированные платежи могут не покрывать время команды",
+      next_step: "Пересобрать модель регулярных турниров",
+    },
+    {
+      name: "Corporate",
+      description: "Корпоративные турниры и тимбилдинги",
+      goal: "Сделать corporate основным платным направлением",
+      target_revenue: 0,
+      current_status: "Нужно упаковать КП и список лидов",
+      main_metric: "pipeline value",
+      risks: "Длинный цикл продаж и нет системного follow-up",
+      next_step: "Собрать КП для корпоративов",
+    },
+    {
+      name: "Education",
+      description: "Школы, кружки, уроки и образовательные партнёрства",
+      goal: "Запустить понятный образовательный продукт",
+      target_revenue: 0,
+      current_status: "Идея есть, упаковка требует сборки",
+      main_metric: "qualified leads",
+      risks: "Сложная логистика преподавателей и расписания",
+      next_step: "Собрать КП для школ",
+    },
+    {
+      name: "Big Events / ТЦ",
+      description: "ТЦ, городские и крупные публичные события",
+      goal: "Продавать шахматы как городской интерактив",
+      target_revenue: 0,
+      current_status: "Нужно собрать контакты и сценарии",
+      main_metric: "meetings/month",
+      risks: "Высокие ожидания к продакшену",
+      next_step: "Собрать список ТЦ и event-контактов",
+    },
+    {
+      name: "Developers / ЖК",
+      description: "Девелоперы, ЖК и соседские комьюнити",
+      goal: "Продавать шахматы как инструмент комьюнити в ЖК",
+      target_revenue: 0,
+      current_status: "Направление в разведке",
+      main_metric: "warm contacts",
+      risks: "Нужен понятный кейс и чек-лист запуска",
+      next_step: "Собрать первые контакты девелоперов",
+    },
+    {
+      name: "Rating Tournaments",
+      description: "Рейтинговые турниры и федерационная связка",
+      goal: "Сделать рейтинг понятной платной ценностью",
+      target_revenue: 0,
+      current_status: "Нужно согласование порядка",
+      main_metric: "rating events/month",
+      risks: "Регламент и коммуникация с федерацией",
+      next_step: "Согласовать порядок рейтингового турнира с федерацией",
+    },
+    {
+      name: "Grants",
+      description: "Гранты и институциональные заявки",
+      goal: "Находить финансирование для городских шахматных проектов",
+      target_revenue: 0,
+      current_status: "Нет регулярного пайплайна",
+      main_metric: "submitted grants",
+      risks: "Высокая бумажная нагрузка",
+      next_step: "Собрать календарь грантов",
+    },
+    {
+      name: "Media / Telegram Growth",
+      description: "Медиа, Telegram и рост аудитории",
+      goal: "Растить аудиторию и конвертировать её в продукты",
+      target_revenue: 0,
+      current_status: "Канал работает, нужна система рубрик",
+      main_metric: "new subscribers/week",
+      risks: "Контент может съедать операционное время",
+      next_step: "Собрать недельную сетку контента",
+    },
+  ]
+
+  const tasks: SeedRow[] = [
+    {
+      title: "Собрать КП для корпоративов",
+      description: "Собрать коммерческое предложение для HR, event-отделов и руководителей компаний.",
+      area: "Corporate",
+      priority: "High",
+      status: "Сегодня",
+      due_date: addDays(baseDate, 0),
+      owner: "Чеслав",
+    },
+    {
+      title: "Собрать КП для школ",
+      description: "Упаковать предложение для школ, детских центров и образовательных партнёров.",
+      area: "Education",
+      priority: "High",
+      status: "Эта неделя",
+      due_date: addDays(baseDate, 3),
+      owner: "Чеслав",
+    },
+    {
+      title: "Собрать таблицу 50 corporate-лидов",
+      description: "Добавить компании, HR, event-менеджеров и контакты для первого касания.",
+      area: "Corporate",
+      priority: "High",
+      status: "В работе",
+      due_date: addDays(baseDate, 7),
+      owner: "Чеслав",
+    },
+    {
+      title: "Собрать таблицу 30 education-лидов",
+      description: "Школы, сады, детские центры, IT-школы и частные образовательные проекты.",
+      area: "Education",
+      priority: "High",
+      status: "Эта неделя",
+      due_date: addDays(baseDate, 7),
+      owner: "Чеслав",
+    },
+    {
+      title: "Собрать список 10 ТЦ и event-контактов",
+      description: "Найти управляющих, event-менеджеров, маркетинг и контакты для ТЦ-пакета.",
+      area: "Big Events / ТЦ",
+      priority: "High",
+      status: "Эта неделя",
+      due_date: addDays(baseDate, 6),
+      owner: "Чеслав",
+    },
+    {
+      title: "Вернуться к TOP IT SCHOOL",
+      description: "Дожать тёплый education-лид: уточнить формат, расписание, преподавателя и экономику.",
+      area: "Education",
+      priority: "Medium",
+      status: "Ожидание ответа",
+      due_date: addDays(baseDate, 1),
+      owner: "Чеслав",
+    },
+    {
+      title: "Вернуться к IT-компании через Кристину",
+      description: "Проработать корпоративный лид на IT-компанию примерно на 50 сотрудников.",
+      area: "Corporate",
+      priority: "Medium",
+      status: "Ожидание ответа",
+      due_date: addDays(baseDate, 2),
+      owner: "Чеслав",
+    },
+    {
+      title: "Подготовить страницу \"Для компаний\"",
+      description: "Собрать структуру страницы с форматами, пакетами, выгодами и формой заявки.",
+      area: "Corporate",
+      priority: "High",
+      status: "Эта неделя",
+      due_date: addDays(baseDate, 5),
+      owner: "Чеслав",
+    },
+    {
+      title: "Подготовить страницу \"Education\"",
+      description: "Упаковать образовательное направление на сайте.",
+      area: "Education",
+      priority: "Medium",
+      status: "Inbox",
+      due_date: addDays(baseDate, 10),
+      owner: "Чеслав",
+    },
+    {
+      title: "Согласовать порядок рейтингового турнира с федерацией",
+      description: "Получить требования, сроки, документы и порядок обсчёта российского рейтинга.",
+      area: "Rating",
+      priority: "Critical",
+      status: "Inbox",
+      due_date: addDays(baseDate, 7),
+      owner: "Чеслав",
+    },
+    {
+      title: "Собрать ТЦ-пакет",
+      description: "Упаковать предложение для ТЦ с форматами, стоимостью и сценариями.",
+      area: "Big Events / ТЦ",
+      priority: "High",
+      status: "Inbox",
+      due_date: addDays(baseDate, 21),
+      owner: "Чеслав",
+    },
+    {
+      title: "Подготовить one-page offer Rep Chess KRD",
+      description: "Сделать короткий offer на одну страницу для первых касаний.",
+      area: "Corporate",
+      priority: "High",
+      status: "Эта неделя",
+      due_date: addDays(baseDate, 5),
+      owner: "Чеслав",
+    },
+    {
+      title: "Делегировать часть обычных турниров",
+      description: "Определить, какие регулярные турниры можно передать ведущим.",
+      area: "Regular Events",
+      priority: "Medium",
+      status: "Inbox",
+      due_date: addDays(baseDate, 30),
+      owner: "Чеслав",
+    },
+    {
+      title: "Создать weekly review за текущую неделю",
+      description: "Зафиксировать прогресс, деньги, лиды, что сработало и фокус следующей недели.",
+      area: "Personal System",
+      priority: "Medium",
+      status: "Сегодня",
+      due_date: addDays(baseDate, 0),
+      owner: "Чеслав",
+    },
+  ]
+
+  const plans: SeedRow[] = [
+    ["Собрать корпоративное КП", "Краткосрочный", "Corporate", "Подготовить короткое коммерческое предложение для компаний: корпоративные турниры, командные форматы, обучение сотрудников, шахматная лига.", "Готовое КП на 5-7 слайдов + one-page offer для отправки HR и event-отделам.", 14, "High"],
+    ["Собрать Education КП", "Краткосрочный", "Education", "Подготовить предложение для частных школ, детских центров и садов: шахматные занятия, вводные дни, кружки, турниры между классами.", "Готовое КП для школ и детских центров.", 14, "High"],
+    ["Создать таблицу 160 лидов", "Краткосрочный", "Operations", "Собрать базу потенциальных клиентов: corporate, education, ТЦ, event-агентства, девелоперы, фестивали.", "160 лидов в CRM Rep Chess OS.", 30, "High"],
+    ["Запустить первые 40 касаний", "Краткосрочный", "Corporate", "Написать первым потенциальным клиентам и проверить спрос на корпоративные и образовательные продукты.", "40 отправленных сообщений, минимум 5 ответов, минимум 2 созвона.", 30, "High"],
+    ["Вернуться к TOP IT SCHOOL", "Краткосрочный", "Education", "Дожать тёплый education-лид по шахматным занятиям. Уточнить формат, расписание, преподавателя и экономику.", "Понятный следующий шаг по запуску пилота.", 10, "Medium"],
+    ["Вернуться к IT-компании через Кристину", "Краткосрочный", "Corporate", "Проработать корпоративный лид на IT-компанию примерно на 50 сотрудников.", "Созвон или встреча с ответственным лицом.", 10, "Medium"],
+    ["Добавить страницу \"Для компаний\"", "Краткосрочный", "Corporate", "Создать на сайте страницу для корпоративных услуг Rep Chess KRD.", "Страница /corporate с оффером, форматами, пакетами и формой заявки.", 30, "High"],
+    ["Закрыть первый корпоративный клиент", "Среднесрочный", "Corporate", "Продать первый корпоративный шахматный формат: турнир, командный вечер, лига или обучение сотрудников.", "Сделка на 45 000-100 000 руб.", 75, "Critical"],
+    ["Запустить первый education-пилот", "Среднесрочный", "Education", "Запустить пилот шахматных занятий в школе, детском центре или TOP IT SCHOOL.", "Одна регулярная education-точка с понятной экономикой.", 75, "High"],
+    ["Собрать ТЦ-пакет", "Среднесрочный", "Big Events / ТЦ", "Упаковать предложение для ТЦ: турнир 40-50 участников, свободная игра, споты, квиз, обучение, фото/видео.", "Готовое КП для ТЦ с пакетами 30 000 / 60 000 / 100 000 руб.", 60, "High"],
+    ["Провести один крупный ивент", "Среднесрочный", "Big Events / ТЦ", "Закрыть и провести один крупный платный ивент в ТЦ, гастромаркете, у девелопера или на городской площадке.", "Ивент с оплатой от 30 000 руб.", 90, "High"],
+    ["Согласовать порядок рейтинговых турниров", "Среднесрочный", "Rating", "Получить от федерации / рейтингового администратора порядок проведения турниров с обсчётом российского рейтинга.", "Понятный чек-лист документов, требований и сроков.", 60, "High"],
+    ["Запустить Rep Chess KRD Rating Rapid", "Среднесрочный", "Rating", "Подготовить и провести первый рейтинговый турнир Rep Chess KRD.", "Первый пилотный рейтинговый турнир: 7 туров, 10+5 или 15+0, участники с ФШР ID / НИ.", 90, "High"],
+    ["Делегировать часть обычных турниров", "Среднесрочный", "Operations", "Передать часть регулярных турниров ведущим, чтобы Чеслав мог заниматься продажами, партнёрами и стратегией.", "30-40% обычной операционки не на Чеславе.", 90, "Medium"],
+    ["Выйти на личный доход Чеслава 100 000 руб.+", "Долгосрочный", "Finance", "Перестроить модель так, чтобы личный доход Чеслава был не 20-40 тыс. руб., а минимум 100 тыс. руб. в месяц.", "Стабильный личный доход 100 000 руб.+ за счёт corporate, education, big events и регулярки.", 180, "Critical"],
+    ["Сформировать регулярную corporate-воронку", "Долгосрочный", "Corporate", "Сделать корпоративные услуги постоянным направлением Rep Chess KRD.", "2-3 корпоративных клиента или события в месяц.", 180, "High"],
+    ["Развернуть Rep Chess Education в Краснодаре", "Долгосрочный", "Education", "Запустить несколько регулярных точек обучения: школы, детские центры, сады, IT-школы.", "3-5 education-точек с понятной маржинальностью.", 240, "High"],
+    ["Закрепиться в ТЦ и у девелоперов", "Долгосрочный", "Big Events / ТЦ", "Сделать крупные городские шахматные события отдельным направлением выручки и статуса.", "1 крупный ивент в месяц или квартал с оплатой от 50 000 руб.", 240, "High"],
+    ["Запустить грантовое направление", "Долгосрочный", "Grants", "Подготовить грантовые заявки на городские, молодёжные, культурные и образовательные шахматные проекты.", "Минимум 1-2 поданные грантовые заявки.", 270, "Medium"],
+    ["Подготовить базу для собственного шахматного заведения", "Долгосрочный", "Strategic", "Начать собирать финансовую, партнёрскую и продуктовую базу для будущего шахматного заведения Rep Chess KRD.", "Понятная предварительная модель заведения: формат, экономика, аудитория, партнёры, стартовый капитал.", 365, "Medium"],
+  ].map(([title, horizon, direction, description, targetResult, days, priority]) => ({
+    title,
+    horizon,
+    direction,
+    description,
+    target_result: targetResult,
+    target_date: addDays(baseDate, Number(days)),
+    status: "Не начато",
+    priority,
+  }))
+
+  const leads: SeedRow[] = [
+    {
+      name: "TOP IT SCHOOL",
+      segment: "Education",
+      status: "Ответили",
+      source: "Тёплый контакт",
+      potential_value: 30000,
+      probability: 45,
+      next_action: "Вернуться с понятным education-пилотом",
+      next_action_date: addDays(baseDate, 1),
+      notes: "Уточнить формат занятий, расписание, преподавателя и экономику.",
+    },
+    {
+      name: "IT-компания через Кристину",
+      segment: "Corporate",
+      status: "Контакт найден",
+      source: "Тёплая рекомендация",
+      potential_value: 60000,
+      probability: 35,
+      next_action: "Попросить интро и предложить корпоративный шахматный вечер",
+      next_action_date: addDays(baseDate, 2),
+      notes: "Ориентир: компания примерно на 50 сотрудников.",
+    },
+    {
+      name: "Потенциальный ТЦ для шахматного ивента",
+      segment: "ТЦ",
+      status: "Новый лид",
+      source: "Big Events / ТЦ",
+      potential_value: 70000,
+      probability: 20,
+      next_action: "Найти управляющего или event-менеджера",
+      next_action_date: addDays(baseDate, 5),
+      notes: "Подходит для ТЦ-пакета: турнир, свободная игра, фото/видео, партнёрские активности.",
+    },
+    {
+      name: "Девелопер / ЖК для комьюнити-ивента",
+      segment: "Developers / ЖК",
+      status: "Новый лид",
+      source: "Developers / ЖК",
+      potential_value: 50000,
+      probability: 20,
+      next_action: "Собрать 5 контактов девелоперов и УК",
+      next_action_date: addDays(baseDate, 7),
+      notes: "Шахматы как инструмент соседского комьюнити.",
+    },
+  ]
+
+  const weekly_reviews: SeedRow[] = [
+    {
+      week_start: weekStartDate.toISOString().slice(0, 10),
+      week_end: weekEndDate.toISOString().slice(0, 10),
+      events_count: 0,
+      participants_count: 0,
+      revenue: 0,
+      cheslav_income: 0,
+      new_subscribers: 0,
+      new_leads: leads.length,
+      proposals_sent: 0,
+      meetings_count: 0,
+      deals_won: 0,
+      what_worked: "Rep Chess OS запущена как рабочая система управления.",
+      what_failed: "Нужно заполнить реальные контакты, финансы и ближайшие ивенты.",
+      next_week_focus: "КП для corporate и education, 160 лидов, первые 40 касаний.",
+    },
+  ]
+
+  const message_templates: SeedRow[] = [
+    {
+      title: "Первое касание для corporate",
+      category: "Corporate",
+      body: "Здравствуйте! Я Чеслав, Rep Chess KRD. Мы проводим шахматные корпоративы, турниры и командные форматы для компаний в Краснодаре. Хочу предложить короткий формат для вашей команды: интеллектуально, живо, без сложной подготовки. Могу прислать варианты и стоимость?",
+      tags: ["corporate", "first-touch"],
+      is_favorite: true,
+      effectiveness: "unknown",
+    },
+    {
+      title: "Follow-up после первого сообщения",
+      category: "Follow-up",
+      body: "Здравствуйте! Возвращаюсь к идее шахматного формата для вашей команды. Могу предложить 2-3 сценария под разный бюджет: камерный вечер, турнир, командный тимбилдинг или мини-лига. Подскажите, кому лучше отправить короткое КП?",
+      tags: ["follow-up", "sales"],
+      is_favorite: true,
+      effectiveness: "unknown",
+    },
+    {
+      title: "Education offer",
+      category: "Education",
+      body: "Здравствуйте! Rep Chess KRD запускает шахматные занятия и вводные форматы для школ и детских центров. Можем провести пробное занятие, кружок или турнир между группами. Хотел бы обсудить, какой формат может подойти вашей площадке.",
+      tags: ["education", "first-touch"],
+      is_favorite: true,
+      effectiveness: "unknown",
+    },
+    {
+      title: "ТЦ / крупный ивент",
+      category: "ТЦ",
+      body: "Здравствуйте! Мы делаем шахматные городские события: турниры, свободную игру, интерактивы и контент для площадки. Формат хорошо работает как семейный трафик и событие выходного дня. Могу прислать короткий пакет форматов для ТЦ?",
+      tags: ["mall", "event"],
+      is_favorite: false,
+      effectiveness: "unknown",
+    },
+  ]
+
+  return {
+    directions,
+    tasks,
+    plans,
+    leads,
+    weekly_reviews,
+    message_templates,
+  }
+}

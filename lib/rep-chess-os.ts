@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase"
+import { buildRepChessOsSeedData } from "@/lib/rep-chess-os-seed"
 
 export const TASK_STATUSES = [
   "Inbox",
@@ -204,6 +205,14 @@ const TASK_DONE_STATUS = "Готово"
 const WON_LEAD_STATUS = "Сделка выиграна"
 const LOST_LEAD_STATUS = "Сделка проиграна"
 const PAUSED_LEAD_STATUS = "Пауза"
+const SETUP_ERROR_MESSAGE = "База Rep Chess OS ещё не создана в Supabase. Нужно применить supabase_migration_rep_chess_os.sql, затем открыть OS снова."
+
+export class RepChessOsSetupError extends Error {
+  constructor(message = SETUP_ERROR_MESSAGE) {
+    super(message)
+    this.name = "RepChessOsSetupError"
+  }
+}
 
 const DEFAULT_EVENT_CHECKLIST: Array<{ stage: string; title: string }> = [
   { stage: "За 7+ дней", title: "Подтвердить дату и время" },
@@ -599,6 +608,82 @@ function rowFrom(data: unknown): RepChessOsRow | null {
   return data && typeof data === "object" ? data as RepChessOsRow : null
 }
 
+function isMissingTableError(error: unknown) {
+  if (!error || typeof error !== "object") return false
+  const { code, message } = error as { code?: string; message?: string }
+  return (
+    code === "42P01" ||
+    code === "PGRST205" ||
+    String(message || "").toLowerCase().includes("could not find the table") ||
+    String(message || "").toLowerCase().includes("schema cache") ||
+    String(message || "").toLowerCase().includes("does not exist")
+  )
+}
+
+function throwRepChessOsDataError(error: unknown, fallback: string): never {
+  if (isMissingTableError(error)) {
+    throw new RepChessOsSetupError()
+  }
+
+  const message = error && typeof error === "object" && "message" in error
+    ? String((error as { message?: string }).message || fallback)
+    : fallback
+  throw new Error(message)
+}
+
+function seedRowsWithTimestamp(rows: RepChessOsRow[]) {
+  return rows.map((row) => withTimestamp(row, true))
+}
+
+let seedPromise: Promise<void> | null = null
+
+async function resourceHasAnyRows(resource: RepChessOsResource) {
+  const { data, error } = await supabaseAdmin
+    .from(RESOURCE_TABLES[resource])
+    .select("id")
+    .limit(1)
+
+  if (error) {
+    throwRepChessOsDataError(error, `Failed to inspect ${resource}`)
+  }
+
+  return rowsFrom(data).length > 0
+}
+
+async function seedResourceIfEmpty(resource: RepChessOsResource, rows: RepChessOsRow[]) {
+  if (rows.length === 0 || await resourceHasAnyRows(resource)) return
+
+  const { error } = await supabaseAdmin
+    .from(RESOURCE_TABLES[resource])
+    .insert(seedRowsWithTimestamp(rows))
+
+  if (error) {
+    throwRepChessOsDataError(error, `Failed to seed ${resource}`)
+  }
+}
+
+async function seedRepChessOsData() {
+  const seed = buildRepChessOsSeedData()
+
+  await seedResourceIfEmpty("directions", seed.directions)
+  await seedResourceIfEmpty("tasks", seed.tasks)
+  await seedResourceIfEmpty("plans", seed.plans)
+  await seedResourceIfEmpty("leads", seed.leads)
+  await seedResourceIfEmpty("weekly_reviews", seed.weekly_reviews)
+  await seedResourceIfEmpty("message_templates", seed.message_templates)
+}
+
+export async function ensureRepChessOsSeedData() {
+  if (!seedPromise) {
+    seedPromise = seedRepChessOsData().catch((error) => {
+      seedPromise = null
+      throw error
+    })
+  }
+
+  await seedPromise
+}
+
 function applyFilters(resource: RepChessOsResource, rows: RepChessOsRow[], filters: RepChessOsListFilters) {
   const search = String(filters.search || "").trim().toLowerCase()
   const today = todayKey()
@@ -662,6 +747,8 @@ export async function listRepChessOsResource(
   resource: RepChessOsResource,
   filters: RepChessOsListFilters = {}
 ) {
+  await ensureRepChessOsSeedData()
+
   const order = RESOURCE_ORDER[resource]
   const { data, error } = await supabaseAdmin
     .from(RESOURCE_TABLES[resource])
@@ -669,13 +756,15 @@ export async function listRepChessOsResource(
     .order(order.column, { ascending: order.ascending })
 
   if (error) {
-    throw new Error(error.message || `Failed to list ${resource}`)
+    throwRepChessOsDataError(error, `Failed to list ${resource}`)
   }
 
   return applyFilters(resource, rowsFrom(data), filters)
 }
 
 export async function createRepChessOsResource(resource: RepChessOsResource, input: unknown) {
+  await ensureRepChessOsSeedData()
+
   const payload = withTimestamp(buildPayload(resource, input, true), true)
   const { data, error } = await supabaseAdmin
     .from(RESOURCE_TABLES[resource])
@@ -684,7 +773,7 @@ export async function createRepChessOsResource(resource: RepChessOsResource, inp
     .single()
 
   if (error) {
-    throw new Error(error.message || `Failed to create ${resource}`)
+    throwRepChessOsDataError(error, `Failed to create ${resource}`)
   }
 
   const row = rowFrom(data)
@@ -700,6 +789,8 @@ export async function updateRepChessOsResource(
   id: string,
   input: unknown
 ) {
+  await ensureRepChessOsSeedData()
+
   const payload = withTimestamp(buildPayload(resource, input, false), false)
   if (Object.keys(payload).length <= 1) {
     throw new Error("No fields to update")
@@ -713,20 +804,22 @@ export async function updateRepChessOsResource(
     .single()
 
   if (error) {
-    throw new Error(error.message || `Failed to update ${resource}`)
+    throwRepChessOsDataError(error, `Failed to update ${resource}`)
   }
 
   return rowFrom(data)
 }
 
 export async function deleteRepChessOsResource(resource: RepChessOsResource, id: string) {
+  await ensureRepChessOsSeedData()
+
   const { error } = await supabaseAdmin
     .from(RESOURCE_TABLES[resource])
     .delete()
     .eq("id", normalizeId(id))
 
   if (error) {
-    throw new Error(error.message || `Failed to delete ${resource}`)
+    throwRepChessOsDataError(error, `Failed to delete ${resource}`)
   }
 
   return true

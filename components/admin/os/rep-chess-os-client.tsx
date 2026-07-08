@@ -1349,6 +1349,28 @@ export default function RepChessOsClient({ initialSection = "dashboard" }: { ini
     setActiveSection(initialSection)
   }, [initialSection])
 
+  const navigateToSection = useCallback((section: { key: SectionKey; path: string }) => {
+    setActiveSection(section.key)
+    setPageError(null)
+
+    if (typeof window !== "undefined" && window.location.pathname !== section.path) {
+      window.history.pushState({ repChessOsSection: section.key }, "", section.path)
+    }
+  }, [])
+
+  useEffect(() => {
+    function handlePopState() {
+      const section = SECTIONS.find((item) => item.path === window.location.pathname)
+      if (section) {
+        setActiveSection(section.key)
+        setPageError(null)
+      }
+    }
+
+    window.addEventListener("popstate", handlePopState)
+    return () => window.removeEventListener("popstate", handlePopState)
+  }, [])
+
   const buildHeaders = useCallback((extra: Record<string, string> = {}) => {
     return initData ? { Authorization: `Bearer ${initData}`, ...extra } : extra
   }, [initData])
@@ -1593,10 +1615,7 @@ export default function RepChessOsClient({ initialSection = "dashboard" }: { ini
                 return (
                   <button
                     key={section.key}
-                    onClick={() => {
-                      setActiveSection(section.key)
-                      router.push(section.path)
-                    }}
+                    onClick={() => navigateToSection(section)}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-bold transition-colors ${activeItem ? "bg-white text-[#151515]" : "text-white/68 hover:bg-white/10 hover:text-white"}`}
                   >
                     <Icon className="h-4 w-4 shrink-0" />

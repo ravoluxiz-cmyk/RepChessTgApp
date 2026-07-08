@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import {
   deleteRepChessOsResource,
   isRepChessOsResource,
+  RepChessOsSetupError,
   updateRepChessOsResource,
 } from "@/lib/rep-chess-os"
 import { getRepChessOsAccessError } from "@/lib/rep-chess-os-guard"
@@ -28,7 +29,10 @@ export async function PATCH(
     return NextResponse.json({ row })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Не удалось обновить запись"
-    return NextResponse.json({ error: message }, { status: 400 })
+    return NextResponse.json(
+      { error: message },
+      { status: error instanceof RepChessOsSetupError ? 503 : 400 }
+    )
   }
 }
 
@@ -51,6 +55,9 @@ export async function DELETE(
     return NextResponse.json({ ok: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Не удалось удалить запись"
-    return NextResponse.json({ error: message }, { status: 400 })
+    return NextResponse.json(
+      { error: message },
+      { status: error instanceof RepChessOsSetupError ? 503 : 400 }
+    )
   }
 }

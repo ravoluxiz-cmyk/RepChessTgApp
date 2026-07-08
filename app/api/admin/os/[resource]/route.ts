@@ -4,6 +4,7 @@ import {
   getRepChessOsMeta,
   isRepChessOsResource,
   listRepChessOsResource,
+  RepChessOsSetupError,
 } from "@/lib/rep-chess-os"
 import { getRepChessOsAccessError } from "@/lib/rep-chess-os-guard"
 
@@ -43,7 +44,11 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ resourc
     return NextResponse.json({ rows })
   } catch (error) {
     console.error(`Failed to list Rep Chess OS ${resource}:`, error)
-    return NextResponse.json({ error: "Не удалось загрузить данные" }, { status: 500 })
+    const message = error instanceof Error ? error.message : "Не удалось загрузить данные"
+    return NextResponse.json(
+      { error: message },
+      { status: error instanceof RepChessOsSetupError ? 503 : 500 }
+    )
   }
 }
 
@@ -64,6 +69,9 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ resour
     return NextResponse.json({ row }, { status: 201 })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Не удалось сохранить запись"
-    return NextResponse.json({ error: message }, { status: 400 })
+    return NextResponse.json(
+      { error: message },
+      { status: error instanceof RepChessOsSetupError ? 503 : 400 }
+    )
   }
 }
