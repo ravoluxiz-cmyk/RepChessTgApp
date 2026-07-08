@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import ChessBackground from "@/components/ChessBackground"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
-import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut, BarChart3, Building2, Headphones, Newspaper, Users } from "lucide-react"
+import { Shield, PlusCircle, Archive, ArrowLeft, List, LogIn, LogOut, BarChart3, Building2, Headphones, Newspaper, Users, KeyRound } from "lucide-react"
 
 export default function AdminMainMenuPage() {
   const router = useRouter()
@@ -216,6 +216,22 @@ export default function AdminMainMenuPage() {
                   <span className="text-lg sm:text-xl font-bold">Статистика</span>
                 </div>
                 <div className="text-white/70">Регистрации, посещаемость, заявки и спрос</div>
+              </button>
+
+              <button
+                onClick={() => router.push("/admin/os")}
+                className="brand-panel-dark w-full rounded-[18px] border-[#20d66b]/45 bg-[#20d66b]/[0.08] p-5 text-left shadow-[0_18px_55px_rgba(32,214,107,0.13)] transition-all hover:border-[#20d66b]/80 hover:bg-[#20d66b]/[0.12] sm:p-6"
+              >
+                <div className="mb-3 flex items-center justify-between gap-3 text-white">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <KeyRound className="h-6 w-6 shrink-0 text-[#20d66b]" />
+                    <span className="text-lg font-bold sm:text-xl">Rep Chess OS</span>
+                  </div>
+                  <span className="shrink-0 rounded-lg bg-white px-3 py-1.5 text-xs font-black text-[#151515]">
+                    Открыть систему
+                  </span>
+                </div>
+                <div className="text-white/72">Задачи, продажи, ивенты, финансы и стратегия развития Rep Chess KRD</div>
               </button>
             </div>
           )}

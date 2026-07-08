@@ -29,6 +29,15 @@ interface MemStore {
   rounds: MemRow[]
   matches: MemRow[]
   leaderboard: MemRow[]
+  repchess_os_tasks: MemRow[]
+  repchess_os_leads: MemRow[]
+  repchess_os_directions: MemRow[]
+  repchess_os_plans: MemRow[]
+  repchess_os_events: MemRow[]
+  repchess_os_event_checklist_items: MemRow[]
+  repchess_os_finance_entries: MemRow[]
+  repchess_os_weekly_reviews: MemRow[]
+  repchess_os_message_templates: MemRow[]
   counters: Record<string, number>
 }
 
@@ -54,7 +63,43 @@ function getGlobalStore(): MemStore {
       rounds: [],
       matches: [],
       leaderboard: [],
-      counters: { users: 0, tournaments: 0, tournament_participants: 0, tournament_registrations: 0, rating_requests: 0, partnership_requests: 0, lesson_requests: 0, merch_orders: 0, club_content: 0, support_requests: 0, site_user_accounts: 0, site_user_sessions: 0, player_ratings: 0, rating_history: 0, rounds: 0, matches: 0, leaderboard: 0 }
+      repchess_os_tasks: [],
+      repchess_os_leads: [],
+      repchess_os_directions: [],
+      repchess_os_plans: [],
+      repchess_os_events: [],
+      repchess_os_event_checklist_items: [],
+      repchess_os_finance_entries: [],
+      repchess_os_weekly_reviews: [],
+      repchess_os_message_templates: [],
+      counters: {
+        users: 0,
+        tournaments: 0,
+        tournament_participants: 0,
+        tournament_registrations: 0,
+        rating_requests: 0,
+        partnership_requests: 0,
+        lesson_requests: 0,
+        merch_orders: 0,
+        club_content: 0,
+        support_requests: 0,
+        site_user_accounts: 0,
+        site_user_sessions: 0,
+        player_ratings: 0,
+        rating_history: 0,
+        rounds: 0,
+        matches: 0,
+        leaderboard: 0,
+        repchess_os_tasks: 0,
+        repchess_os_leads: 0,
+        repchess_os_directions: 0,
+        repchess_os_plans: 0,
+        repchess_os_events: 0,
+        repchess_os_event_checklist_items: 0,
+        repchess_os_finance_entries: 0,
+        repchess_os_weekly_reviews: 0,
+        repchess_os_message_templates: 0,
+      }
     } as MemStore
   }
   return g.__MEM_SUPABASE_STORE__ as MemStore
@@ -78,7 +123,9 @@ class QueryBuilder {
   }
 
   select(clause: string = '*') {
-    this.action = 'select'
+    if (this.action === 'select') {
+      this.action = 'select'
+    }
     this.selectClause = clause
     return this
   }
