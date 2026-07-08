@@ -201,11 +201,35 @@ const RESOURCE_ORDER: Record<RepChessOsResource, ResourceOrder> = {
   message_templates: { column: "updated_at", ascending: false },
 }
 
+const STORE_RESOURCES: RepChessOsResource[] = [
+  "tasks",
+  "leads",
+  "directions",
+  "plans",
+  "events",
+  "event_checklist_items",
+  "finance_entries",
+  "weekly_reviews",
+  "message_templates",
+]
+
 const TASK_DONE_STATUS = "Готово"
 const WON_LEAD_STATUS = "Сделка выиграна"
 const LOST_LEAD_STATUS = "Сделка проиграна"
 const PAUSED_LEAD_STATUS = "Пауза"
-const SETUP_ERROR_MESSAGE = "База Rep Chess OS ещё не создана в Supabase. Нужно применить supabase_migration_rep_chess_os.sql, затем открыть OS снова."
+const FALLBACK_STORE_TYPE = "rules"
+const FALLBACK_STORE_TITLE = "Rep Chess OS Internal Store"
+const FALLBACK_STORE_VERSION = 1
+const SETUP_ERROR_MESSAGE = "Хранилище Rep Chess OS недоступно в Supabase. Проверь, что таблица club_content существует, или примени миграции проекта."
+
+type RepChessOsStorageMode = "native" | "fallback"
+
+interface RepChessOsFallbackStore {
+  version: number
+  resources: Record<RepChessOsResource, RepChessOsRow[]>
+  counters: Record<RepChessOsResource, number>
+  updated_at?: string
+}
 
 export class RepChessOsSetupError extends Error {
   constructor(message = SETUP_ERROR_MESSAGE) {
@@ -636,6 +660,7 @@ function seedRowsWithTimestamp(rows: RepChessOsRow[]) {
 }
 
 let seedPromise: Promise<void> | null = null
+let storageModePromise: Promise<RepChessOsStorageMode> | null = null
 
 async function resourceHasAnyRows(resource: RepChessOsResource) {
   const { data, error } = await supabaseAdmin
@@ -684,6 +709,197 @@ export async function ensureRepChessOsSeedData() {
   await seedPromise
 }
 
+function createEmptyFallbackStore(): RepChessOsFallbackStore {
+  const resources = STORE_RESOURCES.reduce((accumulator, resource) => {
+    accumulator[resource] = []
+    return accumulator
+  }, {} as Record<RepChessOsResource, RepChessOsRow[]>)
+
+  const counters = STORE_RESOURCES.reduce((accumulator, resource) => {
+    accumulator[resource] = 0
+    return accumulator
+  }, {} as Record<RepChessOsResource, number>)
+
+  return {
+    version: FALLBACK_STORE_VERSION,
+    resources,
+    counters,
+  }
+}
+
+function getNextFallbackId(store: RepChessOsFallbackStore, resource: RepChessOsResource) {
+  const maxExistingId = store.resources[resource].reduce((max, row) => {
+    const numericId = Number(row.id)
+    return Number.isFinite(numericId) ? Math.max(max, numericId) : max
+  }, 0)
+  const nextId = Math.max(store.counters[resource] ?? 0, maxExistingId) + 1
+  store.counters[resource] = nextId
+  return nextId
+}
+
+function addSeedRows(
+  store: RepChessOsFallbackStore,
+  resource: RepChessOsResource,
+  rows: RepChessOsRow[]
+) {
+  store.resources[resource] = rows.map((row) => ({
+    id: getNextFallbackId(store, resource),
+    ...withTimestamp(row, true),
+  }))
+}
+
+function createSeedFallbackStore() {
+  const store = createEmptyFallbackStore()
+  const seed = buildRepChessOsSeedData()
+
+  addSeedRows(store, "directions", seed.directions)
+  addSeedRows(store, "tasks", seed.tasks)
+  addSeedRows(store, "plans", seed.plans)
+  addSeedRows(store, "leads", seed.leads)
+  addSeedRows(store, "weekly_reviews", seed.weekly_reviews)
+  addSeedRows(store, "message_templates", seed.message_templates)
+
+  return store
+}
+
+function normalizeFallbackStore(input: unknown): RepChessOsFallbackStore {
+  const store = createEmptyFallbackStore()
+  if (!input || typeof input !== "object") return store
+
+  const source = input as Partial<RepChessOsFallbackStore>
+  const sourceResources: Partial<Record<RepChessOsResource, unknown>> = source.resources && typeof source.resources === "object"
+    ? source.resources
+    : {}
+  const sourceCounters: Partial<Record<RepChessOsResource, unknown>> = source.counters && typeof source.counters === "object"
+    ? source.counters
+    : {}
+
+  for (const resource of STORE_RESOURCES) {
+    const rows = sourceResources[resource]
+    store.resources[resource] = Array.isArray(rows) ? rows.filter((row) => row && typeof row === "object") as RepChessOsRow[] : []
+    const counter = Number(sourceCounters[resource])
+    const maxExistingId = store.resources[resource].reduce((max, row) => {
+      const numericId = Number(row.id)
+      return Number.isFinite(numericId) ? Math.max(max, numericId) : max
+    }, 0)
+    store.counters[resource] = Math.max(Number.isFinite(counter) ? counter : 0, maxExistingId)
+  }
+
+  store.version = Number(source.version) || FALLBACK_STORE_VERSION
+  store.updated_at = typeof source.updated_at === "string" ? source.updated_at : undefined
+  return store
+}
+
+function parseFallbackStore(row: RepChessOsRow) {
+  const body = typeof row.body === "string" ? row.body : ""
+  if (!body.trim()) return createSeedFallbackStore()
+
+  try {
+    return normalizeFallbackStore(JSON.parse(body))
+  } catch {
+    return createSeedFallbackStore()
+  }
+}
+
+function serializeFallbackStore(store: RepChessOsFallbackStore) {
+  return JSON.stringify({
+    ...store,
+    updated_at: new Date().toISOString(),
+  })
+}
+
+async function loadFallbackStore() {
+  const { data, error } = await supabaseAdmin
+    .from("club_content")
+    .select("id, body")
+    .eq("type", FALLBACK_STORE_TYPE)
+    .eq("title", FALLBACK_STORE_TITLE)
+    .limit(1)
+
+  if (error) {
+    throw new RepChessOsSetupError("Не удалось открыть запасное хранилище Rep Chess OS в Supabase.")
+  }
+
+  const existingRow = rowsFrom(data)[0]
+  if (existingRow?.id !== undefined && existingRow.id !== null) {
+    return {
+      rowId: existingRow.id,
+      store: parseFallbackStore(existingRow),
+    }
+  }
+
+  const store = createSeedFallbackStore()
+  const { data: insertedData, error: insertError } = await supabaseAdmin
+    .from("club_content")
+    .insert({
+      type: FALLBACK_STORE_TYPE,
+      title: FALLBACK_STORE_TITLE,
+      subtitle: "Hidden storage for Rep Chess OS admin data",
+      body: serializeFallbackStore(store),
+      is_published: false,
+      is_featured: false,
+      sort_order: 9999,
+      published_at: null,
+    })
+    .select("id, body")
+    .single()
+
+  if (insertError) {
+    throw new RepChessOsSetupError("Не удалось создать запасное хранилище Rep Chess OS в Supabase.")
+  }
+
+  const insertedRow = rowFrom(insertedData)
+  if (insertedRow?.id === undefined || insertedRow.id === null) {
+    throw new RepChessOsSetupError("Supabase не вернул id запасного хранилища Rep Chess OS.")
+  }
+
+  return {
+    rowId: insertedRow.id,
+    store,
+  }
+}
+
+async function saveFallbackStore(rowId: string | number, store: RepChessOsFallbackStore) {
+  const { error } = await supabaseAdmin
+    .from("club_content")
+    .update({
+      body: serializeFallbackStore(store),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", rowId)
+
+  if (error) {
+    throw new RepChessOsSetupError("Не удалось сохранить данные Rep Chess OS в Supabase.")
+  }
+}
+
+async function detectRepChessOsStorageMode(): Promise<RepChessOsStorageMode> {
+  for (const resource of STORE_RESOURCES) {
+    const { error } = await supabaseAdmin
+      .from(RESOURCE_TABLES[resource])
+      .select("id")
+      .limit(1)
+
+    if (error) {
+      if (isMissingTableError(error)) return "fallback"
+      throwRepChessOsDataError(error, `Failed to inspect ${resource}`)
+    }
+  }
+
+  return "native"
+}
+
+async function getRepChessOsStorageMode() {
+  if (!storageModePromise) {
+    storageModePromise = detectRepChessOsStorageMode().catch((error) => {
+      storageModePromise = null
+      throw error
+    })
+  }
+
+  return storageModePromise
+}
+
 function applyFilters(resource: RepChessOsResource, rows: RepChessOsRow[], filters: RepChessOsListFilters) {
   const search = String(filters.search || "").trim().toLowerCase()
   const today = todayKey()
@@ -723,6 +939,103 @@ function applyFilters(resource: RepChessOsResource, rows: RepChessOsRow[], filte
   })
 }
 
+function sortResourceRows(resource: RepChessOsResource, rows: RepChessOsRow[]) {
+  const order = RESOURCE_ORDER[resource]
+  return rows.slice().sort((left, right) => {
+    const leftValue = dateValue(left, order.column) || String(left[order.column] || "")
+    const rightValue = dateValue(right, order.column) || String(right[order.column] || "")
+    const normalizedLeft = leftValue || "9999-12-31"
+    const normalizedRight = rightValue || "9999-12-31"
+    return order.ascending
+      ? normalizedLeft.localeCompare(normalizedRight)
+      : normalizedRight.localeCompare(normalizedLeft)
+  })
+}
+
+async function listFallbackRepChessOsResource(
+  resource: RepChessOsResource,
+  filters: RepChessOsListFilters = {}
+) {
+  const { store } = await loadFallbackStore()
+  const rows = sortResourceRows(resource, store.resources[resource])
+  return applyFilters(resource, rows, filters)
+}
+
+function createFallbackEventChecklist(store: RepChessOsFallbackStore, eventId: string | number | undefined) {
+  if (eventId === undefined || eventId === null) return
+
+  for (const item of DEFAULT_EVENT_CHECKLIST) {
+    store.resources.event_checklist_items.push({
+      id: getNextFallbackId(store, "event_checklist_items"),
+      event_id: eventId,
+      stage: item.stage,
+      title: item.title,
+      status: "Не начато",
+      ...withTimestamp({}, true),
+    })
+  }
+}
+
+async function createFallbackRepChessOsResource(resource: RepChessOsResource, input: unknown) {
+  const { rowId, store } = await loadFallbackStore()
+  const row = {
+    id: getNextFallbackId(store, resource),
+    ...withTimestamp(buildPayload(resource, input, true), true),
+  }
+
+  store.resources[resource].push(row)
+
+  if (resource === "events") {
+    createFallbackEventChecklist(store, row.id)
+  }
+
+  await saveFallbackStore(rowId, store)
+  return row
+}
+
+async function updateFallbackRepChessOsResource(
+  resource: RepChessOsResource,
+  id: string,
+  input: unknown
+) {
+  const { rowId, store } = await loadFallbackStore()
+  const index = store.resources[resource].findIndex((row) => String(row.id) === String(id))
+  const existingRow = store.resources[resource][index]
+  if (index === -1 || !existingRow) throw new Error("Запись не найдена")
+
+  const payload = withTimestamp(buildPayload(resource, input, false), false)
+  if (Object.keys(payload).length <= 1) {
+    throw new Error("No fields to update")
+  }
+
+  const updatedRow = {
+    ...existingRow,
+    ...payload,
+    id: existingRow.id,
+  }
+
+  store.resources[resource][index] = updatedRow
+  await saveFallbackStore(rowId, store)
+  return updatedRow
+}
+
+async function deleteFallbackRepChessOsResource(resource: RepChessOsResource, id: string) {
+  const { rowId, store } = await loadFallbackStore()
+  const previousLength = store.resources[resource].length
+  store.resources[resource] = store.resources[resource].filter((row) => String(row.id) !== String(id))
+
+  if (resource === "events") {
+    store.resources.event_checklist_items = store.resources.event_checklist_items.filter((row) => String(row.event_id) !== String(id))
+  }
+
+  if (store.resources[resource].length === previousLength) {
+    throw new Error("Запись не найдена")
+  }
+
+  await saveFallbackStore(rowId, store)
+  return true
+}
+
 async function createDefaultChecklist(eventId: string | number | undefined) {
   if (eventId === undefined || eventId === null) return
   const rows = DEFAULT_EVENT_CHECKLIST.map((item) => ({
@@ -747,6 +1060,10 @@ export async function listRepChessOsResource(
   resource: RepChessOsResource,
   filters: RepChessOsListFilters = {}
 ) {
+  if (await getRepChessOsStorageMode() === "fallback") {
+    return listFallbackRepChessOsResource(resource, filters)
+  }
+
   await ensureRepChessOsSeedData()
 
   const order = RESOURCE_ORDER[resource]
@@ -763,6 +1080,10 @@ export async function listRepChessOsResource(
 }
 
 export async function createRepChessOsResource(resource: RepChessOsResource, input: unknown) {
+  if (await getRepChessOsStorageMode() === "fallback") {
+    return createFallbackRepChessOsResource(resource, input)
+  }
+
   await ensureRepChessOsSeedData()
 
   const payload = withTimestamp(buildPayload(resource, input, true), true)
@@ -789,6 +1110,10 @@ export async function updateRepChessOsResource(
   id: string,
   input: unknown
 ) {
+  if (await getRepChessOsStorageMode() === "fallback") {
+    return updateFallbackRepChessOsResource(resource, id, input)
+  }
+
   await ensureRepChessOsSeedData()
 
   const payload = withTimestamp(buildPayload(resource, input, false), false)
@@ -811,6 +1136,10 @@ export async function updateRepChessOsResource(
 }
 
 export async function deleteRepChessOsResource(resource: RepChessOsResource, id: string) {
+  if (await getRepChessOsStorageMode() === "fallback") {
+    return deleteFallbackRepChessOsResource(resource, id)
+  }
+
   await ensureRepChessOsSeedData()
 
   const { error } = await supabaseAdmin

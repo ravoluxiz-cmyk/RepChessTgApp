@@ -1250,7 +1250,17 @@ function LockScreen({
               </div>
             </div>
 
-            {accessState === "forbidden" ? (
+            {accessState === "checking" ? (
+              <div className="rounded-lg border border-white/10 bg-black/25 p-4">
+                <div className="flex items-center gap-3">
+                  <RefreshCw className="h-5 w-5 animate-spin text-[#bdf8d2]" />
+                  <div>
+                    <div className="font-black text-white">Открываю Rep Chess OS</div>
+                    <div className="mt-1 text-sm text-white/50">Проверяю доступ к внутренней панели...</div>
+                  </div>
+                </div>
+              </div>
+            ) : accessState === "forbidden" ? (
               <div className="rounded-lg border border-[#ff1515]/30 bg-[#ff1515]/12 p-3 text-sm text-[#ffc7c7]">
                 Сначала нужен вход в админку.
               </div>

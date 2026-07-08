@@ -1141,9 +1141,16 @@ export async function updatePartnershipRequestStatus(
   return data as PartnershipRequest
 }
 
+const REP_CHESS_OS_INTERNAL_STORE_TITLE = 'Rep Chess OS Internal Store'
+
+function isVisibleClubContentItem(item: Pick<ClubContent, 'title'>) {
+  return item.title !== REP_CHESS_OS_INTERNAL_STORE_TITLE
+}
+
 function fallbackClubContent(type?: string): ClubContent[] {
   const normalizedType = type && type !== 'all' ? normalizeClubContentType(type) : null
   return DEFAULT_CLUB_CONTENT
+    .filter(isVisibleClubContentItem)
     .filter((item) => !normalizedType || item.type === normalizedType)
     .filter((item) => item.is_published !== false)
     .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0))
@@ -1172,7 +1179,8 @@ export async function listClubContent(options: {
 
   const rows = ((data || []) as ClubContent[]).map(fromDbClubContent)
   const normalizedType = type && type !== 'all' ? normalizeClubContentType(type) : null
-  const filteredRows = normalizedType ? rows.filter((item) => item.type === normalizedType) : rows
+  const visibleRows = rows.filter(isVisibleClubContentItem)
+  const filteredRows = normalizedType ? visibleRows.filter((item) => item.type === normalizedType) : visibleRows
 
   if (publishedOnly && filteredRows.length === 0) {
     return fallbackClubContent(type)
