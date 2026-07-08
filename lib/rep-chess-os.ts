@@ -219,7 +219,7 @@ const LOST_LEAD_STATUS = "Сделка проиграна"
 const PAUSED_LEAD_STATUS = "Пауза"
 const FALLBACK_STORE_TYPE = "rules"
 const FALLBACK_STORE_TITLE = "Rep Chess OS Internal Store"
-const FALLBACK_STORE_VERSION = 1
+const FALLBACK_STORE_VERSION = 2
 const SETUP_ERROR_MESSAGE = "Хранилище Rep Chess OS недоступно в Supabase. Проверь, что таблица club_content существует, или примени миграции проекта."
 
 type RepChessOsStorageMode = "native" | "fallback"
@@ -762,6 +762,208 @@ function createSeedFallbackStore() {
   return store
 }
 
+function dateAfterDays(days: number) {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return date.toISOString().slice(0, 10)
+}
+
+function rowTitle(row: RepChessOsRow) {
+  return String(row.title || "").trim()
+}
+
+function rowName(row: RepChessOsRow) {
+  return String(row.name || "").trim()
+}
+
+function appendHistoryNote(row: RepChessOsRow, note: string) {
+  const current = String(row.notes || "").trim()
+  return current.includes(note) ? current : [current, note].filter(Boolean).join("\n")
+}
+
+function removeFallbackRowsByTitle(
+  store: RepChessOsFallbackStore,
+  resource: "tasks" | "plans",
+  titles: string[]
+) {
+  const before = store.resources[resource].length
+  store.resources[resource] = store.resources[resource].filter((row) => !titles.includes(rowTitle(row)))
+  return store.resources[resource].length !== before
+}
+
+function ensureFallbackRow(
+  store: RepChessOsFallbackStore,
+  resource: "tasks" | "plans",
+  row: RepChessOsRow
+) {
+  if (store.resources[resource].some((item) => rowTitle(item) === rowTitle(row))) return false
+
+  store.resources[resource].push({
+    id: getNextFallbackId(store, resource),
+    ...withTimestamp(row, true),
+  })
+  return true
+}
+
+function upsertFallbackTaskByTitle(
+  store: RepChessOsFallbackStore,
+  oldTitle: string,
+  row: RepChessOsRow
+) {
+  const existing = store.resources.tasks.find((item) => rowTitle(item) === rowTitle(row))
+  const oldRow = store.resources.tasks.find((item) => rowTitle(item) === oldTitle)
+
+  if (existing) {
+    if (oldRow && String(oldRow.id) !== String(existing.id)) {
+      store.resources.tasks = store.resources.tasks.filter((item) => rowTitle(item) !== oldTitle)
+      return true
+    }
+    return false
+  }
+
+  if (oldRow) {
+    Object.assign(oldRow, row, {
+      id: oldRow.id,
+      created_at: oldRow.created_at,
+      updated_at: new Date().toISOString(),
+    })
+    return true
+  }
+
+  return ensureFallbackRow(store, "tasks", row)
+}
+
+function migrateFallbackStore(store: RepChessOsFallbackStore) {
+  const sourceVersion = Number(store.version) || 1
+  if (sourceVersion >= FALLBACK_STORE_VERSION) return false
+
+  let changed = false
+  const now = new Date().toISOString()
+
+  for (const lead of store.resources.leads) {
+    const name = rowName(lead)
+    if (name === "TOP IT SCHOOL") {
+      Object.assign(lead, {
+        status: LOST_LEAD_STATUS,
+        probability: 0,
+        next_action: null,
+        next_action_date: null,
+        notes: appendHistoryNote(lead, "Закрыто: экономика не подходит, оплата слишком маленькая для сложности услуги."),
+        updated_at: now,
+      })
+      changed = true
+    }
+
+    if (name === "IT-компания через Кристину") {
+      Object.assign(lead, {
+        status: PAUSED_LEAD_STATUS,
+        probability: 0,
+        next_action: null,
+        next_action_date: null,
+        notes: appendHistoryNote(lead, "Неактуально: контакт проигнорировали, не держим в активных corporate-приоритетах."),
+        updated_at: now,
+      })
+      changed = true
+    }
+  }
+
+  changed = removeFallbackRowsByTitle(store, "tasks", [
+    "Вернуться к TOP IT SCHOOL",
+    "Вернуться к IT-компании через Кристину",
+  ]) || changed
+
+  changed = upsertFallbackTaskByTitle(store, "Собрать таблицу 50 corporate-лидов", {
+    title: "Собрать 50 corporate-лидов без старых неактуальных контактов",
+    description: "Добавить компании, HR, event-менеджеров и контакты для первого касания, не опираясь на старые неответившие контакты.",
+    area: "Corporate",
+    priority: "High",
+    status: "В работе",
+    due_date: dateAfterDays(7),
+    owner: "Чеслав",
+  }) || changed
+
+  changed = upsertFallbackTaskByTitle(store, "Собрать таблицу 30 education-лидов", {
+    title: "Собрать 30 education-лидов без TOP IT SCHOOL",
+    description: "Частные школы, детские центры, кружки и образовательные проекты с более подходящей экономикой.",
+    area: "Education",
+    priority: "High",
+    status: "Эта неделя",
+    due_date: dateAfterDays(7),
+    owner: "Чеслав",
+  }) || changed
+
+  changed = ensureFallbackRow(store, "tasks", {
+    title: "Найти 5 новых тёплых входов в компании Краснодара",
+    description: "Найти личные интро, знакомых HR, предпринимателей и event-ответственных для corporate-направления.",
+    area: "Corporate",
+    priority: "High",
+    status: "Эта неделя",
+    due_date: dateAfterDays(5),
+    owner: "Чеслав",
+  }) || changed
+
+  changed = ensureFallbackRow(store, "tasks", {
+    title: "Найти 10 частных школ / детских центров с более подходящей экономикой",
+    description: "Собрать площадки, где возможна нормальная оплата за сложность образовательной услуги.",
+    area: "Education",
+    priority: "High",
+    status: "Эта неделя",
+    due_date: dateAfterDays(6),
+    owner: "Чеслав",
+  }) || changed
+
+  changed = removeFallbackRowsByTitle(store, "plans", [
+    "Вернуться к TOP IT SCHOOL",
+    "Вернуться к IT-компании через Кристину",
+  ]) || changed
+
+  changed = ensureFallbackRow(store, "plans", {
+    title: "Найти новые тёплые входы в компании Краснодара",
+    horizon: "Краткосрочный",
+    direction: "Corporate",
+    description: "Собрать 5 новых тёплых входов в компании Краснодара через личные интро, знакомых и предпринимательские контакты.",
+    target_result: "5 новых контактов, где можно предложить corporate-формат без старых неответивших лидов.",
+    target_date: dateAfterDays(14),
+    status: "Не начато",
+    priority: "High",
+  }) || changed
+
+  changed = ensureFallbackRow(store, "plans", {
+    title: "Собрать список частных школ и детских центров",
+    horizon: "Краткосрочный",
+    direction: "Education",
+    description: "Найти 10 частных школ, детских центров и образовательных площадок с более подходящей экономикой.",
+    target_result: "10 education-лидов без TOP IT SCHOOL и с более реалистичной оплатой.",
+    target_date: dateAfterDays(14),
+    status: "Не начато",
+    priority: "High",
+  }) || changed
+
+  for (const plan of store.resources.plans) {
+    if (rowTitle(plan) === "Запустить первый education-пилот" && String(plan.description || "").includes("TOP IT SCHOOL")) {
+      plan.description = "Запустить пилот шахматных занятий в школе или детском центре с понятной экономикой."
+      plan.updated_at = now
+      changed = true
+    }
+    if (rowTitle(plan) === "Создать таблицу 160 лидов" && !String(plan.description || "").includes("без опоры на старые")) {
+      plan.description = "Собрать базу потенциальных клиентов: corporate, education, ТЦ, event-агентства, девелоперы, фестивали без опоры на старые неактуальные контакты."
+      plan.updated_at = now
+      changed = true
+    }
+  }
+
+  for (const review of store.resources.weekly_reviews) {
+    if (String(review.next_week_focus || "") === "КП для corporate и education, 160 лидов, первые 40 касаний.") {
+      review.next_week_focus = "КП для corporate и education, новые лиды без старых неактуальных контактов, первые 40 касаний."
+      review.updated_at = now
+      changed = true
+    }
+  }
+
+  store.version = FALLBACK_STORE_VERSION
+  return changed || sourceVersion !== FALLBACK_STORE_VERSION
+}
+
 function normalizeFallbackStore(input: unknown): RepChessOsFallbackStore {
   const store = createEmptyFallbackStore()
   if (!input || typeof input !== "object") return store
@@ -822,9 +1024,14 @@ async function loadFallbackStore() {
 
   const existingRow = rowsFrom(data)[0]
   if (existingRow?.id !== undefined && existingRow.id !== null) {
+    const store = parseFallbackStore(existingRow)
+    if (migrateFallbackStore(store)) {
+      await saveFallbackStore(existingRow.id, store)
+    }
+
     return {
       rowId: existingRow.id,
-      store: parseFallbackStore(existingRow),
+      store,
     }
   }
 
