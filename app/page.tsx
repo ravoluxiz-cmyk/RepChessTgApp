@@ -122,7 +122,7 @@ const SEO_TOPICS = [
   {
     title: "Мерч и стиль клуба",
     text: "В мерче лежат футболки и вещи Rep Chess KRD. Не обязательная форма, просто приятно, когда клуб виден и вне доски.",
-    href: "/merch",
+    href: "/merch?from=site-menu",
     cta: "Мерч",
   },
   {
@@ -307,7 +307,7 @@ export default async function Home() {
             ))}
           </section>
 
-          <section className="brand-panel-dark p-5 sm:p-7" aria-labelledby="seo-chess-krasnodar">
+          <section id="site-menu" className="brand-panel-dark scroll-mt-6 p-5 sm:p-7" aria-labelledby="seo-chess-krasnodar">
             <div className="mb-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
               <div>
                 <h2 id="seo-chess-krasnodar" className="brand-title text-3xl text-white sm:text-5xl">

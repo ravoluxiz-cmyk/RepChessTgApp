@@ -150,6 +150,20 @@
     line-height: 0.86;
   }
 
+  .seo-hero-title {
+    max-width: 100%;
+    font-size: clamp(2.35rem, 3.1vw, 3.05rem);
+    line-height: 0.86;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  @media (max-width: 640px) {
+    .seo-hero-title {
+      font-size: clamp(2.25rem, 11.5vw, 3.35rem);
+    }
+  }
+
   .brand-panel {
     border: 1px solid rgb(21 21 21 / 0.14);
     border-radius: 18px;

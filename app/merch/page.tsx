@@ -49,7 +49,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default function MerchPage() {
+type MerchPageProps = {
+  searchParams?: Promise<{ from?: string }>
+}
+
+export default async function MerchPage({ searchParams }: MerchPageProps = {}) {
+  const params = searchParams ? await searchParams : {}
+  const backHref = params?.from === "site-menu" ? "/#site-menu" : "/"
+
   return (
     <ChessBackground>
       <JsonLd data={merchJsonLd} />
@@ -57,7 +64,7 @@ export default function MerchPage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-6">
           <header className="flex items-center justify-between gap-3">
             <Link
-              href="/"
+              href={backHref}
               className="brand-underlink inline-flex items-center gap-2 px-3 py-2 text-white transition-colors hover:text-white/70"
               aria-label="Назад"
             >

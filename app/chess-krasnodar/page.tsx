@@ -119,10 +119,10 @@ export default function ChessKrasnodarPage() {
         <div className="mx-auto max-w-6xl">
           <BackButton />
 
-          <section className="mt-6 grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
-            <article className="brand-panel-dark relative overflow-hidden p-5 sm:p-8">
+          <section className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-stretch">
+            <article className="brand-panel-dark relative min-w-0 overflow-hidden p-5 sm:p-8">
               <div className="brand-bg-icons pointer-events-none absolute -right-24 -top-24 h-80 w-80 opacity-[0.07]" />
-              <h1 className="brand-title max-w-4xl text-4xl leading-none text-white sm:text-6xl md:text-7xl">
+              <h1 className="brand-title seo-hero-title text-white">
                 Где играть в шахматы в Краснодаре
               </h1>
               <p className="mt-5 max-w-3xl text-base leading-relaxed text-white/68 sm:text-lg">
@@ -138,7 +138,7 @@ export default function ChessKrasnodarPage() {
               </div>
             </article>
 
-            <aside className="brand-panel p-5 text-[#151515] sm:p-6">
+            <aside className="brand-panel min-w-0 p-5 text-[#151515] sm:p-6">
               <h2 className="brand-title text-3xl leading-none">Что здесь есть</h2>
               <ul className="mt-5 space-y-3 text-sm font-semibold leading-relaxed text-[#151515]/70">
                 {WHERE_TO_PLAY.map((item) => (
