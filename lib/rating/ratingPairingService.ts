@@ -1,4 +1,4 @@
-import { supabase } from '../supabase'
+import { supabaseAdmin } from '../supabase'
 import { type Tournament } from '../db'
 import { ratingService } from './ratingService'
 import { 
@@ -68,7 +68,7 @@ export class RatingPairingService {
    */
   private async getTournamentConfig(tournamentId: number): Promise<Tournament | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('tournaments')
         .select('*')
         .eq('id', tournamentId)
@@ -279,7 +279,7 @@ export class RatingPairingService {
       }
 
       // Get tournament participants
-      const { data: participants } = await supabase
+      const { data: participants } = await supabaseAdmin
         .from('tournament_participants')
         .select('*, user:users(*)')
         .eq('tournament_id', tournamentId)

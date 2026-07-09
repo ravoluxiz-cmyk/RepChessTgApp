@@ -1,19 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase"
+import { supabaseAdmin } from "@/lib/supabase"
+
+function escapePostgrestPattern(value: string) {
+  return value
+    .trim()
+    .replace(/[(),]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/[%_\\]/g, "\\$&")
+}
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const query = searchParams.get('q') || ''
+    const query = escapePostgrestPattern(searchParams.get('q') || '')
     
     if (!query || query.length < 2) {
       return NextResponse.json({ users: [] })
     }
 
     // Search by first name, last name, and username
-    const { data: users, error } = await supabase
+    const { data: users, error } = await supabaseAdmin
       .from('users')
-      .select('id, telegram_id, username, first_name, last_name, rating')
+      .select('id, username, first_name, last_name, rating')
       .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,username.ilike.%${query}%`)
       .order('first_name', { ascending: true })
       .limit(10)

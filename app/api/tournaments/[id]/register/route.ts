@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-import { addTournamentRegistration, getTournamentById, getTournamentRegistration, getUserByTelegramId } from "@/lib/db"
+import {
+  addTournamentRegistration,
+  getSiteUserBySessionHash,
+  getTournamentById,
+  getTournamentRegistration,
+  getUserByTelegramId,
+} from "@/lib/db"
 import { getTelegramUserFromHeaders, sendTelegramMessage } from "@/lib/telegram"
-import { getWebProfileUserFromHeaders, type WebAppUser } from "@/lib/web-auth"
+import { type WebAppUser } from "@/lib/web-auth"
+import { getSiteSessionSecretFromHeaders, hashSessionSecret } from "@/lib/site-auth"
 
 const CANCELLATION_HINT = "Чтобы отменить регистрацию, напишите в чат «-»."
 
@@ -14,11 +21,27 @@ function getDisplayName(user: { first_name?: string | null; last_name?: string |
   return fullName || username || "Участник"
 }
 
-function getRegistrationUser(request: NextRequest): WebAppUser | null {
+async function getRegistrationUser(request: NextRequest): Promise<WebAppUser | null> {
   const telegramUser = request.headers.has("authorization")
     ? getTelegramUserFromHeaders(request.headers)
     : null
-  return telegramUser || getWebProfileUserFromHeaders(request.headers)
+  if (telegramUser) return telegramUser
+
+  const sessionSecret = getSiteSessionSecretFromHeaders(request.headers)
+  if (!sessionSecret) return null
+
+  const session = await getSiteUserBySessionHash(hashSessionSecret(sessionSecret))
+  if (!session?.user) return null
+
+  return {
+    id: session.user.telegram_id,
+    first_name: session.user.first_name,
+    last_name: session.user.last_name,
+    username: session.user.username || undefined,
+    photo_url: "",
+    auth_date: Math.floor(Date.now() / 1000),
+    hash: "site-session",
+  }
 }
 
 function parseTournamentId(id: string) {
@@ -34,7 +57,7 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ id: str
       return NextResponse.json({ error: "Некорректный ID турнира" }, { status: 400 })
     }
 
-    const user = getRegistrationUser(request)
+    const user = await getRegistrationUser(request)
     if (!user) {
       return NextResponse.json({ registered: false })
     }
@@ -58,7 +81,7 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ id: st
       return NextResponse.json({ error: "Некорректный ID турнира" }, { status: 400 })
     }
 
-    const user = getRegistrationUser(request)
+    const user = await getRegistrationUser(request)
     if (!user) {
       return NextResponse.json({ error: "Нужно открыть приложение через Telegram или профиль веб-версии" }, { status: 401 })
     }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getTelegramUserFromHeaders } from "@/lib/telegram"
+import { requireAdmin } from "@/lib/telegram"
 import { listMatches, updateMatchResult } from "@/lib/db"
 
 export async function GET(
@@ -22,8 +22,8 @@ export async function GET(
 
 export async function PATCH(req: NextRequest) {
   try {
-    const telegramUser = getTelegramUserFromHeaders(req.headers)
-    if (!telegramUser) {
+    const adminUser = await requireAdmin(req.headers)
+    if (!adminUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 

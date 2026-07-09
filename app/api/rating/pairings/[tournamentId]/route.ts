@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ratingPairingService } from '@/lib/rating/ratingPairingService'
 import { ratingService } from '@/lib/rating/ratingService'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET /api/rating/pairings/[tournamentId] - Get rating-based pairings for tournament
 export async function GET(
@@ -24,7 +24,7 @@ export async function GET(
     }
 
     // Get tournament participants
-    const { data: participants } = await supabase
+    const { data: participants } = await supabaseAdmin
       .from('tournament_participants')
       .select('*, user:users(*)')
       .eq('tournament_id', tournamentId)

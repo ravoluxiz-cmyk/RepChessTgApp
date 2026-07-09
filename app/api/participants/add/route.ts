@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { addTournamentParticipant } from "@/lib/db"
-import { supabase } from "@/lib/supabase"
+import { supabaseAdmin } from "@/lib/supabase"
 import { requireAdmin } from "@/lib/telegram"
 
 export async function POST(request: NextRequest) {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check tournament existence and status
-    const { data: tournament, error: tErr } = await supabase
+    const { data: tournament, error: tErr } = await supabaseAdmin
       .from('tournaments')
       .select('id, archived')
       .eq('id', tournament_id)
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check user existence
-    const { data: user, error: uErr } = await supabase
+    const { data: user, error: uErr } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('id', user_id)

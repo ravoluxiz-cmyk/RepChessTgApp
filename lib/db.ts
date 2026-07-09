@@ -599,11 +599,12 @@ export async function updateUserPlayerStatus(
 export async function searchUsersByUsernameFragment(fragment: string, limit = 8): Promise<User[]> {
   const q = (fragment || '').trim()
   if (!q) return []
+  const escaped = q.replace(/[%_\\]/g, '\\$&')
 
   const { data, error } = await supabaseAdmin
     .from('users')
     .select('*')
-    .ilike('username', `%${q}%`)
+    .ilike('username', `%${escaped}%`)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -1608,6 +1609,106 @@ export async function listMatches(roundId: number): Promise<Array<Match & { whit
     white_nickname: row.white?.nickname || null,
     black_nickname: row.black?.nickname || null
   }))
+}
+
+export interface MatchAuthorizationContext {
+  match: Pick<Match, 'id' | 'round_id' | 'white_participant_id' | 'black_participant_id'>
+  tournament: Pick<Tournament, 'id' | 'allow_edit_results'>
+  participantUserIds: number[]
+  participantTelegramIds: number[]
+}
+
+export async function getMatchAuthorizationContext(matchId: number): Promise<MatchAuthorizationContext | null> {
+  const { data: match, error: matchError } = await supabaseAdmin
+    .from('matches')
+    .select('id, round_id, white_participant_id, black_participant_id')
+    .eq('id', matchId)
+    .single()
+
+  if (matchError || !match) {
+    if (matchError?.code !== 'PGRST116') {
+      console.error('Error getting match authorization context:', matchError)
+    }
+    return null
+  }
+
+  const typedMatch = match as Match
+  const { data: round, error: roundError } = await supabaseAdmin
+    .from('rounds')
+    .select('id, tournament_id')
+    .eq('id', typedMatch.round_id)
+    .single()
+
+  if (roundError || !round) {
+    console.error('Error getting match round authorization context:', roundError)
+    return null
+  }
+
+  const tournamentId = Number((round as Round).tournament_id)
+  const { data: tournament, error: tournamentError } = await supabaseAdmin
+    .from('tournaments')
+    .select('id, allow_edit_results')
+    .eq('id', tournamentId)
+    .single()
+
+  if (tournamentError || !tournament) {
+    console.error('Error getting match tournament authorization context:', tournamentError)
+    return null
+  }
+
+  const participantIds = [
+    typedMatch.white_participant_id,
+    typedMatch.black_participant_id,
+  ].filter((id): id is number => typeof id === 'number' && Number.isFinite(id))
+
+  let participantUserIds: number[] = []
+  if (participantIds.length > 0) {
+    const { data: participants, error: participantsError } = await supabaseAdmin
+      .from('tournament_participants')
+      .select('id, user_id')
+      .in('id', participantIds)
+
+    if (participantsError) {
+      console.error('Error getting match participants authorization context:', participantsError)
+      return null
+    }
+
+    participantUserIds = ((participants || []) as Array<{ user_id?: number | null }>)
+      .map((participant) => participant.user_id)
+      .filter((id): id is number => typeof id === 'number' && Number.isFinite(id))
+  }
+
+  let participantTelegramIds: number[] = []
+  if (participantUserIds.length > 0) {
+    const { data: users, error: usersError } = await supabaseAdmin
+      .from('users')
+      .select('id, telegram_id')
+      .in('id', participantUserIds)
+
+    if (usersError) {
+      console.error('Error getting match users authorization context:', usersError)
+      return null
+    }
+
+    participantTelegramIds = ((users || []) as Array<{ telegram_id?: number | null }>)
+      .map((user) => user.telegram_id)
+      .filter((id): id is number => typeof id === 'number' && Number.isFinite(id))
+  }
+
+  return {
+    match: {
+      id: typedMatch.id,
+      round_id: typedMatch.round_id,
+      white_participant_id: typedMatch.white_participant_id,
+      black_participant_id: typedMatch.black_participant_id,
+    },
+    tournament: {
+      id: tournamentId,
+      allow_edit_results: Number((tournament as Tournament).allow_edit_results || 0),
+    },
+    participantUserIds,
+    participantTelegramIds,
+  }
 }
 
 async function getTournamentScoring(tournamentId: number) {

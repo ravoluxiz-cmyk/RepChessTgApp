@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/telegram"
 import { deleteRoundById } from "@/lib/db"
-import { supabase } from "@/lib/supabase"
+import { supabaseAdmin } from "@/lib/supabase"
 
 export async function DELETE(
   req: NextRequest,
@@ -21,7 +21,7 @@ export async function DELETE(
     }
 
     // Проверяем, что тур принадлежит турниру
-    const { data: round, error } = await supabase
+    const { data: round, error } = await supabaseAdmin
       .from("rounds")
       .select("id, tournament_id")
       .eq("id", tourId)

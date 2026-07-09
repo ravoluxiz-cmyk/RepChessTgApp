@@ -3,7 +3,6 @@ import { promises as fs, existsSync } from 'fs'
 import * as path from 'path'
 import * as os from 'os'
 import { getTournamentById, listTournamentParticipants, listRounds, listMatches, generateSwissPairings, type Tournament, type TournamentParticipant, type Round, type Match, type User } from './db'
-import { supabase } from './supabase'
 
 /**
  * BBP Pairings integration harness.

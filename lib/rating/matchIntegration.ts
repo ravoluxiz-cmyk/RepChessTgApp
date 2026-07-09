@@ -1,4 +1,4 @@
-import { supabase } from '../supabase'
+import { supabaseAdmin } from '../supabase'
 import { ratingService } from './ratingService'
 import { type Match, type TournamentParticipant, type User } from '../db'
 import type { RatingHistory } from './ratingService'
@@ -24,7 +24,7 @@ async function getMatchParticipants(matchId: number): Promise<{
   tournamentId: number
 } | null> {
   try {
-    const { data: matchData, error: matchError } = await supabase
+    const { data: matchData, error: matchError } = await supabaseAdmin
       .from('matches')
       .select(`
         *,
@@ -181,7 +181,7 @@ export async function processMatchResultWithRatings(
  */
 // async function getUserIdByTelegramId(telegramId: number): Promise<number | null> {
 //   try {
-//     const { data, error } = await supabase
+//     const { data, error } = await supabaseAdmin
 //       .from('users')
 //       .select('id')
 //       .eq('telegram_id', telegramId)
@@ -208,7 +208,7 @@ export async function validateRatingEligibility(userId: number): Promise<{
   warnings: string[]
 }> {
   try {
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('rating')
       .eq('id', userId)
@@ -271,7 +271,7 @@ export async function getUserRatingStats(userId: number): Promise<{
     }
 
     // Get recent history for trend analysis
-    const { data: recentHistory } = await supabase
+    const { data: recentHistory } = await supabaseAdmin
       .from('rating_history')
       .select('new_rating, created_at')
       .eq('user_id', userId)
@@ -292,7 +292,7 @@ export async function getUserRatingStats(userId: number): Promise<{
     }
 
     // Get stats from player_rating_stats
-    const { data: stats } = await supabase
+    const { data: stats } = await supabaseAdmin
       .from('player_rating_stats')
       .select('*')
       .eq('user_id', userId)

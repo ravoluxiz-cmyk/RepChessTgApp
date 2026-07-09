@@ -10,7 +10,6 @@ export interface WebAppUser {
   hash: string
 }
 
-const WEB_USER_HEADER = "x-repchess-web-user"
 const ADMIN_COOKIE = "repchess_web_admin"
 const ADMIN_SESSION_TTL_SECONDS = 60 * 60 * 24 * 14
 
@@ -76,31 +75,4 @@ export function verifyWebAdminSessionFromHeaders(headers: Headers) {
 
 export function getWebAdminCookieName() {
   return ADMIN_COOKIE
-}
-
-export function getWebProfileUserFromHeaders(headers: Headers): WebAppUser | null {
-  const raw = headers.get(WEB_USER_HEADER)
-  if (!raw) return null
-
-  try {
-    const parsed = JSON.parse(raw) as Partial<WebAppUser>
-    const id = Number(parsed.id)
-    const firstName = String(parsed.first_name || "").trim()
-
-    if (!Number.isSafeInteger(id) || id < 900000000 || !firstName) {
-      return null
-    }
-
-    return {
-      id,
-      first_name: firstName,
-      last_name: parsed.last_name ? String(parsed.last_name) : "",
-      username: parsed.username ? String(parsed.username) : `web_${id}`,
-      photo_url: "",
-      auth_date: Math.floor(Date.now() / 1000),
-      hash: "web",
-    }
-  } catch {
-    return null
-  }
 }

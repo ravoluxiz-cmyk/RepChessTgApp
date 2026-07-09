@@ -1,4 +1,4 @@
-import { supabase } from '../supabase'
+import { supabaseAdmin } from '../supabase'
 import { getUserById } from '../db'
 import type { User } from '../db'
 import type { RatingValidationResult, RatingHistory } from './types'
@@ -198,7 +198,7 @@ export class RatingValidator {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
       
       // Check recent rating history
-      const { data: recentHistory } = await supabase
+      const { data: recentHistory } = await supabaseAdmin
         .from('rating_history')
         .select('created_at')
         .eq('user_id', userId)
@@ -247,7 +247,7 @@ export class RatingValidator {
    */
   private async getLastRatingUpdate(userId: number): Promise<Date | null> {
     try {
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from('rating_history')
         .select('created_at')
         .eq('user_id', userId)
@@ -284,7 +284,7 @@ export class RatingValidator {
       }
 
       // Check recent changes pattern
-      const { data: recentHistory } = await supabase
+      const { data: recentHistory } = await supabaseAdmin
         .from('rating_history')
         .select('rating_change')
         .eq('user_id', userId)
@@ -325,7 +325,7 @@ export class RatingValidator {
       const errors: string[] = []
 
       // Check if match exists and user is participant
-      const { data: match } = await supabase
+      const { data: match } = await supabaseAdmin
         .from('matches')
         .select(`
           *,
@@ -367,7 +367,7 @@ export class RatingValidator {
    */
   async flagSuspiciousActivity(userId: number, reason: string): Promise<void> {
     try {
-      await supabase.from('security_flags').insert({
+      await supabaseAdmin.from('security_flags').insert({
         user_id: userId,
         type: 'rating_manipulation',
         reason,
