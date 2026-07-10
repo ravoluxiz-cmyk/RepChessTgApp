@@ -15,9 +15,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/club", priority: 0.85 },
     { path: "/lessons", priority: 0.8 },
     { path: "/merch", priority: 0.75 },
+    { path: "/corporate", priority: 0.82 },
     { path: "/partners", priority: 0.7 },
     { path: "/corporate/chess-events-krasnodar", priority: 0.68 },
-    { path: "/corporate", priority: 0.65 },
     { path: "/rating/leaderboard", priority: 0.55 },
   ]
 

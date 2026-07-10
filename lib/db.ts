@@ -213,6 +213,20 @@ export interface PartnershipRequest {
   updated_at?: string
 }
 
+export interface CorporateRequest {
+  id?: number
+  name: string
+  company: string
+  contact: string
+  email?: string | null
+  participants_count?: number | null
+  format_interest: string
+  comment?: string | null
+  status?: 'new' | 'in_progress' | 'done' | 'rejected'
+  created_at?: string
+  updated_at?: string
+}
+
 export type { ClubContent, ClubContentType }
 
 export interface SupportRequest {
@@ -1102,6 +1116,79 @@ export async function createPartnershipRequest(request: PartnershipRequest): Pro
   }
 
   return data as PartnershipRequest
+}
+
+function isMissingSupabaseTableError(error: unknown) {
+  if (!error || typeof error !== 'object') return false
+  const { code, message } = error as { code?: string; message?: string }
+  const normalizedMessage = String(message || '').toLowerCase()
+
+  return (
+    code === '42P01' ||
+    code === 'PGRST205' ||
+    normalizedMessage.includes('could not find the table') ||
+    normalizedMessage.includes('schema cache') ||
+    normalizedMessage.includes('does not exist')
+  )
+}
+
+export async function createCorporateRequest(request: CorporateRequest): Promise<CorporateRequest | null> {
+  const payload = {
+    name: request.name,
+    company: request.company,
+    contact: request.contact,
+    email: request.email ?? null,
+    participants_count: request.participants_count ?? null,
+    format_interest: request.format_interest,
+    comment: request.comment ?? null,
+    status: request.status || 'new',
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('corporate_requests')
+    .insert(payload)
+    .select()
+    .single()
+
+  if (!error) {
+    return data as CorporateRequest
+  }
+
+  console.error('Error creating corporate request:', error)
+
+  if (!isMissingSupabaseTableError(error)) {
+    return null
+  }
+
+  const fallback = await createPartnershipRequest({
+    name: request.name,
+    company: request.company,
+    contact: request.contact,
+    format: request.format_interest,
+    people_count: request.participants_count ?? null,
+    comment: [
+      request.email ? `Email: ${request.email}` : null,
+      request.comment || null,
+      'Источник: /corporate',
+    ].filter(Boolean).join('\n') || null,
+    status: request.status || 'new',
+  })
+
+  if (!fallback) return null
+
+  return {
+    id: fallback.id,
+    name: fallback.name,
+    company: fallback.company,
+    contact: fallback.contact,
+    email: request.email ?? null,
+    participants_count: fallback.people_count ?? null,
+    format_interest: fallback.format,
+    comment: fallback.comment ?? null,
+    status: fallback.status,
+    created_at: fallback.created_at,
+    updated_at: fallback.updated_at,
+  }
 }
 
 export async function listPartnershipRequests(status?: string): Promise<PartnershipRequest[]> {

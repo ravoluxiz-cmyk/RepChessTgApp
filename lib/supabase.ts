@@ -18,6 +18,7 @@ interface MemStore {
   tournament_registrations: MemRow[]
   rating_requests: MemRow[]
   partnership_requests: MemRow[]
+  corporate_requests: MemRow[]
   lesson_requests: MemRow[]
   merch_orders: MemRow[]
   club_content: MemRow[]
@@ -52,6 +53,7 @@ function getGlobalStore(): MemStore {
       tournament_registrations: [],
       rating_requests: [],
       partnership_requests: [],
+      corporate_requests: [],
       lesson_requests: [],
       merch_orders: [],
       club_content: [],
@@ -79,6 +81,7 @@ function getGlobalStore(): MemStore {
         tournament_registrations: 0,
         rating_requests: 0,
         partnership_requests: 0,
+        corporate_requests: 0,
         lesson_requests: 0,
         merch_orders: 0,
         club_content: 0,

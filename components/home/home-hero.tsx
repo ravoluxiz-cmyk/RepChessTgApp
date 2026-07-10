@@ -105,7 +105,7 @@ export function HomeHero() {
           </button>
         </div>
 
-        <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:max-w-xl">
+        <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:max-w-2xl">
           <a
             href="/tournaments"
             className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.07] px-4 py-3 text-xs font-black uppercase text-white/72 transition hover:bg-white hover:text-[#151515]"
@@ -117,6 +117,12 @@ export function HomeHero() {
             className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.07] px-4 py-3 text-xs font-black uppercase text-white/72 transition hover:bg-white hover:text-[#151515]"
           >
             Мерч
+          </a>
+          <a
+            href="/corporate"
+            className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.07] px-4 py-3 text-xs font-black uppercase text-white/72 transition hover:bg-white hover:text-[#151515]"
+          >
+            Для компаний
           </a>
         </div>
 
