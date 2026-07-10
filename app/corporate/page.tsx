@@ -1,34 +1,26 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight, BadgeCheck, Building2, CalendarDays, CheckCircle2, Download, Flag, Handshake, LineChart, MessageCircle, Trophy, Users } from "lucide-react"
-import ChessBackground from "@/components/ChessBackground"
 import { CorporateRequestForm } from "@/components/corporate/corporate-request-form"
 import { JsonLd } from "@/components/seo/json-ld"
-import { getClubContentCoverImage } from "@/lib/club-content"
-import { listClubContent, type ClubContent } from "@/lib/db"
 import { SITE_URL, TELEGRAM_URL, buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildGraphJsonLd } from "@/lib/seo"
 
 const KP_URL = "/files/Rep_Chess_KRD_Corporate_KP.pdf"
-const OG_IMAGE = "/icon.svg"
+const OG_IMAGE = "/favicon.ico"
 
 const OFFER_ITEMS = [
   {
-    icon: Trophy,
     title: "Турнир под ключ",
     text: "Регламент, посадка, часы, ведущий, результаты и понятная механика для участников любого уровня.",
   },
   {
-    icon: Users,
     title: "Командный вечер",
     text: "Сценарий для офиса, отдела, HR-события или закрытого вечера с коллегами.",
   },
   {
-    icon: CalendarDays,
     title: "Внутренняя лига",
     text: "Сезонный формат на несколько недель с таблицей, турами, финалом и корпоративным рейтингом.",
   },
   {
-    icon: BadgeCheck,
     title: "Обучение сотрудников",
     text: "Занятия для новичков, разборы партий и спокойная практика перед турниром или лигой.",
   },
@@ -195,45 +187,18 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
-function getCorporateHeroImage(items: ClubContent[]) {
-  return items
-    .filter((item) => Number(item.id || 0) > 0)
-    .filter((item) => item.type === "gallery" || item.type === "news" || item.type === "honor")
-    .map((item) => getClubContentCoverImage(item))
-    .filter((imageUrl) => !imageUrl.startsWith("/merch/"))
-    .find((imageUrl): imageUrl is string => Boolean(imageUrl))
-}
-
-export default async function CorporatePage() {
-  const clubContent = await listClubContent({ publishedOnly: true })
-  const heroImage = getCorporateHeroImage(clubContent)
-
+export default function CorporatePage() {
   return (
-    <ChessBackground>
+    <div className="min-h-screen overflow-hidden bg-[#151515] text-white">
       <JsonLd data={jsonLd} />
-      <main className="min-h-screen text-white">
-        <section className="relative isolate min-h-[86svh] overflow-hidden px-4 pb-10 pt-4 sm:px-6 lg:px-8">
-          {heroImage ? (
-            <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={heroImage}
-                alt="Событие Rep Chess KRD"
-                className="absolute inset-0 -z-20 h-full w-full object-cover"
-                loading="eager"
-                decoding="async"
-              />
-              <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(0,0,0,0.94)_0%,rgba(0,0,0,0.78)_44%,rgba(0,0,0,0.34)_75%,rgba(0,0,0,0.58)_100%)]" />
-            </>
-          ) : (
-            <>
-              <div className="absolute inset-0 -z-20 bg-[#151515]" />
-              <div className="brand-photo-strip absolute inset-0 -z-20 opacity-[0.18]" />
-              <div className="brand-pixel-corner right-[8%] top-[18%] -z-10 opacity-[0.16]" />
-              <div className="brand-doodle bottom-[16%] right-[18%] -z-10 h-44 w-44 opacity-[0.16]" />
-              <div className="absolute inset-0 -z-10 bg-[linear-gradient(120deg,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.68)_52%,rgba(255,21,21,0.18)_100%)]" />
-            </>
-          )}
+      <main className="relative min-h-screen">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(255,21,21,0.16),transparent_24%),radial-gradient(circle_at_82%_14%,rgba(19,87,255,0.13),transparent_22%),linear-gradient(180deg,#101010_0%,#171717_48%,#101010_100%)]" />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18)_0_1px,transparent_1px),radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.1)_0_1px,transparent_1px)] [background-size:28px_28px,42px_42px]" />
+
+        <section className="relative isolate min-h-[78svh] overflow-hidden px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+          <div className="absolute inset-0 -z-10 bg-[linear-gradient(120deg,rgba(0,0,0,0.78)_0%,rgba(0,0,0,0.42)_58%,rgba(255,21,21,0.14)_100%)]" />
+          <div className="absolute right-[-12%] top-[18%] -z-10 hidden h-[520px] w-[520px] rounded-full border border-white/10 opacity-45 lg:block" />
+          <div className="absolute right-[8%] top-[30%] -z-10 hidden h-28 w-28 border border-[#ff1515]/30 opacity-70 lg:block" />
           <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-[#151515] to-transparent" />
 
           <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 rounded-full border border-white/12 bg-black/30 px-4 py-3 backdrop-blur-md" aria-label="Навигация по разделу">
@@ -249,11 +214,10 @@ export default async function CorporatePage() {
 
           <div className="mx-auto flex w-full max-w-7xl flex-1 items-center pt-16 sm:pt-24">
             <div className="w-full min-w-0 max-w-4xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#ff1515]/50 bg-[#ff1515]/18 px-4 py-2 text-xs font-black uppercase text-white">
-                <Building2 className="h-4 w-4" />
+              <div className="mb-5 inline-flex rounded-full border border-[#ff1515]/50 bg-[#ff1515]/18 px-4 py-2 text-xs font-black uppercase text-white">
                 Для HR, event, office и internal comms
               </div>
-              <h1 className="brand-title max-w-full text-[clamp(1.55rem,7.6vw,5rem)] text-white">
+              <h1 className="brand-title max-w-[980px] text-[clamp(2rem,5vw,4.8rem)] text-white">
                 Корпоративные шахматы для команд
               </h1>
               <p className="mt-6 max-w-full text-base font-semibold leading-relaxed text-white/76 sm:max-w-3xl sm:text-xl">
@@ -261,12 +225,13 @@ export default async function CorporatePage() {
               </p>
               <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
                 <a href="#request" className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-4 text-sm font-black uppercase text-[#151515] transition hover:-translate-y-0.5 hover:bg-[#fff200] sm:w-auto">
-                  <MessageCircle className="h-5 w-5" />
                   Обсудить формат
                 </a>
-                <a href={KP_URL} className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full border border-white/18 bg-white/10 px-6 py-4 text-sm font-black uppercase text-white transition hover:-translate-y-0.5 hover:bg-white hover:text-[#151515] sm:w-auto">
-                  <Download className="h-5 w-5" />
-                  Скачать КП
+                <a href={KP_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-14 w-full items-center justify-center rounded-full border border-white/18 bg-white/10 px-6 py-4 text-sm font-black uppercase text-white transition hover:-translate-y-0.5 hover:bg-white hover:text-[#151515] sm:w-auto">
+                  Посмотреть КП
+                </a>
+                <a href={KP_URL} download className="inline-flex min-h-14 w-full items-center justify-center rounded-full border border-white/18 bg-white/10 px-6 py-4 text-sm font-black uppercase text-white transition hover:-translate-y-0.5 hover:bg-white hover:text-[#151515] sm:w-auto">
+                  Скачать PDF
                 </a>
               </div>
             </div>
@@ -275,11 +240,12 @@ export default async function CorporatePage() {
 
         <div className="mx-auto w-full max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
           <section className="-mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {OFFER_ITEMS.map((item) => {
-              const Icon = item.icon
+            {OFFER_ITEMS.map((item, index) => {
               return (
                 <article key={item.title} className="brand-panel-dark min-h-[220px] p-5">
-                  <Icon className="h-7 w-7 text-[#ff1515]" />
+                  <div className="brand-font flex h-10 w-10 items-center justify-center rounded-full bg-[#ff1515] text-sm text-white">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
                   <h2 className="brand-font mt-6 text-xl leading-tight text-white">{item.title}</h2>
                   <p className="mt-4 text-sm leading-relaxed text-white/60">{item.text}</p>
                 </article>
@@ -308,14 +274,13 @@ export default async function CorporatePage() {
 
           <section className="mt-5 grid gap-5 lg:grid-cols-2">
             <div className="brand-panel-dark p-5 sm:p-7">
-              <div className="mb-5 flex items-center gap-3">
-                <LineChart className="h-7 w-7 text-[#20d66b]" />
+              <div className="mb-5">
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Польза для команды</h2>
               </div>
               <div className="space-y-3">
                 {BENEFITS.map((item) => (
                   <div key={item} className="flex gap-3 rounded-[16px] border border-white/10 bg-white/[0.05] p-4">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#20d66b]" />
+                    <span className="mt-1 h-3 w-3 shrink-0 rounded-full bg-[#20d66b]" />
                     <p className="text-sm font-semibold leading-relaxed text-white/68">{item}</p>
                   </div>
                 ))}
@@ -350,10 +315,14 @@ export default async function CorporatePage() {
                   Итоговая смета зависит от количества участников, площадки, длительности, состава команды и задач брендинга.
                 </p>
               </div>
-              <a href={KP_URL} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black uppercase text-[#151515] transition hover:bg-[#fff200]">
-                <Download className="h-5 w-5" />
-                Скачать КП
-              </a>
+              <div className="flex flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row">
+                <a href={KP_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black uppercase text-[#151515] transition hover:bg-[#fff200]">
+                  Посмотреть КП
+                </a>
+                <a href={KP_URL} download className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black uppercase text-white transition hover:bg-white hover:text-[#151515]">
+                  Скачать PDF
+                </a>
+              </div>
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {FORMAT_PACKAGES.map((item) => (
@@ -384,7 +353,6 @@ export default async function CorporatePage() {
               </p>
               <a href="#request" className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#ff1515] px-5 py-3 text-sm font-black uppercase text-white transition hover:bg-white hover:text-[#151515] sm:w-auto">
                 Запросить пилот
-                <ArrowRight className="h-5 w-5" />
               </a>
             </div>
           </section>
@@ -404,15 +372,13 @@ export default async function CorporatePage() {
 
           <section className="mt-5 grid gap-5 lg:grid-cols-2">
             <div className="brand-panel-dark p-5 sm:p-7">
-              <Flag className="h-8 w-8 text-[#1357ff]" />
-              <h2 className="brand-title mt-5 text-3xl text-white sm:text-5xl">Внутренняя лига</h2>
+              <h2 className="brand-title text-3xl text-white sm:text-5xl">Внутренняя лига</h2>
               <p className="mt-5 text-base font-semibold leading-relaxed text-white/64">
                 Подходит для компаний, где шахматы хочется сделать регулярной активностью: туры по расписанию, таблица, финал, победители месяца и общая история сезона.
               </p>
             </div>
             <div className="brand-panel p-5 sm:p-7">
-              <Handshake className="h-8 w-8 text-[#ff1515]" />
-              <h2 className="brand-title mt-5 text-3xl text-[#151515] sm:text-5xl">Брендинг события</h2>
+              <h2 className="brand-title text-3xl text-[#151515] sm:text-5xl">Брендинг события</h2>
               <p className="mt-5 text-base font-semibold leading-relaxed text-[#151515]/68">
                 Добавляем название компании, визуальный стиль события, призовую механику, фото-точки и материалы для внутреннего анонса.
               </p>
@@ -446,6 +412,6 @@ export default async function CorporatePage() {
           </footer>
         </div>
       </main>
-    </ChessBackground>
+    </div>
   )
 }

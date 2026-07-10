@@ -87,7 +87,7 @@ export function HomeHero() {
           Турниры, лекции, новичковые вечера и мерч. Если хочется играть в шахматы в Краснодаре не одному за ноутбуком, тебе сюда.
         </p>
 
-        <div className="mt-7 grid gap-3 sm:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:max-w-2xl">
+        <div className="mt-7 grid gap-3 sm:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:max-w-3xl xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.82fr)_minmax(0,0.82fr)]">
           <a
             href={TELEGRAM_URL}
             target="_blank"
@@ -95,6 +95,12 @@ export function HomeHero() {
             className="inline-flex min-h-16 items-center justify-center gap-3 rounded-full border border-white/25 bg-[#f7f7f2] px-6 py-4 text-base font-black uppercase text-[#151515] shadow-[0_18px_55px_rgba(255,255,255,0.14)] transition hover:-translate-y-0.5 hover:bg-white"
           >
             @RepChessKRD
+          </a>
+          <a
+            href="/corporate"
+            className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-[#ff1515]/45 bg-[#ff1515] px-5 py-3 text-sm font-black uppercase text-white transition hover:-translate-y-0.5 hover:bg-white hover:text-[#151515]"
+          >
+            Для компаний
           </a>
           <button
             type="button"
@@ -105,7 +111,7 @@ export function HomeHero() {
           </button>
         </div>
 
-        <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:max-w-2xl">
+        <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:max-w-2xl">
           <a
             href="/tournaments"
             className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.07] px-4 py-3 text-xs font-black uppercase text-white/72 transition hover:bg-white hover:text-[#151515]"
@@ -117,12 +123,6 @@ export function HomeHero() {
             className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.07] px-4 py-3 text-xs font-black uppercase text-white/72 transition hover:bg-white hover:text-[#151515]"
           >
             Мерч
-          </a>
-          <a
-            href="/corporate"
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.07] px-4 py-3 text-xs font-black uppercase text-white/72 transition hover:bg-white hover:text-[#151515]"
-          >
-            Для компаний
           </a>
         </div>
 

@@ -15,8 +15,8 @@ export function MobileDock() {
       <button type="button" onClick={() => router.push("/merch")} className="flex min-h-12 items-center justify-center rounded-2xl text-[0.58rem] font-black uppercase text-white/76 transition hover:bg-white/10 hover:text-white">
         Мерч
       </button>
-      <button type="button" onClick={() => router.push("/corporate")} className="flex min-h-12 items-center justify-center rounded-2xl text-[0.58rem] font-black uppercase text-white/76 transition hover:bg-white/10 hover:text-white">
-        Бизнес
+      <button type="button" onClick={() => router.push("/corporate")} className="flex min-h-12 items-center justify-center rounded-2xl text-[0.54rem] font-black uppercase text-white/76 transition hover:bg-white/10 hover:text-white">
+        Компании
       </button>
       <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center rounded-2xl bg-white text-[0.58rem] font-black uppercase text-[#151515]">
         TG

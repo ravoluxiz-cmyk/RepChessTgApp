@@ -1,7 +1,6 @@
 "use client"
 
 import { FormEvent, useMemo, useState } from "react"
-import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react"
 
 const FORMAT_OPTIONS = [
   "Корпоративный турнир",
@@ -91,13 +90,17 @@ export function CorporateRequestForm() {
     <form onSubmit={submit} className="brand-panel space-y-4 p-5 text-[#151515] sm:p-6">
       {message && (
         <div className="flex gap-3 rounded-[14px] border border-[#20d66b]/35 bg-[#20d66b]/12 p-4 text-sm font-bold leading-relaxed text-[#151515]">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#15964d]" />
+          <span className="brand-font flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#20d66b] text-[0.6rem] text-[#151515]">
+            OK
+          </span>
           <span>{message}</span>
         </div>
       )}
       {error && (
         <div className="flex gap-3 rounded-[14px] border border-[#ff1515]/35 bg-[#ff1515]/10 p-4 text-sm font-bold leading-relaxed text-[#151515]">
-          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#ff1515]" />
+          <span className="brand-font flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#ff1515] text-sm text-white">
+            !
+          </span>
           <span>{error}</span>
         </div>
       )}
@@ -195,7 +198,6 @@ export function CorporateRequestForm() {
         disabled={saving}
         className="brand-button inline-flex min-h-14 w-full items-center justify-center gap-2 px-5 py-3 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
         {saving ? "Отправка..." : "Отправить заявку"}
       </button>
     </form>
