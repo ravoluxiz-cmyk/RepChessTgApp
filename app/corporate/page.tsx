@@ -189,16 +189,11 @@ export const revalidate = 0
 
 export default function CorporatePage() {
   return (
-    <div className="min-h-screen overflow-hidden bg-[#151515] text-white">
+    <div className="min-h-screen overflow-hidden bg-[#101010] bg-[radial-gradient(circle_at_16%_10%,rgba(255,21,21,0.14),transparent_34%),radial-gradient(circle_at_86%_26%,rgba(19,87,255,0.12),transparent_34%),linear-gradient(180deg,#101010_0%,#171717_46%,#101010_100%)] text-white [background-attachment:fixed] [background-repeat:no-repeat] [background-size:100%_100%]">
       <JsonLd data={jsonLd} />
       <main className="relative min-h-screen">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(255,21,21,0.16),transparent_24%),radial-gradient(circle_at_82%_14%,rgba(19,87,255,0.13),transparent_22%),linear-gradient(180deg,#101010_0%,#171717_48%,#101010_100%)]" />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18)_0_1px,transparent_1px),radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.1)_0_1px,transparent_1px)] [background-size:28px_28px,42px_42px]" />
-
-        <section className="relative isolate min-h-[78svh] overflow-hidden px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+        <section className="relative isolate overflow-hidden px-4 pb-8 pt-4 sm:px-6 lg:px-8">
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(120deg,rgba(0,0,0,0.78)_0%,rgba(0,0,0,0.42)_58%,rgba(255,21,21,0.14)_100%)]" />
-          <div className="absolute right-[-12%] top-[18%] -z-10 hidden h-[520px] w-[520px] rounded-full border border-white/10 opacity-45 lg:block" />
-          <div className="absolute right-[8%] top-[30%] -z-10 hidden h-28 w-28 border border-[#ff1515]/30 opacity-70 lg:block" />
           <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-[#151515] to-transparent" />
 
           <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 rounded-full border border-white/12 bg-black/30 px-4 py-3 backdrop-blur-md" aria-label="Навигация по разделу">
@@ -212,7 +207,7 @@ export default function CorporatePage() {
             </div>
           </nav>
 
-          <div className="mx-auto flex w-full max-w-7xl flex-1 items-center pt-16 sm:pt-24">
+          <div className="mx-auto flex w-full max-w-7xl items-center py-12 sm:py-16">
             <div className="w-full min-w-0 max-w-4xl">
               <div className="mb-5 inline-flex rounded-full border border-[#ff1515]/50 bg-[#ff1515]/18 px-4 py-2 text-xs font-black uppercase text-white">
                 Для HR, event, office и internal comms
@@ -238,8 +233,8 @@ export default function CorporatePage() {
           </div>
         </section>
 
-        <div className="mx-auto w-full max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
-          <section className="-mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto w-full max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
+          <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {OFFER_ITEMS.map((item, index) => {
               return (
                 <article key={item.title} className="brand-panel-dark min-h-[220px] p-5">
@@ -253,7 +248,7 @@ export default function CorporatePage() {
             })}
           </section>
 
-          <section className="mt-5 grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
+          <section className="mt-4 grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
             <div className="brand-panel p-5 sm:p-7">
               <h2 className="brand-title text-3xl text-[#151515] sm:text-5xl">Где работает формат</h2>
               <p className="mt-5 text-base font-semibold leading-relaxed text-[#151515]/68">
@@ -272,7 +267,7 @@ export default function CorporatePage() {
             </div>
           </section>
 
-          <section className="mt-5 grid gap-5 lg:grid-cols-2">
+          <section className="mt-4 grid gap-4 lg:grid-cols-2">
             <div className="brand-panel-dark p-5 sm:p-7">
               <div className="mb-5">
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Польза для команды</h2>
@@ -307,7 +302,7 @@ export default function CorporatePage() {
             </div>
           </section>
 
-          <section className="mt-5 brand-panel-dark p-5 sm:p-7">
+          <section className="mt-4 brand-panel-dark p-5 sm:p-7">
             <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
               <div>
                 <h2 className="brand-title text-3xl text-white sm:text-5xl">Форматы и стоимость</h2>
@@ -335,10 +330,15 @@ export default function CorporatePage() {
             </div>
           </section>
 
-          <section className="mt-5 grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="brand-panel p-5 sm:p-7">
-              <h2 className="brand-title text-3xl text-[#151515] sm:text-5xl">Что входит</h2>
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <section className="mt-4 brand-panel p-5 sm:p-7">
+            <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
+              <div>
+                <h2 className="brand-title text-3xl text-[#151515] sm:text-5xl">Что входит</h2>
+                <p className="mt-4 text-base font-semibold leading-relaxed text-[#151515]/68">
+                  Берем на себя игровую часть, тайминг, инвентарь и понятное проведение события.
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
                 {INCLUDED.map((item) => (
                   <div key={item} className="rounded-[16px] border border-[#151515]/10 bg-[#151515]/5 p-4 text-sm font-bold leading-relaxed text-[#151515]/70">
                     {item}
@@ -346,18 +346,23 @@ export default function CorporatePage() {
                 ))}
               </div>
             </div>
-            <div className="brand-panel-dark p-5 sm:p-7">
-              <h2 className="brand-title text-3xl text-white sm:text-5xl">Пилот</h2>
-              <p className="mt-5 text-base font-semibold leading-relaxed text-white/64">
-                Можно начать с одного события на 20-30 участников: проверить интерес, собрать обратную связь и понять, нужен ли компании регулярный формат.
-              </p>
-              <a href="#request" className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#ff1515] px-5 py-3 text-sm font-black uppercase text-white transition hover:bg-white hover:text-[#151515] sm:w-auto">
+          </section>
+
+          <section className="mt-4 brand-panel-dark p-5 sm:p-7">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-3xl">
+                <h2 className="brand-title text-3xl text-white sm:text-5xl">Пилот на 20-30 участников</h2>
+                <p className="mt-4 text-base font-semibold leading-relaxed text-white/64">
+                  Быстрый старт, чтобы проверить интерес команды, собрать обратную связь и понять, нужен ли регулярный формат.
+                </p>
+              </div>
+              <a href="#request" className="inline-flex min-h-12 w-full shrink-0 items-center justify-center rounded-full bg-[#ff1515] px-5 py-3 text-sm font-black uppercase text-white transition hover:bg-white hover:text-[#151515] sm:w-auto">
                 Запросить пилот
               </a>
             </div>
           </section>
 
-          <section className="mt-5 brand-panel-dark p-5 sm:p-7">
+          <section className="mt-4 brand-panel-dark p-5 sm:p-7">
             <h2 className="brand-title text-3xl text-white sm:text-5xl">Как запускаем</h2>
             <div className="mt-6 grid gap-3 md:grid-cols-4">
               {TIMELINE.map((item) => (
@@ -370,7 +375,7 @@ export default function CorporatePage() {
             </div>
           </section>
 
-          <section className="mt-5 grid gap-5 lg:grid-cols-2">
+          <section className="mt-4 grid gap-4 lg:grid-cols-2">
             <div className="brand-panel-dark p-5 sm:p-7">
               <h2 className="brand-title text-3xl text-white sm:text-5xl">Внутренняя лига</h2>
               <p className="mt-5 text-base font-semibold leading-relaxed text-white/64">
@@ -385,20 +390,16 @@ export default function CorporatePage() {
             </div>
           </section>
 
-          <section id="request" className="mt-5 grid scroll-mt-8 gap-5 lg:grid-cols-[0.82fr_1.18fr]">
-            <div className="brand-panel-dark p-5 sm:p-7">
-              <h2 className="brand-title text-3xl text-white sm:text-5xl">Обсудить формат</h2>
-              <p className="mt-5 text-base font-semibold leading-relaxed text-white/64">
-                Оставьте заявку, и мы предложим сценарий под вашу задачу, количество участников и площадку.
-              </p>
-              <div className="mt-6 rounded-[18px] border border-white/10 bg-white/[0.06] p-5">
-                <div className="brand-font text-xl text-white">В OS появится лид</div>
-                <p className="mt-3 text-sm leading-relaxed text-white/58">
-                  Заявка сохраняется на сервере, а в Rep Chess OS создается corporate-лид со статусом “Новый лид”.
+          <section id="request" className="mt-4 scroll-mt-8">
+            <div className="brand-panel-dark grid gap-5 p-5 sm:p-7 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
+              <div>
+                <h2 className="brand-title text-3xl text-white sm:text-5xl">Обсудить формат</h2>
+                <p className="mt-5 text-base font-semibold leading-relaxed text-white/64">
+                  Оставьте заявку, и мы предложим сценарий под вашу задачу, количество участников и площадку.
                 </p>
               </div>
+              <CorporateRequestForm />
             </div>
-            <CorporateRequestForm />
           </section>
 
           <footer className="mt-8 flex flex-col gap-4 border-t border-white/10 py-8 text-sm font-black uppercase text-white/54 sm:flex-row sm:items-center sm:justify-between">
