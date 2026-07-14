@@ -4,7 +4,6 @@ import { CorporateRequestForm } from "@/components/corporate/corporate-request-f
 import { JsonLd } from "@/components/seo/json-ld"
 import { SITE_URL, TELEGRAM_URL, buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildGraphJsonLd } from "@/lib/seo"
 
-const KP_URL = "/files/Rep_Chess_KRD_Corporate_KP.pdf"
 const OG_IMAGE = "/favicon.ico"
 
 const OFFER_ITEMS = [
@@ -47,22 +46,18 @@ const BENEFITS = [
 const FORMAT_PACKAGES = [
   {
     name: "Корпоративный турнир",
-    price: "от 30 000 ₽",
     text: "2-3 часа, ведущий, инвентарь, сетка, результаты, призовая механика.",
   },
   {
     name: "Тимбилдинг",
-    price: "от 60 000 ₽",
     text: "Смешанный вечер: турнир, командные задания, шахматный квиз и свободная игра.",
   },
   {
     name: "Спартакиада / family day",
-    price: "от 100 000 ₽",
     text: "Большой поток участников, отдельная шахматная зона, ведущий и сценарий под площадку.",
   },
   {
     name: "Внутренняя лига",
-    price: "от 120 000 ₽",
     text: "Серия туров, таблица, финал, коммуникация с участниками и регулярное ведение.",
   },
 ]
@@ -78,8 +73,8 @@ const INCLUDED = [
 
 const TIMELINE = [
   { label: "01", title: "Заявка", text: "Вы оставляете контакт, задачу и примерное количество участников." },
-  { label: "02", title: "Созвон", text: "Уточняем площадку, уровень игроков, дату, бюджет и ожидания." },
-  { label: "03", title: "Формат", text: "Собираем сценарий, тайминг, стоимость и список подготовки." },
+  { label: "02", title: "Созвон", text: "Уточняем площадку, уровень игроков, дату и ожидания." },
+  { label: "03", title: "Формат", text: "Собираем сценарий, тайминг и список подготовки." },
   { label: "04", title: "Событие", text: "Проводим игру, ведем участников, считаем результаты и закрываем финал." },
 ]
 
@@ -124,7 +119,6 @@ const jsonLd = buildGraphJsonLd([
         "@type": "Offer",
         name: item.name,
         description: item.text,
-        priceCurrency: "RUB",
       })),
     },
   },
@@ -222,12 +216,6 @@ export default function CorporatePage() {
                 <a href="#request" className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-4 text-sm font-black uppercase text-[#151515] transition hover:-translate-y-0.5 hover:bg-[#fff200] sm:w-auto">
                   Обсудить формат
                 </a>
-                <a href={KP_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-14 w-full items-center justify-center rounded-full border border-white/18 bg-white/10 px-6 py-4 text-sm font-black uppercase text-white transition hover:-translate-y-0.5 hover:bg-white hover:text-[#151515] sm:w-auto">
-                  Посмотреть КП
-                </a>
-                <a href={KP_URL} download className="inline-flex min-h-14 w-full items-center justify-center rounded-full border border-white/18 bg-white/10 px-6 py-4 text-sm font-black uppercase text-white transition hover:-translate-y-0.5 hover:bg-white hover:text-[#151515] sm:w-auto">
-                  Скачать PDF
-                </a>
               </div>
             </div>
           </div>
@@ -305,26 +293,20 @@ export default function CorporatePage() {
           <section className="mt-4 brand-panel-dark p-5 sm:p-7">
             <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
               <div>
-                <h2 className="brand-title text-3xl text-white sm:text-5xl">Форматы и стоимость</h2>
+                <h2 className="brand-title text-3xl text-white sm:text-5xl">Форматы мероприятий</h2>
                 <p className="mt-4 max-w-3xl text-sm font-semibold leading-relaxed text-white/62 sm:text-base">
-                  Итоговая смета зависит от количества участников, площадки, длительности, состава команды и задач брендинга.
+                  Подбираем сценарий под количество участников, площадку, длительность, состав команды и задачи брендинга.
                 </p>
               </div>
-              <div className="flex flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row">
-                <a href={KP_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black uppercase text-[#151515] transition hover:bg-[#fff200]">
-                  Посмотреть КП
-                </a>
-                <a href={KP_URL} download className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black uppercase text-white transition hover:bg-white hover:text-[#151515]">
-                  Скачать PDF
-                </a>
-              </div>
+              <a href="#request" className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black uppercase text-[#151515] transition hover:bg-[#fff200]">
+                Обсудить формат
+              </a>
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {FORMAT_PACKAGES.map((item) => (
                 <article key={item.name} className="flex min-h-[230px] flex-col rounded-[18px] border border-white/10 bg-white/[0.06] p-5">
                   <h3 className="brand-font text-xl leading-tight text-white">{item.name}</h3>
-                  <div className="brand-font mt-5 text-2xl text-[#fff200]">{item.price}</div>
-                  <p className="mt-4 text-sm leading-relaxed text-white/58">{item.text}</p>
+                  <p className="mt-5 text-sm leading-relaxed text-white/58">{item.text}</p>
                 </article>
               ))}
             </div>
