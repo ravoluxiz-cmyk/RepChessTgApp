@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Админ-панель",
+  description: "Закрытая админ-панель Rep Chess KRD.",
   robots: {
     index: false,
     follow: false,

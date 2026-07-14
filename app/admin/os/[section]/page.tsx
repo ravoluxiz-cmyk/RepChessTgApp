@@ -4,6 +4,7 @@ import RepChessOsClient, { type RepChessOsSectionKey } from "@/components/admin/
 
 export const metadata: Metadata = {
   title: "Rep Chess OS",
+  description: "Закрытый раздел операционной панели Rep Chess KRD.",
   robots: {
     index: false,
     follow: false,

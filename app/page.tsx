@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import ChessBackground from "@/components/ChessBackground";
 import { HomeGalleryCarousel } from "@/components/home/home-gallery-carousel";
 import { HomeHero } from "@/components/home/home-hero";
@@ -5,6 +6,28 @@ import { MobileDock } from "@/components/home/mobile-dock";
 import { getClubContentCoverImage, getClubContentImages, normalizeClubContentImagePosition } from "@/lib/club-content";
 import { listClubContent, listTournaments, type Tournament } from "@/lib/db";
 import { TELEGRAM_URL, formatRegistrationCount, formatTournamentFormat, getUpcomingTournaments } from "@/lib/tournament-display";
+
+export const metadata: Metadata = {
+  title: "Rep Chess KRD - шахматы в Краснодаре, турниры и Telegram-канал",
+  description:
+    "Rep Chess KRD - шахматное комьюнити Краснодара: турниры по шахматам, Telegram-канал, уроки для начинающих, лекции, мерч и корпоративные шахматные мероприятия.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Rep Chess KRD - шахматы в Краснодаре",
+    description: "Турниры, уроки, лекции, мерч и городское шахматное комьюнити Rep Chess KRD.",
+    url: "https://repchesskrd.ru",
+    siteName: "Rep Chess KRD",
+    locale: "ru_RU",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rep Chess KRD - шахматы в Краснодаре",
+    description: "Турниры, уроки, лекции, мерч и городское шахматное комьюнити Rep Chess KRD.",
+  },
+}
 
 function getTournamentDate(tournament?: Tournament | null) {
   if (!tournament?.start_at) return "Дата скоро"
