@@ -278,7 +278,7 @@ export default function CorporatePage() {
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 {[
                   ["20+", "участников на клубных турнирах"],
-                  ["700+", "активных игроков в городе"],
+                  ["890+", "активных участников в городе"],
                   ["14", "городов Rep Chess"],
                 ].map(([value, label]) => (
                   <div key={label} className="rounded-[16px] bg-[#151515] p-4 text-white">
