@@ -11,7 +11,7 @@ export default async function OpenGraphImage() {
   const [font, photo, logo] = await Promise.all([
     readFile(join(process.cwd(), "public/fonts/benzin-brand-extrabold.ttf")),
     readFile(join(process.cwd(), "public/home/chess-evening.jpg")),
-    readFile(join(process.cwd(), "public/home/rep-chess-krd-white.png")),
+    readFile(join(process.cwd(), "public/home/rep-chess-krd-logo-white.png")),
   ])
   return new ImageResponse(
     <div style={{ width: "100%", height: "100%", background: "#151515", color: "#fff", display: "flex", position: "relative", fontFamily: "Benzin", padding: 54 }}>

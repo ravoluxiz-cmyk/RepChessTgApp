@@ -146,8 +146,8 @@ export default async function Home() {
         <section className={styles.finalCall} aria-labelledby="join-title"><p className={styles.eyebrow}>ТВОЯ ИГРА НАЧИНАЕТСЯ ЗДЕСЬ</p><h2 id="join-title">ТВОЙ ХОД.</h2><div className={styles.heroActions}><a href="#app" className={`${styles.button} ${styles.buttonDark}`}>Скачать приложение <ArrowUpRight size={21} aria-hidden="true" /></a><a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={`${styles.button} ${styles.buttonOutlineDark}`}>Войти в Telegram <ArrowUpRight size={21} aria-hidden="true" /></a></div></section>
       </main>
       <footer className={styles.footer}>
-        <div className={styles.footerBrand}><Link href="/" aria-label="Rep Chess KRD — главная"><Image src="/home/rep-chess-krd-white.png" width={604} height={421} alt="Rep Chess KRD" /></Link><p>Шахматы, люди, Краснодар.</p></div>
-        <nav aria-label="Разделы сайта"><Link href="/tournaments">Турниры</Link><Link href="/beginners">Новичкам</Link><Link href="/corporate">Для компаний</Link><Link href="/partners">Партнёрам</Link><Link href="/merch">Мерч</Link><Link href="/club">Жизнь клуба</Link><Link href="/lessons">Лекции и уроки</Link><Link href="/profile">Личный кабинет</Link></nav>
+        <div className={styles.footerBrand}><Link href="/" aria-label="Rep Chess KRD — главная"><Image src="/home/rep-chess-krd-logo-white.png" width={604} height={421} alt="Rep Chess KRD" /></Link><p>Шахматы, люди, Краснодар.</p></div>
+        <nav aria-label="Разделы сайта"><Link href="/tournaments">Турниры</Link><Link href="/beginners">Новичкам</Link><Link href="/corporate">Для компаний</Link><Link href="/partners">Партнёрам</Link><Link href="/merch">Мерч</Link><Link href="/club">Жизнь клуба</Link><Link href="/lessons">Лекции и уроки</Link></nav>
         <div className={styles.footerBottom}><span>© Rep Chess KRD</span><a href="https://repchess.ru/" target="_blank" rel="noopener noreferrer">Rep Chess в других городах ↗</a><HomeAccess /></div>
       </footer>
     </div>
