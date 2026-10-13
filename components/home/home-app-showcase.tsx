@@ -22,7 +22,7 @@ export function HomeAppShowcase() {
   const active = FEATURES.find((feature) => feature.id === activeId) || FEATURES[0]
   return (
     <section id="app" className={styles.appSection} aria-labelledby="app-title">
-      <div className={styles.sectionTopline}><span>01 / ПРИЛОЖЕНИЕ REP CHESS</span><span>IOS + ANDROID</span></div>
+      <div className={styles.sectionTopline}><span>ПРИЛОЖЕНИЕ REP CHESS</span><span>IOS + ANDROID</span></div>
       <div className={styles.appLayout}>
         <div className={styles.appContent}>
           <h2 id="app-title" className={styles.sectionTitle}>ТВОЯ ИГРА.<br />ВСЕГДА<br /><span>ПОД РУКОЙ.</span></h2>

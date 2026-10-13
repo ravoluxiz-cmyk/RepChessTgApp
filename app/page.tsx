@@ -42,6 +42,8 @@ const FAQ = [
 const FALLBACK_PHOTOS = [
   { id: "brand-evening", title: "Шахматный вечер Rep Chess", imageUrl: "/home/chess-evening.jpg", imagePosition: "center center" },
   { id: "brand-people", title: "Люди и партии Rep Chess", imageUrl: "/home/chess-friends.jpg", imagePosition: "center center" },
+  { id: "brand-park", title: "Партия на свежем воздухе", imageUrl: "/home/chess-park.jpg", imagePosition: "center center" },
+  { id: "brand-cafe", title: "Шахматы за столиком в кафе", imageUrl: "/home/chess-cafe.jpg", imagePosition: "32% center" },
   { id: "brand-community", title: "Открытая встреча сообщества Rep Chess", imageUrl: "/home/chess-community.jpg", imagePosition: "center center" },
 ]
 
@@ -67,8 +69,15 @@ export default async function Home() {
       imagePosition: normalizeClubContentImagePosition(item.image_position),
     })))
     .filter((item) => /^\/(?!\/)|^https?:\/\//.test(item.imageUrl))
-  const photos = [...publishedPhotos, ...FALLBACK_PHOTOS].slice(0, 3)
-  const heroPhoto = publishedPhotos[0] || FALLBACK_PHOTOS[0]
+  const seenPhotos = new Set<string>()
+  const photoPool = [...publishedPhotos, ...FALLBACK_PHOTOS].filter((photo) => {
+    const key = photo.imageUrl.split(/[?#]/)[0]
+    if (seenPhotos.has(key)) return false
+    seenPhotos.add(key)
+    return true
+  })
+  const [heroPhoto, polaroidPhoto] = photoPool
+  const photos = photoPool.slice(2, 5)
   const pageJsonLd = buildGraphJsonLd([
     {
       "@type": "WebPage", "@id": `${SITE_URL}/#home`, url: SITE_URL,
@@ -90,12 +99,12 @@ export default async function Home() {
     <div className={styles.home}>
       <a href="#main-content" className={styles.skipLink}>К содержанию</a>
       <JsonLd data={pageJsonLd} />
-      <HomeHero photo={heroPhoto} />
+      <HomeHero photo={heroPhoto} polaroid={polaroidPhoto} />
       <main id="main-content">
         <div className={styles.ticker} aria-hidden="true"><span>CHESS IS REP</span><span>+</span><span>КРАСНОДАР</span><span>+</span><span>УВИДИМСЯ ЗА ДОСКОЙ</span></div>
         <HomeAppShowcase />
         <section id="community" className={styles.community} aria-labelledby="community-title">
-          <div className={styles.sectionTopline}><span>02 / СВОИ ЛЮДИ</span><span>REP CHESS KRD</span></div>
+          <div className={styles.sectionTopline}><span>СВОИ ЛЮДИ</span><span>REP CHESS KRD</span></div>
           <div className={styles.communityHeading}>
             <h2 id="community-title" className={styles.sectionTitle}>ПРИХОДИ ОДИН.<br /><span>УХОДИ СО СВОИМИ.</span></h2>
             <div className={styles.communityCopy}>
@@ -106,7 +115,6 @@ export default async function Home() {
           <div className={styles.photoGrid}>{photos.map((photo, index) => (
             <figure key={photo.id} className={index === 1 ? styles.photoPortrait : styles.photoLandscape}>
               <Image src={photo.imageUrl} alt={photo.title} fill sizes="(max-width: 640px) 85vw, (max-width: 1000px) 45vw, 30vw" unoptimized={/^https?:\/\//.test(photo.imageUrl)} style={{ objectPosition: photo.imagePosition }} />
-              <figcaption>{String(index + 1).padStart(2, "0")} / {publishedPhotos.length ? photo.title : "СООБЩЕСТВО REP CHESS"}</figcaption>
             </figure>
           ))}</div>
           <div className={styles.communityBottom}>
@@ -116,7 +124,7 @@ export default async function Home() {
           </div>
         </section>
         <section id="events" className={styles.events} aria-labelledby="events-title">
-          <div className={styles.sectionTopline}><span>03 / ИЗ ОНЛАЙНА — ЗА ДОСКУ</span><span>КРАСНОДАР</span></div>
+          <div className={styles.sectionTopline}><span>ИЗ ОНЛАЙНА — ЗА ДОСКУ</span><span>КРАСНОДАР</span></div>
           <div className={styles.sectionHeadingRow}><h2 id="events-title" className={styles.sectionTitle}>ВСТРЕТИМСЯ<br />ЗА ДОСКОЙ.</h2><Link href="/tournaments" className={styles.underlink}>Всё расписание <ArrowUpRight size={18} aria-hidden="true" /></Link></div>
           {events.length ? <div className={styles.eventGrid}>{events.map((event) => (
             <article className={styles.eventCard} key={event.id || event.title}>
@@ -138,7 +146,7 @@ export default async function Home() {
         <section className={styles.finalCall} aria-labelledby="join-title"><p className={styles.eyebrow}>ТВОЯ ИГРА НАЧИНАЕТСЯ ЗДЕСЬ</p><h2 id="join-title">ТВОЙ ХОД.</h2><div className={styles.heroActions}><a href="#app" className={`${styles.button} ${styles.buttonDark}`}>Скачать приложение <ArrowUpRight size={21} aria-hidden="true" /></a><a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className={`${styles.button} ${styles.buttonOutlineDark}`}>Войти в Telegram <ArrowUpRight size={21} aria-hidden="true" /></a></div></section>
       </main>
       <footer className={styles.footer}>
-        <div className={styles.footerBrand}><Link href="/" aria-label="Rep Chess KRD — главная"><Image src="/home/rep-chess-logo.png" width={455} height={180} alt="Rep Chess" /></Link><p>Шахматы, люди, Краснодар.</p></div>
+        <div className={styles.footerBrand}><Link href="/" aria-label="Rep Chess KRD — главная"><Image src="/home/rep-chess-krd-white.png" width={604} height={421} alt="Rep Chess KRD" /></Link><p>Шахматы, люди, Краснодар.</p></div>
         <nav aria-label="Разделы сайта"><Link href="/tournaments">Турниры</Link><Link href="/beginners">Новичкам</Link><Link href="/corporate">Для компаний</Link><Link href="/partners">Партнёрам</Link><Link href="/merch">Мерч</Link><Link href="/club">Жизнь клуба</Link><Link href="/lessons">Лекции и уроки</Link><Link href="/profile">Личный кабинет</Link></nav>
         <div className={styles.footerBottom}><span>© Rep Chess KRD</span><a href="https://repchess.ru/" target="_blank" rel="noopener noreferrer">Rep Chess в других городах ↗</a><HomeAccess /></div>
       </footer>

@@ -1,5 +1,16 @@
 import { test, expect } from '@playwright/test'
 
+test('editorial photos are not reused between the hero and community', async ({ page }) => {
+  await page.goto('/')
+  const photos = await page.locator('section[aria-labelledby="home-title"] img:not(header img), #community figure img').evaluateAll(elements => elements.map(element => {
+    const source = element.getAttribute('src') || ''
+    const url = new URL(source, location.origin)
+    return url.searchParams.get('url') || url.pathname
+  }))
+  expect(photos).toHaveLength(5)
+  expect(new Set(photos).size).toBe(photos.length)
+})
+
 test('homepage prioritizes the app and Telegram and exposes crawlable content', async ({ page }) => {
   await page.goto('/')
   await expect(page).toHaveTitle(/Шахматы в Краснодаре/)

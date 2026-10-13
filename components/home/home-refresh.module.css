@@ -14,7 +14,7 @@
 .header { position:relative; display:flex; justify-content:space-between; align-items:center; gap:24px; max-width:1440px; margin:0 auto; padding:25px 48px; z-index:10; }
 .header::after { content:''; position:absolute; inset:auto 48px 0; height:1px; background:rgb(255 255 255 / .24); }
 .brand { display:flex; align-items:center; gap:24px; color:#fff; }
-.brand img { width:106px; height:auto; filter:invert(1); mix-blend-mode:screen; }
+.brand img { width:92px; height:auto; }
 .brand > span { font-size:10px; line-height:1.7; letter-spacing:1.2px; border-left:1px solid rgb(255 255 255 / .3); padding-left:20px; }
 .desktopNavigation { display:flex; align-items:center; gap:30px; font-size:13px; }
 .desktopNavigation a { color:#fff; transition:color .18s ease; }
@@ -28,7 +28,6 @@
 .heroContent { max-width:1440px; padding:90px 48px 78px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1.75fr) minmax(0,.75fr); align-items:center; gap:45px; min-height:660px; }
 .heroCopy { position:relative; z-index:2; min-width:0; }
 .heroEyebrow { display:flex; align-items:center; gap:11px; font-size:11px; letter-spacing:1.8px; margin:0 0 31px; }
-.heroEyebrow > span { background:var(--yellow); width:7px; height:7px; flex-shrink:0; border-radius:50%; }
 .heroTitle { margin:0; font-family:RepBenzin,Arial,sans-serif; font-size:clamp(40px,6vw,88px); line-height:1.13; letter-spacing:-1.7px; font-weight:900; }
 .heroTitle > span { display:block; white-space:nowrap; }
 .heroTitle mark { display:inline-block; padding:0 8px 4px; background:var(--yellow); color:#151515; transform:rotate(-2deg); }
@@ -49,9 +48,6 @@
 .heroPolaroid > div { position:relative; width:100%; aspect-ratio:1 / 1.16; overflow:hidden; }
 .heroPolaroid img { object-fit:cover; object-position:center 62%; filter:grayscale(1); }
 .heroPolaroid figcaption { font-size:10px; letter-spacing:1.4px; text-align:center; padding-top:13px; }
-.memberStamp { position:absolute; bottom:-13px; right:-13px; width:136px; height:136px; background:var(--yellow); color:#151515; border-radius:50%; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; transform:rotate(-10deg); }
-.memberStamp strong { font-family:RepBenzin,Arial,sans-serif; font-size:31px; letter-spacing:-1px; }
-.memberStamp span { font-size:10px; line-height:1.5; font-weight:800; margin-top:5px; }
 .citySticker { position:absolute; top:-23px; left:4px; color:#151515; background:#fff; padding:8px 18px; transform:rotate(-5deg); font-size:11px; letter-spacing:1.5px; }
 .heroBottom { max-width:1440px; margin:0 auto; padding:22px 48px 27px; display:flex; align-items:center; justify-content:space-between; gap:20px; color:#d5d5c9; font-size:10px; letter-spacing:1.4px; position:relative; }
 .heroBottom::before { content:''; position:absolute; inset:0 48px auto; height:1px; background:rgb(255 255 255 / .23); }
@@ -103,7 +99,6 @@
 .photoGrid figure:hover img { filter:grayscale(0); transform:scale(1.025); }
 .photoLandscape { aspect-ratio:1.25; }
 .photoPortrait { aspect-ratio:.76; }
-.photoGrid figcaption { position:absolute; left:13px; right:13px; bottom:13px; width:fit-content; max-width:calc(100% - 26px); background:#fff; color:#151515; padding:7px 10px; font-size:9px; line-height:1.5; letter-spacing:.4px; }
 .communityBottom { display:flex; justify-content:space-between; align-items:center; gap:28px; margin-top:35px; padding:30px 0 5px; border-top:1px solid #ffffff30; }
 .memberCount { display:flex; align-items:center; gap:24px; }
 .memberCount strong { font-family:RepBenzin,Arial,sans-serif; font-size:57px; line-height:1; letter-spacing:-2px; }
@@ -146,7 +141,7 @@
 .finalCall h2 { font-family:RepBenzin,Arial,sans-serif; font-size:clamp(48px,9vw,126px); line-height:1.05; font-weight:900; letter-spacing:-3px; margin:0 0 30px; }
 .footer { background:#151515; color:#fff; padding-top:39px; padding-bottom:25px; }
 .footerBrand { display:flex; align-items:center; justify-content:space-between; gap:25px; margin-bottom:29px; }
-.footerBrand img { width:100px; height:auto; filter:invert(1); mix-blend-mode:screen; }
+.footerBrand img { width:92px; height:auto; }
 .footerBrand p { color:#bbbbae; font-size:13px; margin:0; }
 .footer nav { display:flex; flex-wrap:wrap; gap:15px 30px; padding:20px 0 33px; border-top:1px solid #ffffff30; }
 .footer nav a { color:#d2d2c7; font-size:13px; }
@@ -158,9 +153,6 @@
   .heroContent { gap:24px; grid-template-columns:minmax(0,1.8fr) minmax(0,.8fr); }
   .heroCollage { min-height:370px; }
   .heroPolaroid { width:220px; }
-  .memberStamp { width:113px; height:113px; bottom:-13px; }
-  .memberStamp strong { font-size:25px; }
-  .memberStamp span { font-size:9px; }
   .appLayout { gap:50px; }
   .appVisual { min-height:646px; }
   .phoneDevice { width:250px; }
@@ -209,7 +201,7 @@
   .header { padding:19px 22px; }
   .header::after, .heroBottom::before { left:22px; right:22px; }
   .brand { gap:15px; }
-  .brand img { width:83px; }
+  .brand img { width:70px; }
   .brand > span { font-size:8px; padding-left:14px; letter-spacing:1px; }
   .menuToggle { width:42px; height:42px; }
   .heroContent { padding:42px 22px 43px; }
@@ -254,7 +246,6 @@
   .photoGrid { grid-template-columns:1fr 1fr; gap:13px; }
   .photoGrid figure:first-child { grid-column:span 2; aspect-ratio:1.4; }
   .photoGrid figure:nth-child(2), .photoGrid figure:nth-child(3) { aspect-ratio:.75; }
-  .photoGrid figcaption { left:8px; right:8px; bottom:8px; max-width:calc(100% - 16px); font-size:7px; padding:5px 6px; }
   .communityBottom { display:grid; grid-template-columns:1fr; align-items:start; gap:24px; margin-top:27px; padding-top:26px; }
   .memberCount strong { font-size:52px; }
   .memberCount span { font-size:11px; }
