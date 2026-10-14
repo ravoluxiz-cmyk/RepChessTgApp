@@ -1,17 +1,14 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import { PublicHomeLink } from "@/components/public/public-home-link"
 import ChessBackground from "@/components/ChessBackground"
-import MerchOrderWidget from "@/components/merch/merch-order-widget"
+import MerchCatalog from "@/components/merch/merch-catalog"
+import styles from "@/components/merch/merch.module.css"
 import { JsonLd } from "@/components/seo/json-ld"
 import { merchProducts } from "@/lib/merch-products"
 import { buildBreadcrumbJsonLd, buildGraphJsonLd, buildProductJsonLd } from "@/lib/seo"
 
-const orderProducts = merchProducts.map(({ id, name, price, image, colors }) => ({
-  id,
-  name,
-  price,
-  image,
-  colors,
+const orderProducts = merchProducts.map(({ id, name, price, image, colors, shortDescription, fit }) => ({
+  id, name, price, image, colors, shortDescription, fit,
 }))
 
 const merchJsonLd = buildGraphJsonLd([
@@ -21,12 +18,8 @@ const merchJsonLd = buildGraphJsonLd([
     name: "Шахматный мерч Rep Chess KRD",
     url: "https://repchesskrd.ru/merch",
     inLanguage: "ru-RU",
-    isPartOf: {
-      "@id": "https://repchesskrd.ru/#website",
-    },
-    about: {
-      "@id": "https://repchesskrd.ru/#organization",
-    },
+    isPartOf: { "@id": "https://repchesskrd.ru/#website" },
+    about: { "@id": "https://repchesskrd.ru/#organization" },
   },
   buildBreadcrumbJsonLd([
     { name: "Главная", path: "/" },
@@ -36,15 +29,12 @@ const merchJsonLd = buildGraphJsonLd([
 ])
 
 export const metadata: Metadata = {
-  title: "Шахматный мерч Rep Chess KRD - футболки и клубные вещи",
-  description:
-    "Шахматный мерч Rep Chess KRD: футболки и клубные вещи для турниров, встреч, фотоотчетов и повседневного образа в Краснодаре.",
-  alternates: {
-    canonical: "/merch",
-  },
+  title: "Шахматный мерч — футболки I Hate Chess",
+  description: "Футболки Rep Chess KRD: I Hate Chess и «Я ненавижу шахматы». Три дизайна, фотографии, цены и подготовка заявки на заказ.",
+  alternates: { canonical: "/merch" },
   openGraph: {
     title: "Шахматный мерч Rep Chess KRD",
-    description: "Футболки и клубные вещи Rep Chess KRD для игроков и друзей клуба.",
+    description: "Три футболки Rep Chess KRD: I Hate Chess и «Я ненавижу шахматы». Фото, цены и выбор размера.",
     url: "https://repchesskrd.ru/merch",
   },
 }
@@ -53,118 +43,33 @@ type MerchPageProps = {
   searchParams?: Promise<{ from?: string }>
 }
 
-export default async function MerchPage({ searchParams }: MerchPageProps = {}) {
+export default async function MerchPage({ searchParams }: MerchPageProps) {
   const params = searchParams ? await searchParams : {}
   const backHref = params?.from === "site-menu" ? "/#site-menu" : "/"
 
   return (
-    <ChessBackground>
+    <ChessBackground editorial>
       <JsonLd data={merchJsonLd} />
-      <div className="min-h-screen w-full px-4 py-6 sm:px-6">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6">
-          <header className="flex items-center justify-between gap-3">
-            <Link
-              href={backHref}
-              className="brand-underlink inline-flex items-center gap-2 px-3 py-2 text-white transition-colors hover:text-white/70"
-              aria-label="Назад"
-            >
-              <span aria-hidden="true">←</span>
-              <span className="font-semibold">Главная</span>
-            </Link>
+      <main className={styles.page}>
+        <div className={styles.container}>
+          <header className={styles.navigation}>
+            <PublicHomeLink href={backHref} />
+            <span className={styles.eyebrow}>REP CHESS KRD · МЕРЧ</span>
           </header>
-
-          <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
-            <div className="brand-bg-icons pointer-events-none absolute -right-16 -top-24 h-72 w-72 opacity-[0.08]" />
-            <div className="grid gap-5">
-              <div>
-                <h1 className="brand-title text-[2.45rem] leading-none text-white sm:text-6xl">Шахматный мерч Rep Chess KRD</h1>
-                <p className="mt-4 max-w-3xl text-white/62">
-                  Футболки, лонгсливы и клубные вещи для тех, кто играет в шахматы в Краснодаре, ходит на турниры Rep Chess KRD и хочет носить мерч с живой клубной историей.
-                </p>
-                <div className="brand-accent-line mt-5 w-52" />
-              </div>
+          <section className={styles.hero} aria-labelledby="merch-title">
+            <div>
+              <h1 id="merch-title" className="brand-title">Клубный<br /><span className={styles.highlight}>мерч.</span></h1>
+              <p className={styles.tagline}>За доской. И вне игры.</p>
             </div>
-          </div>
-
-          <section className="grid gap-5 lg:grid-cols-[1fr_360px]">
-            <div className="grid gap-5">
-              {merchProducts.map((item, index) => (
-                <article
-                  key={item.id}
-                  id={item.id}
-                  className="brand-panel overflow-hidden text-[#151515]"
-                  itemScope
-                  itemType="https://schema.org/Product"
-                >
-                  <meta itemProp="sku" content={item.id} />
-                  <meta itemProp="brand" content="Rep Chess KRD" />
-                  <meta itemProp="category" content={item.category} />
-                  <div className="grid gap-0 lg:grid-cols-[340px_1fr]">
-                    <div className="relative self-start border-b border-[#151515]/10 bg-[#151515] lg:border-b-0 lg:border-r">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.image}
-                        alt={`${item.name} - шахматный мерч Rep Chess KRD`}
-                        className="aspect-[4/5] w-full bg-[#151515] object-contain"
-                        loading={index < 2 ? "eager" : "lazy"}
-                        decoding="async"
-                        itemProp="image"
-                      />
-                      <div className="brand-font absolute left-3 top-3 rounded-full border border-[#151515]/15 bg-white px-2.5 py-1 text-xs text-black shadow-lg">
-                        {item.price.toLocaleString("ru-RU")} ₽
-                      </div>
-                    </div>
-
-                    <div className="p-5 sm:p-6">
-                      <h2 className="brand-title text-3xl leading-none sm:text-4xl" itemProp="name">{item.name}</h2>
-                      <p className="mt-3 max-w-3xl text-base font-semibold leading-relaxed text-[#151515]/62" itemProp="description">
-                        {item.shortDescription}
-                      </p>
-
-                      <div className="mt-5 grid gap-3 text-sm font-bold text-[#151515]/68 sm:grid-cols-3">
-                        <div className="rounded-2xl border border-[#151515]/10 bg-white px-4 py-3">
-                          <div className="text-xs font-black uppercase opacity-50">Цена</div>
-                          <div className="mt-1 text-[#151515]" itemProp="offers" itemScope itemType="https://schema.org/Offer">
-                            <meta itemProp="priceCurrency" content="RUB" />
-                            <meta itemProp="availability" content="https://schema.org/InStock" />
-                            <meta itemProp="url" content={`https://repchesskrd.ru/merch#${item.id}`} />
-                            <data itemProp="price" value={String(item.price)}>{item.price.toLocaleString("ru-RU")} ₽</data>
-                          </div>
-                        </div>
-                        <div className="rounded-2xl border border-[#151515]/10 bg-white px-4 py-3">
-                          <div className="text-xs font-black uppercase opacity-50">Размеры</div>
-                          <div className="mt-1 text-[#151515]">S / M / L / XL</div>
-                        </div>
-                        <div className="rounded-2xl border border-[#151515]/10 bg-white px-4 py-3">
-                          <div className="text-xs font-black uppercase opacity-50">Заказ</div>
-                          <a className="mt-1 inline-flex text-[#151515] underline decoration-[#151515]/30 underline-offset-4" href="#merch-order">
-                            Выбрать товар
-                          </a>
-                        </div>
-                      </div>
-
-                      <details className="mt-5 rounded-2xl border border-[#151515]/10 bg-white p-4">
-                        <summary className="cursor-pointer text-sm font-black uppercase text-[#151515]">
-                          Полное описание товара
-                        </summary>
-                        <div className="mt-4 space-y-4 text-sm font-semibold leading-relaxed text-[#151515]/68">
-                          {item.seoParagraphs.map((paragraph) => (
-                            <p key={paragraph}>{paragraph}</p>
-                          ))}
-                        </div>
-                      </details>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <div id="merch-order">
-              <MerchOrderWidget products={orderProducts} />
-            </div>
+            <p className={styles.intro}>Шахматная ирония, которую можно надеть. Выбери футболку и размер — детали заказа обсудим лично.</p>
           </section>
+          <MerchCatalog products={orderProducts} />
+          <footer className={styles.footer}>
+            <span>CHESS IS REP</span>
+            <span>КРАСНОДАР</span>
+          </footer>
         </div>
-      </div>
+      </main>
     </ChessBackground>
   )
 }

@@ -172,7 +172,6 @@ export function buildProductJsonLd(product: MerchProduct) {
       url: `${SITE_URL}/merch#${product.id}`,
       priceCurrency: "RUB",
       price: product.price,
-      availability: "https://schema.org/InStock",
       itemCondition: "https://schema.org/NewCondition",
     },
   }

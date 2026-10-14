@@ -1,0 +1,63 @@
+.page { min-height:100vh; padding:24px; }
+.container { max-width:1440px; margin:0 auto; }
+.navigation { display:flex; align-items:center; justify-content:space-between; gap:20px; padding-bottom:20px; border-bottom:1px solid #444; }
+.eyebrow { font-size:11px; letter-spacing:.08em; color:#bdbdb5; text-align:right; }
+.hero { display:grid; grid-template-columns:1.35fr 1fr; align-items:end; gap:40px; padding:56px 0 48px; }
+.hero h1 { margin:0; font-size:clamp(32px,5vw,68px); line-height:1.15; }
+.highlight { color:#fff200; }
+.tagline { margin:20px 0 0; font-size:16px; color:#c9c9c1; }
+.intro { max-width:470px; margin:0 0 6px; color:#c9c9c1; font-size:16px; }
+.shop { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:28px; align-items:start; }
+.catalogHeading { display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:20px; }
+.catalogHeading h2 { font-size:24px; margin:0; }
+.catalogHeading span { font-size:11px; color:#bdbdb5; }
+.catalog { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.card { display:flex; flex-direction:column; min-width:0; overflow:hidden; background:#fff; color:#151515; border:1px solid #ddd; scroll-margin-top:24px; }
+.photo { display:block; width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; object-position:center 35%; background:#222; }
+.cardBody { display:flex; flex-direction:column; flex:1; padding:18px; }
+.productMeta { margin:0 0 12px; color:#666; font-size:11px; }
+.card h3 { margin:0; font-size:19px; }
+.description { color:#555; margin:14px 0 20px; font-size:12px; }
+.cardBottom { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top:auto; }
+.price { font-size:18px; font-weight:800; }
+.sizes { font-size:10px; color:#666; }
+.choose { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; margin-top:18px; padding:12px; border:1px solid #151515; background:#151515; color:#fff; font:inherit; font-size:11px; text-align:left; }
+.choose:hover { background:#fff200; color:#151515; }
+.catalogNote { color:#bdbdb5; font-size:12px; margin:24px 0 0; max-width:650px; }
+.order { position:sticky; top:24px; background:#fff; color:#151515; padding:24px; min-width:0; border-top:5px solid #fff200; }
+.order h2 { margin:0; font-size:25px; scroll-margin-top:24px; }
+.orderIntro { margin:14px 0 22px; font-size:12px; color:#555; }
+.fields { display:grid; gap:20px; }
+.field { display:grid; gap:8px; min-width:0; font-size:12px; color:#555; }
+.field input,.field select { width:100%; min-width:0; padding:12px 10px; border:1px solid #ccc; border-radius:0; background:#fff; color:#151515; font-family:Arial,sans-serif; }
+.field input[aria-invalid=true] { border-color:#a32222; }
+.color { margin:0; font-size:12px; color:#555; }
+.color span { color:#151515; }
+.fieldset { border:0; padding:0; margin:0; min-width:0; }
+.fieldset legend { font-size:12px; color:#555; margin-bottom:8px; }
+.sizeOptions { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.sizeOptions button { border:1px solid #ccc; background:#fff; color:#151515; font:inherit; font-size:13px; }
+.sizeOptions button[aria-pressed=true] { background:#151515; color:#fff; border-color:#151515; }
+.quantityRow { display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:12px; color:#555; }
+.quantity { display:flex; align-items:center; border:1px solid #ccc; color:#151515; }
+.quantity button { width:44px; padding:0; border:0; background:#fff; color:#151515; font-size:20px; }
+.quantity button:disabled { color:#aaa; }
+.quantity span { width:28px; text-align:center; }
+.total { display:flex; align-items:baseline; justify-content:space-between; gap:20px; padding-top:20px; margin:22px 0; border-top:1px solid #ddd; font-size:13px; }
+.total strong { font-size:22px; }
+.copy { display:flex; justify-content:space-between; align-items:center; width:100%; min-height:48px; gap:10px; border:1px solid #151515; border-radius:0; background:#fff200; color:#151515; padding:14px 12px; font:inherit; font-size:12px; font-weight:800; text-align:left; text-decoration:none; }
+.copy:hover { background:#efe300; }
+.copy:disabled,.share:disabled { opacity:.65; }
+.share { display:block; width:100%; margin-top:10px; border:1px solid #151515; background:#fff; color:#151515; padding:12px; font:inherit; font-size:12px; }
+.status { font-size:11px; color:#555; margin:14px 0 0; }
+.status:empty { display:none; }
+.contactNote { color:#666; font-size:10px; margin:10px 0 0; }
+.fields .contactNote { margin:-12px 0 0; }
+.error { border-left:3px solid #a32222; padding:10px; background:#fff5f5; color:#861b1b; font-size:12px; margin:14px 0 0; }
+.draft { margin-top:18px; border-top:1px solid #ddd; padding-top:16px; }
+.draft summary { display:flex; align-items:center; min-height:44px; cursor:pointer; color:#555; font-size:12px; text-decoration:underline; text-underline-offset:4px; }
+.draft pre { white-space:pre-wrap; margin:12px 0 0; padding:12px; background:#f3f3ef; color:#333; font:13px/1.7 Arial,sans-serif; overflow-wrap:anywhere; user-select:text; }
+.footer { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:56px; padding-top:20px; border-top:1px solid #444; color:#bdbdb5; font-size:11px; letter-spacing:.06em; }
+@media (max-width:1200px) { .catalog { grid-template-columns:repeat(2,minmax(0,1fr)); } .shop { grid-template-columns:minmax(0,1fr) 320px; } }
+@media (max-width:900px) { .shop { grid-template-columns:1fr; } .catalog { grid-template-columns:repeat(2,minmax(0,1fr)); } .order { position:static; max-width:560px; width:100%; margin:12px auto 0; } .hero { grid-template-columns:1fr; gap:24px; padding:36px 0; } }
+@media (max-width:700px) { .page { padding:20px 16px; } .catalog { grid-template-columns:1fr; gap:24px; } .cardBody { padding:20px; } .card h3 { font-size:24px; } .description { font-size:14px; } .productMeta { font-size:12px; } .choose { font-size:13px; } .order { padding:20px; } .eyebrow { font-size:9px; } .hero h1 { font-size:clamp(28px,7.5vw,48px); } .intro { font-size:14px; } .navigation { gap:12px; } .catalogHeading { align-items:flex-start; } .footer { margin-top:36px; } }

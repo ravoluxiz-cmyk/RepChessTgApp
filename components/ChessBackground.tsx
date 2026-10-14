@@ -1,20 +1,24 @@
 import type { ReactNode } from "react";
 import { HoverButton } from "@/components/ui/hover-button";
+import publicStyles from "@/components/public/public-page.module.css";
 
 export default function ChessBackground({
   title1 = "Освойте",
   title2 = "Новые Навыки",
   description = "Каждый урок приближает вас к мастерству. Начните свой путь к знаниям уже сегодня.",
   children,
+  editorial = false,
 }: {
   badge?: string;
   title1?: string;
   title2?: string;
   description?: string;
   children?: ReactNode;
+  editorial?: boolean;
 }) {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#151515] text-[#f7f7f2]">
+    <div className={`relative min-h-screen w-full overflow-hidden bg-[#151515] text-[#f7f7f2] ${editorial ? publicStyles.page : ""}`}>
+      {!editorial && <>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_12%,rgba(255,255,255,0.13),transparent_24%),radial-gradient(circle_at_86%_18%,rgba(19,87,255,0.16),transparent_20%),radial-gradient(circle_at_12%_86%,rgba(255,21,21,0.14),transparent_22%),radial-gradient(circle_at_80%_84%,rgba(255,242,0,0.10),transparent_18%),linear-gradient(180deg,#111111_0%,#171717_48%,#0f0f0f_100%)]" />
       <div className="brand-noise absolute inset-0 opacity-[0.18]" />
       <div className="brand-bg-icons pointer-events-none absolute -right-28 top-28 hidden h-[430px] w-[520px] rotate-6 opacity-[0.045] md:block" />
@@ -22,6 +26,7 @@ export default function ChessBackground({
       <div className="pointer-events-none absolute left-[10%] top-24 hidden h-24 w-48 rounded-full bg-[#ff1515]/12 blur-2xl md:block" />
       <div className="pointer-events-none absolute right-[12%] top-[42%] hidden h-28 w-56 rounded-full bg-[#1357ff]/12 blur-2xl md:block" />
       <div className="pointer-events-none absolute bottom-16 left-[52%] hidden h-24 w-48 rounded-full bg-[#20d66b]/10 blur-2xl md:block" />
+      </>}
 
       <div className="relative z-10 mx-auto w-full max-w-[1480px] px-4 md:px-6">
         {children ? (

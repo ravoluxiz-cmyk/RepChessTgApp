@@ -1,0 +1,48 @@
+/* Public-page refinement: the established Rep Chess poster palette and type. */
+@font-face { font-family:RepPublicBenzin; src:url('/fonts/benzin-brand-regular.ttf') format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
+@font-face { font-family:RepPublicBenzin; src:url('/fonts/benzin-brand-extrabold.ttf') format('truetype'); font-weight:700 900; font-style:normal; font-display:swap; }
+
+.page {
+  --public-canvas:#151515;
+  --public-surface:#222;
+  --public-paper:#fff;
+  --public-ink:#151515;
+  --public-accent:#fff200;
+  --public-line:#444;
+  background:var(--public-canvas);
+  color:var(--public-paper);
+  font-family:RepPublicBenzin,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.page :global(.brand-font), .page :global(.brand-title) { font-family:RepPublicBenzin,Arial,sans-serif; font-weight:800; line-height:1.15; }
+.page h1 { font-size:clamp(26px,4.8vw,64px); text-wrap:balance; overflow-wrap:anywhere; }
+.page h2, .page h3 { text-wrap:balance; overflow-wrap:anywhere; }
+.page p { font-weight:400; line-height:1.75; }
+.page :global(.brand-panel) { background:var(--public-paper); border-color:#ddd; border-radius:6px; box-shadow:none; }
+.page :global(.brand-panel-dark), .page :global(.public-page-hero) { background:var(--public-surface); border:1px solid var(--public-line); border-radius:6px; box-shadow:none; backdrop-filter:none; }
+.page :global(.public-page-hero) { text-align:left; }
+.page :global(.brand-button) { border-radius:4px; box-shadow:none; }
+.page :global(.brand-button):hover { transform:none; }
+.page :global(.brand-bg-icons), .page :global(.brand-bg-illustration) { display:none; }
+.page :is(button, input, select, textarea) { min-height:44px; }
+.page :is(button, a, summary) { touch-action:manipulation; }
+.page :is(input, select, textarea) { font-size:16px; caret-color:var(--public-ink); }
+.page :is(input, textarea)::placeholder { color:#6b6b6b; opacity:1; }
+.page :is(a, button, input, select, textarea, summary):focus-visible {
+  outline:3px solid var(--public-ink);
+  outline-offset:2px;
+  box-shadow:0 0 0 6px var(--public-accent);
+}
+.page ::selection { color:var(--public-ink); background:var(--public-accent); }
+.page pre { overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.homeLink { display:inline-flex; align-items:center; gap:10px; min-height:44px; padding:8px 0; color:inherit; font-size:13px; text-decoration:none; }
+.homeLink:hover { color:var(--public-accent,#fff200); }
+.page button { cursor:pointer; }
+.page button:disabled { cursor:not-allowed; }
+@media (max-width:640px) {
+  .page :global(.public-page-hero) { padding:20px; }
+  .page > div > :is(main, div) { padding-left:0; padding-right:0; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .page *, .page *::before, .page *::after { scroll-behavior:auto; transition:none; animation:none; }
+}
